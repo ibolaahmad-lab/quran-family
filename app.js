@@ -305,7 +305,8 @@ function switchTab(tabName) {
     { name: 'micTest', btn: 'tabBtnMicTest', pane: 'paneMicTest' },
     { name: 'tafsir', btn: 'tabBtnTafsir', pane: 'paneTafsir' },
     { name: 'hifzArchive', btn: 'tabBtnHifzArchive', pane: 'paneHifzArchive' },
-    { name: 'repetition', btn: 'tabBtnRepetition', pane: 'paneRepetition' }
+    { name: 'repetition', btn: 'tabBtnRepetition', pane: 'paneRepetition' },
+    { name: 'quiz', btn: 'tabBtnQuiz', pane: 'paneQuiz' }
   ];
 
   tabs.forEach(t => {
@@ -352,6 +353,9 @@ function switchTab(tabName) {
     updateRepetitionQueue();
   } else if (tabName === 'micTest') {
     initMicTestDisplay();
+  } else if (tabName === 'quiz') {
+    if (typeof populateMurajaaSurahDropdown === 'function') populateMurajaaSurahDropdown();
+    if (typeof setupMurajaaQuestion === 'function') setupMurajaaQuestion();
   }
 
   if (tabName !== 'home') {
@@ -2650,7 +2654,8 @@ window.changeSpeed = changeSpeed;
 
 function switchMainTab(name) {
   if (name === 'quiz') {
-    openMurajaaQuizModal();
+    switchTab('quiz');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
   const map = {
@@ -3159,7 +3164,10 @@ async function renderNamiPdfPage(pageNum) {
   try {
     const volCfg = NAMI_VOL_PAGE_MAP[currentNamiVol] || NAMI_VOL_PAGE_MAP[1];
     if (!namiPdfDocs[currentNamiVol]) {
-      const loadingTask = pdfjsLib.getDocument(volCfg.file);
+      const loadingTask = pdfjsLib.getDocument({
+        url: volCfg.file,
+        disableWorker: true
+      });
       namiPdfDocs[currentNamiVol] = await loadingTask.promise;
     }
     const pdfDoc = namiPdfDocs[currentNamiVol];
@@ -3343,4 +3351,166 @@ window.addEventListener('keydown', (e) => {
 
   checkPinAuth();
   console.log("Quran Hifz Master initialized successfully! 📖");
+});
+
+// ============================================================
+// 16. COMPREHENSIVE UI EXTENSIONS (STEPPERS, LAYOUT, SYNC)
+// ============================================================
+
+// Toggle Home Menu Cards Layout (Grid vs List / دسته‌ای یا ردیفی)
+function toggleHomeCardsLayout() {
+  const grid = document.querySelector('.android-cards-grid');
+  const icon = document.getElementById('homeLayoutIcon');
+  const label = document.getElementById('homeLayoutLabel');
+  if (!grid) return;
+  const isList = grid.classList.toggle('list-view');
+  localStorage.setItem('home_card_layout', isList ? 'list' : 'grid');
+  if (label) label.textContent = isList ? 'حالت دسته‌ای' : 'حالت ردیفی';
+  if (icon) {
+    icon.className = isList ? 'fa-solid fa-table-cells-large' : 'fa-solid fa-bars-staggered';
+  }
+  showToast(isList ? 'نمایش منو: حالت ردیفی ☰' : 'نمایش منو: حالت دسته‌ای ⊞');
+}
+window.toggleHomeCardsLayout = toggleHomeCardsLayout;
+
+function applySavedHomeLayout() {
+  const saved = localStorage.getItem('home_card_layout');
+  const grid = document.querySelector('.android-cards-grid');
+  const icon = document.getElementById('homeLayoutIcon');
+  const label = document.getElementById('homeLayoutLabel');
+  if (!grid) return;
+  if (saved === 'list') {
+    grid.classList.add('list-view');
+    if (label) label.textContent = 'حالت دسته‌ای';
+    if (icon) icon.className = 'fa-solid fa-table-cells-large';
+  } else {
+    grid.classList.remove('list-view');
+    if (label) label.textContent = 'حالت ردیفی';
+    if (icon) icon.className = 'fa-solid fa-bars-staggered';
+  }
+}
+window.applySavedHomeLayout = applySavedHomeLayout;
+
+// Word Studio Page Stepper Functions
+function goToWordStudioPrevPage() {
+  const cur = state.currentPage || 1;
+  const target = Math.max(1, cur - 1);
+  loadPage(target);
+  renderWordStudio();
+  updateWordStudioPageInput();
+}
+window.goToWordStudioPrevPage = goToWordStudioPrevPage;
+
+function goToWordStudioNextPage() {
+  const cur = state.currentPage || 1;
+  const target = Math.min(604, cur + 1);
+  loadPage(target);
+  renderWordStudio();
+  updateWordStudioPageInput();
+}
+window.goToWordStudioNextPage = goToWordStudioNextPage;
+
+function onWordStudioPageInputChange(val) {
+  const p = parseInt(val, 10);
+  if (p >= 1 && p <= 604) {
+    loadPage(p);
+    renderWordStudio();
+  }
+}
+window.onWordStudioPageInputChange = onWordStudioPageInputChange;
+
+function updateWordStudioPageInput() {
+  const inp = document.getElementById('wsPageNumberInput');
+  if (inp) inp.value = state.currentPage || 1;
+}
+window.updateWordStudioPageInput = updateWordStudioPageInput;
+
+// Tafsir Page Stepper Functions
+function goToTafsirPrevPage() {
+  const cur = state.currentPage || 1;
+  const target = Math.max(1, cur - 1);
+  loadPage(target);
+  syncTafsirWithCurrentPage();
+  renderTafsirStudio();
+  updateTafsirPageInput();
+}
+window.goToTafsirPrevPage = goToTafsirPrevPage;
+
+function goToTafsirNextPage() {
+  const cur = state.currentPage || 1;
+  const target = Math.min(604, cur + 1);
+  loadPage(target);
+  syncTafsirWithCurrentPage();
+  renderTafsirStudio();
+  updateTafsirPageInput();
+}
+window.goToTafsirNextPage = goToTafsirNextPage;
+
+function onTafsirPageInputChange(val) {
+  const p = parseInt(val, 10);
+  if (p >= 1 && p <= 604) {
+    loadPage(p);
+    syncTafsirWithCurrentPage();
+    renderTafsirStudio();
+  }
+}
+window.onTafsirPageInputChange = onTafsirPageInputChange;
+
+function updateTafsirPageInput() {
+  const inp = document.getElementById('tafsirPageNumberInput');
+  if (inp) inp.value = state.currentPage || 1;
+}
+window.updateTafsirPageInput = updateTafsirPageInput;
+
+function syncTafsirWithCurrentPage() {
+  if (state.currentVersesData && state.currentVersesData.length > 0) {
+    state.tafsirSurah = state.currentVersesData[0].surahNum;
+    state.tafsirAyah = state.currentVersesData[0].num;
+    const sSel = document.getElementById('tafsirSurahSelect');
+    if (sSel) sSel.value = state.tafsirSurah;
+    if (typeof populateTafsirAyahDropdown === 'function') {
+      populateTafsirAyahDropdown(state.tafsirSurah);
+    }
+    const aSel = document.getElementById('tafsirAyahSelect');
+    if (aSel) aSel.value = state.tafsirAyah;
+  }
+}
+window.syncTafsirWithCurrentPage = syncTafsirWithCurrentPage;
+
+// Sync Page Inputs on render
+const origRenderWordStudio = window.renderWordStudio || renderWordStudio;
+window.renderWordStudio = function() {
+  if (typeof origRenderWordStudio === 'function') origRenderWordStudio();
+  updateWordStudioPageInput();
+};
+
+const origRenderTafsirStudio = window.renderTafsirStudio || renderTafsirStudio;
+window.renderTafsirStudio = function() {
+  if (typeof origRenderTafsirStudio === 'function') origRenderTafsirStudio();
+  updateTafsirPageInput();
+};
+
+// Sync Hero Hifz Progress
+const origUpdateHifzCounter = window.updateHifzCounter || updateHifzCounter;
+window.updateHifzCounter = function() {
+  if (typeof origUpdateHifzCounter === 'function') origUpdateHifzCounter();
+  try {
+    const memList = getAllMemorizedVerses();
+    const count = memList.length;
+    const percent = ((count / 6236) * 100).toFixed(1);
+    const heroCount = document.getElementById('homeHeroHifzCount');
+    if (heroCount) heroCount.textContent = count;
+    const heroPercent = document.getElementById('homeHeroHifzPercent');
+    if (heroPercent) heroPercent.textContent = `${percent}%`;
+  } catch(e) {}
+};
+
+// Apply layout on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    applySavedHomeLayout();
+    updateWordStudioPageInput();
+    updateTafsirPageInput();
+    if (typeof updateHifzCounter === 'function') updateHifzCounter();
+  }, 200);
 });
