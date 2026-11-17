@@ -1,0 +1,6 @@
+*.broken*
+*.bak*
+AppProfile/
+*.tmp
+TafsirNami_PDFs/*خولا*.pdf
+TafsirNami_PDFs/1 خولا*.pdf

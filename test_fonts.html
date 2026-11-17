@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Font Comparison Test</title>
+<style>
+@font-face {
+  font-family: 'KFGQPC_UthmanTN1';
+  src: url('UthmanTN1_Ver10.woff') format('woff');
+}
+@font-face {
+  font-family: 'UthmanicHafs_Ver18';
+  src: url('UthmanicHafs1Ver18.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'UthmanicHafs_Ver09';
+  src: url('UthmanicHafs1_Ver09.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'UthmanicHafs_Basic';
+  src: url('uthmanic_hafs.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'QuranFont_Base';
+  src: url('quran_font.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'AmiriQuran';
+  src: url('amiri_quran.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'ScheherazadeNew';
+  src: url('scheherazade_new.woff2') format('woff2');
+}
+
+body {
+  background: #fdfbf7;
+  color: #111;
+  font-size: 28px;
+  line-height: 2.2;
+  padding: 30px;
+}
+.box {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+.label {
+  font-family: sans-serif;
+  font-size: 14px;
+  color: #666;
+  direction: ltr;
+  text-align: left;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+</style>
+</head>
+<body>
+<h1>مقایسه فونت‌های قرآنی (Font Comparison)</h1>
+
+<div class="box">
+  <div class="label">1. KFGQPC Uthman Taha Naskh (UthmanTN1_Ver10.woff) - مجمع ملک فهد</div>
+  <div style="font-family: 'KFGQPC_UthmanTN1';">
+    بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ<br>
+    كٓهيعٓصٓ ﴿١﴾ ذِكۡرُ رَحۡمَتِ رَبِّكَ عَبۡدَهُۥ زَكَرِيَّآ ﴿٢﴾ إِذۡ نَادَىٰ رَبَّهُۥ نِدَآءً خَفِيّٗا ﴿٣﴾
+  </div>
+</div>
+
+<div class="box">
+  <div class="label">2. Amiri Quran (amiri_quran.woff2) - امیری قرآن استاندارد قاهره/مدینه</div>
+  <div style="font-family: 'AmiriQuran';">
+    بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ<br>
+    كٓهيعٓصٓ ﴿١﴾ ذِكۡرُ رَحۡمَتِ رَبِّكَ عَبۡدَهُۥ زَكَرِيَّآ ﴿٢﴾ إِذۡ نَادَىٰ رَبَّهُۥ نِدَآءً خَفِيّٗا ﴿٣﴾
+  </div>
+</div>
+
+<div class="box">
+  <div class="label">3. UthmanicHafs1Ver18 (UthmanicHafs1Ver18.woff2) - Quran.com / QuranLoop</div>
+  <div style="font-family: 'UthmanicHafs_Ver18';">
+    بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ<br>
+    كٓهيعٓصٓ ﴿١﴾ ذِكۡرُ رَحۡمَتِ رَبِّكَ عَبۡدَهُۥ زَكَرِيَّآ ﴿٢﴾ إِذۡ نَادَىٰ رَبَّهُۥ نِدَآءً خَفِيّٗا ﴿٣﴾
+  </div>
+</div>
+
+<div class="box">
+  <div class="label">4. Scheherazade New (scheherazade_new.woff2)</div>
+  <div style="font-family: 'ScheherazadeNew';">
+    بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ<br>
+    كٓهيعٓصٓ ﴿١﴾ ذِكۡرُ رَحۡمَتِ رَبِّكَ عَبۡدَهُۥ زَكَرِيَّآ ﴿٢﴾ إِذۡ نَادَىٰ رَبَّهُۥ نِدَآءً خَفِيّٗا ﴿٣﴾
+  </div>
+</div>
+
+<div class="box">
+  <div class="label">5. UthmanicHafs Ver09 (UthmanicHafs1_Ver09.woff2)</div>
+  <div style="font-family: 'UthmanicHafs_Ver09';">
+    بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ<br>
+    كٓهيعٓصٓ ﴿١﴾ ذِكۡرُ رَحۡمَتِ رَبِّكَ عَبۡدَهُۥ زَكَرِيَّآ ﴿٢﴾ إِذۡ نَادَىٰ رَبَّهُۥ نِدَآءً خَفِيّٗا ﴿٣﴾
+  </div>
+</div>
+</body>
+</html>

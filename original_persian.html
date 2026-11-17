@@ -1,0 +1,1119 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ù†ÙˆØ±Ø§Ù„Ù‚Ø±Ø¢Ù† | Ø¯Ø³ØªÛŒØ§Ø± Ø¬Ø§Ù…Ø¹ Ø­ÙØ¸ØŒ ØªØ¬ÙˆÛŒØ¯ Ùˆ Ù‚Ø±Ø§Ø¦Øª Ù‚Ø±Ø¢Ù† Ú©Ø±ÛŒÙ…</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:ital,wght@0,400;0,700;1,400&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #0c120c;
+      --panel-bg: #131c15;
+      --card-bg: #1a271d;
+      --border-gold: rgba(212, 175, 55, 0.3);
+      --gold-primary: #d4af37;
+      --gold-light: #fef08a;
+      --emerald-accent: #10b981;
+      --emerald-dark: #064e3b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --quran-font: 'Amiri Quran', 'Amiri', serif;
+      --ui-font: 'Vazirmatn', sans-serif;
+
+      /* Tajweed Color Rules */
+      --tajweed-ghunnah: #34d399;     /* Ø³Ø¨Ø² Ø²Ù…Ø±Ø¯ÛŒ: ØºÙ†Ù‡ Ùˆ Ø§Ø¯ØºØ§Ù… */
+      --tajweed-madd: #f87171;        /* Ù‚Ø±Ù…Ø²: Ù…Ø¯ (Ú©Ø´Ø´ ØµÙˆØª) */
+      --tajweed-qalqalah: #38bdf8;    /* Ø¢Ø¨ÛŒ Ø¢Ø³Ù…Ø§Ù†ÛŒ: Ù‚Ù„Ù‚Ù„Ù‡ */
+      --tajweed-ikhfa: #fb923c;       /* Ù†Ø§Ø±Ù†Ø¬ÛŒ: Ø§Ø®ÙØ§Ø¡ */
+      --tajweed-iqlab: #c084fc;       /* Ø¨Ù†ÙØ´: Ø§Ù‚Ù„Ø§Ø¨ */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--ui-font);
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(212, 175, 55, 0.08) 0%, transparent 40%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+    }
+
+    /* Gift & Dedication Banner */
+    .gift-banner {
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.9), rgba(19, 28, 21, 0.95));
+      border: 1px solid var(--border-gold);
+      border-radius: 20px;
+      padding: 20px 28px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gift-banner::after {
+      content: 'ï·½';
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--quran-font);
+      font-size: 3.5rem;
+      color: rgba(212, 175, 55, 0.08);
+      pointer-events: none;
+    }
+
+    .gift-text h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .gift-text p {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      margin-top: 4px;
+    }
+
+    .hifz-counter-badge {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gold-primary);
+      padding: 8px 18px;
+      border-radius: 30px;
+      color: var(--gold-light);
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* App Header */
+    header {
+      background: linear-gradient(135deg, #131c15, #1a271d);
+      border: 1px solid var(--border-gold);
+      border-radius: 24px;
+      padding: 26px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .app-title h1 {
+      font-size: 1.9rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #d4af37, #fef08a, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-title p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    /* Tajweed Legend Bar */
+    .tajweed-bar {
+      background: #0f1711;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .tajweed-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tajweed-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tajweed-chip {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip-ghunnah { background: rgba(52, 211, 153, 0.15); color: var(--tajweed-ghunnah); border: 1px solid var(--tajweed-ghunnah); }
+    .chip-madd { background: rgba(248, 113, 113, 0.15); color: var(--tajweed-madd); border: 1px solid var(--tajweed-madd); }
+    .chip-qalqalah { background: rgba(56, 189, 248, 0.15); color: var(--tajweed-qalqalah); border: 1px solid var(--tajweed-qalqalah); }
+    .chip-ikhfa { background: rgba(251, 146, 60, 0.15); color: var(--tajweed-ikhfa); border: 1px solid var(--tajweed-ikhfa); }
+    .chip-iqlab { background: rgba(192, 132, 252, 0.15); color: var(--tajweed-iqlab); border: 1px solid var(--tajweed-iqlab); }
+
+    /* Studio Layout */
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 980px) {
+      .layout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sidebar Controls */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .control-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-gold);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .select-box, .input-box {
+      width: 100%;
+      background: #090e0b;
+      border: 1px solid #2d3f32;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .select-box:focus, .input-box:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+    }
+
+    /* Repeat Counter for Hifz */
+    .repeat-selector {
+      display: flex;
+      gap: 8px;
+    }
+
+    .repeat-btn {
+      flex: 1;
+      background: #1e2d22;
+      border: 1px solid #2d3f32;
+      color: #cbd5e1;
+      padding: 8px 0;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .repeat-btn.active {
+      background: var(--gold-primary);
+      color: #000;
+      border-color: var(--gold-primary);
+      box-shadow: 0 2px 10px rgba(212, 175, 55, 0.35);
+    }
+
+    /* Toggle Switch */
+    .switch-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: #090e0b;
+      border-radius: 10px;
+      border: 1px solid #2d3f32;
+    }
+
+    .switch-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .switch-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .switch-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .switch-toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch-toggle input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155; transition: .3s; border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+      background-color: white; transition: .3s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--emerald-accent); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Quran Display Reader Section */
+    .quran-area {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-gold);
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Surah Frame Header */
+    .surah-frame {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(6, 78, 59, 0.25));
+      border: 2px solid var(--border-gold);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .surah-name {
+      font-family: var(--quran-font);
+      font-size: 2.2rem;
+      color: var(--gold-light);
+      font-weight: 700;
+    }
+
+    .surah-details {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .bismillah {
+      font-family: var(--quran-font);
+      font-size: 2.4rem;
+      color: var(--gold-primary);
+      margin: 15px 0 5px;
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+
+    /* Verses List */
+    .verses-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .verse-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .verse-card:hover {
+      border-color: rgba(212, 175, 55, 0.4);
+      background: #1f3024;
+    }
+
+    .verse-card.playing {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+      background: #233628;
+    }
+
+    .verse-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .ayah-number {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-light);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .verse-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      background: #0d1510;
+      border: 1px solid #2d3f32;
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: var(--emerald-accent);
+      color: #000;
+      border-color: var(--emerald-accent);
+    }
+
+    /* Arabic Verse Text with Tajweed Coloring */
+    .arabic-text {
+      font-family: var(--quran-font);
+      font-size: 2.1rem;
+      line-height: 2.3;
+      color: #f8fafc;
+      text-align: right;
+      direction: rtl;
+      margin-bottom: 14px;
+      transition: filter 0.3s ease;
+    }
+
+    /* Hide mode for Hifz Test */
+    .arabic-text.hidden-for-hifz {
+      filter: blur(8px);
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .arabic-text.hidden-for-hifz:hover {
+      filter: blur(4px);
+    }
+
+    /* Tajweed Inline Colors */
+    .t-madd { color: var(--tajweed-madd); font-weight: bold; }
+    .t-ghunnah { color: var(--tajweed-ghunnah); font-weight: bold; }
+    .t-qalqalah { color: var(--tajweed-qalqalah); font-weight: bold; }
+    .t-ikhfa { color: var(--tajweed-ikhfa); font-weight: bold; }
+    .t-iqlab { color: var(--tajweed-iqlab); font-weight: bold; }
+
+    /* Persian Translation */
+    .translation-text {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      text-align: right;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+
+    /* Audio Player Floating Dock */
+    .audio-dock {
+      position: sticky;
+      bottom: 20px;
+      background: linear-gradient(135deg, #131c15, #1f2f23);
+      border: 1px solid var(--gold-primary);
+      border-radius: 18px;
+      padding: 14px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .dock-reciter-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .reciter-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: #000;
+    }
+
+    .reciter-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .reciter-sub {
+      font-size: 0.75rem;
+      color: var(--gold-light);
+    }
+
+    .dock-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dock-btn {
+      background: #090e0b;
+      border: 1px solid #2d3f32;
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .dock-btn:hover {
+      background: var(--gold-primary);
+      color: #000;
+      border-color: var(--gold-primary);
+    }
+
+    .dock-btn.play-btn {
+      width: 48px;
+      height: 48px;
+      background: var(--gold-primary);
+      color: #000;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    }
+
+    footer {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-top: 40px;
+      padding-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Gift & Dedication Banner -->
+  <div class="gift-banner">
+    <div class="gift-text">
+      <h2>ðŸŒ¸ Ù‡Ø¯ÛŒÙ‡â€ŒØ§ÛŒ ÙˆÛŒÚ˜Ù‡ Ùˆ Ø§Ø®ØªØµØ§ØµÛŒ Ø¨Ø±Ø§ÛŒ Ù‡Ù…Ø³Ø± Ù…Ù‡Ø±Ø¨Ø§Ù†Ù…</h2>
+      <p>Ø¨Ù‡ Ù¾Ø§Ø³ ØªÙ…Ø§Ù… Ø²Ø­Ù…Ø§Øª Ùˆ Ù…Ø­Ø¨Øªâ€ŒÙ‡Ø§ÛŒ Ø¨ÛŒâ€ŒØ¯Ø±ÛŒØºØªØ› Ø¯Ø³ØªÛŒØ§Ø± ÙˆÛŒÚ˜Ù‡Ù” Ø­ÙØ¸ Ùˆ ØªÙ„Ø§ÙˆØª Ù‚Ø±Ø¢Ù† Ú©Ø±ÛŒÙ… Ø¨Ø§ ØªØ¬ÙˆÛŒØ¯ Ø¯Ù‚ÛŒÙ‚ Ùˆ ØµØ¯Ø§ÛŒ Ù‚Ø§Ø±ÛŒØ§Ù† Ø¨Ø²Ø±Ú¯ Ø¬Ù‡Ø§Ù†</p>
+    </div>
+    <div class="hifz-counter-badge">
+      <span>ðŸ“– Ø¢ÛŒÙ‡Ù” Ø­ÙØ¸â€ŒØ´Ø¯Ù‡ Ø§Ù…Ø±ÙˆØ²:</span>
+      <span id="memorizedCount">Ûµ Ø¢ÛŒÙ‡ ØªØ«Ø¨ÛŒØª Ø´Ø¯</span>
+    </div>
+  </div>
+
+  <!-- App Header -->
+  <header>
+    <div class="app-title">
+      <h1>âœ¨ Ù†Ø±Ù…â€ŒØ§ÙØ²Ø§Ø± Ø¬Ø§Ù…Ø¹ Ø­ÙØ¸ØŒ ØªØ¬ÙˆÛŒØ¯ Ùˆ Ù‚Ø±Ø§Ø¦Øª Ù‚Ø±Ø¢Ù† Ú©Ø±ÛŒÙ…</h1>
+      <p>Ø±Ø³Ù…â€ŒØ§Ù„Ø®Ø· Ø¹Ø«Ù…Ø§Ù† Ø·Ù‡ØŒ Ù‚ÙˆØ§Ø¹Ø¯ Ø¯Ù‚ÛŒÙ‚ ØªØ¬ÙˆÛŒØ¯ Ø±Ù†Ú¯ÛŒØŒ ØªÚ©Ø±Ø§Ø± Ø¢ÛŒÙ‡ Ø¨Ù‡ Ø¢ÛŒÙ‡ Ùˆ Ø¨Ø±ØªØ±ÛŒÙ† Ù‚Ø§Ø±ÛŒØ§Ù† Ø¬Ù‡Ø§Ù† Ø§Ø³Ù„Ø§Ù…</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button class="action-btn" onclick="toggleHifzTestMode()" id="hifzModeBtn" style="padding: 10px 18px; font-size: 0.88rem; background: #064e3b; color: #a7f3d0; border-color: #059669;">
+        ðŸ™ˆ ÙØ¹Ø§Ù„â€ŒØ³Ø§Ø²ÛŒ Ø­Ø§Ù„Øª Ø¢Ø²Ù…ÙˆÙ† Ø­ÙØ¸ (Ù…Ø®ÙÛŒ Ú©Ø±Ø¯Ù† Ù…ØªÙ†)
+      </button>
+    </div>
+  </header>
+
+  <!-- Tajweed Color Guide Legend -->
+  <div class="tajweed-bar">
+    <div class="tajweed-title">
+      <span>ðŸŽ¨ Ø±Ø§Ù‡Ù†Ù…Ø§ÛŒ Ø±Ù†Ú¯â€ŒÙ‡Ø§ÛŒ ØªØ¬ÙˆÛŒØ¯ Ú©Ù„Ù…Ø§Øª:</span>
+    </div>
+    <div class="tajweed-chips">
+      <span class="tajweed-chip chip-madd">ðŸ”´ Ù…ÙŽØ¯ (Ú©Ø´Ø´ ØµÙˆØª Û´ ØªØ§ Û¶ Ø­Ø±Ú©Øª)</span>
+      <span class="tajweed-chip chip-ghunnah">ðŸŸ¢ ØºÙÙ†Ù‘Ù‡ Ùˆ Ø§Ø¯ØºØ§Ù… (ØµØ¯Ø§ÛŒ Ø®ÛŒØ´ÙˆÙ…ÛŒ)</span>
+      <span class="tajweed-chip chip-qalqalah">ðŸ”µ Ù‚ÙŽÙ„Ù‚ÙŽÙ„Ù‡ (ØªÚ©Ø§Ù† Ø¯Ø§Ø¯Ù† Ùˆ Ø§Ø±ØªØ¹Ø§Ø´ Ø­Ø±Ù)</span>
+      <span class="tajweed-chip chip-ikhfa">ðŸŸ  Ø§ÙØ®ÙØ§Ø¡ (Ù¾Ù†Ù‡Ø§Ù† Ú©Ø±Ø¯Ù† Ù†ÙˆÙ† Ø³Ø§Ú©Ù†Ù‡)</span>
+      <span class="tajweed-chip chip-iqlab">ðŸŸ£ Ø§ÙÙ‚Ù„Ø§Ø¨ (ØªØ¨Ø¯ÛŒÙ„ Ù†ÙˆÙ† Ø¨Ù‡ Ù…ÛŒÙ…)</span>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="layout-grid">
+    
+    <!-- Sidebar: Qari Selection, Surah Selector & Hifz Studio -->
+    <div class="sidebar">
+
+      <!-- Qari / Reciter Selector -->
+      <div class="control-card">
+        <div class="card-title">
+          <span>ðŸŽ™ï¸ Û±. Ø§Ù†ØªØ®Ø§Ø¨ Ù‚Ø§Ø±ÛŒ Ø¨Ø²Ø±Ú¯ Ø¬Ù‡Ø§Ù†</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ù‚Ø§Ø±ÛŒ Ù…ÙˆØ±Ø¯ Ù†Ø¸Ø± Ø¨Ø±Ø§ÛŒ ØªÙ„Ø§ÙˆØª:</label>
+          <select id="qariSelect" class="select-box" onchange="changeQari()">
+            <!-- Master Qaris of the World -->
+            <option value="Minshawi_Teacher_128kbps">Ù…Ø­Ù…Ø¯ ØµØ¯ÛŒÙ‚ Ø§Ù„Ù…Ù†Ø´Ø§ÙˆÛŒ (Ù…Ø¹Ù„Ù… Ø­ÙØ¸ - Ø¨Ø§ ØªØ¬ÙˆÛŒØ¯ Ø¯Ù‚ÛŒÙ‚)</option>
+            <option value="Abdul_Basit_Murattal_192kbps">Ø§Ø³ØªØ§Ø¯ Ø¹Ø¨Ø¯Ø§Ù„Ø¨Ø§Ø³Ø· Ø¹Ø¨Ø¯Ø§Ù„ØµÙ…Ø¯ (ØªØ±ØªÛŒÙ„ Ù…Ø¹Ø±ÙˆÙ)</option>
+            <option value="AbdulSamad_64kbps_QuranExplorer.Com">Ø§Ø³ØªØ§Ø¯ Ø¹Ø¨Ø¯Ø§Ù„Ø¨Ø§Ø³Ø· Ø¹Ø¨Ø¯Ø§Ù„ØµÙ…Ø¯ (ØªÙ„Ø§ÙˆØª Ù…Ø¬ÙˆØ¯ Ùˆ Ø­Ù…Ø§Ø³ÛŒ)</option>
+            <option value="Alafasy_128kbps" selected>Ù…Ø´Ø§Ø±ÛŒ Ø±Ø§Ø´Ø¯ Ø§Ù„Ø¹ÙØ§Ø³ÛŒ (ØµØ¯Ø§ÛŒ Ø¯Ù„Ù†Ø´ÛŒÙ† Ùˆ Ø¢Ø±Ø§Ù…Ø´â€ŒØ¨Ø®Ø´)</option>
+            <option value="Parhizgar_48kbps">Ø§Ø³ØªØ§Ø¯ Ø´Ù‡Ø±ÛŒØ§Ø± Ù¾Ø±Ù‡ÛŒØ²Ú©Ø§Ø± (Ø¯Ù‚ÛŒÙ‚â€ŒØªØ±ÛŒÙ† ØªØ±ØªÛŒÙ„ Ø¢Ù…ÙˆØ²Ø´ÛŒ Ùˆ Ø­ÙØ¸)</option>
+            <option value="Husary_128kbps">Ø´ÛŒØ® Ù…Ø­Ù…ÙˆØ¯ Ø®Ù„ÛŒÙ„ Ø§Ù„Ø­ØµØ±ÛŒ (Ø´ÛŒØ®â€ŒØ§Ù„Ù‚Ø±Ø§Ø¡ - Ù…Ø±Ø¬Ø¹ ØªØ¬ÙˆÛŒØ¯ Ø¬Ù‡Ø§Ù†)</option>
+            <option value="Ghamadi_40kbps">Ø³Ø¹Ø¯ Ø§Ù„ØºØ§Ù…Ø¯ÛŒ (Ø±ÙˆØ§Ù† Ùˆ Ø³Ø±Ø¹ØªÛŒ Ù…Ø®ØµÙˆØµ Ù…Ø±ÙˆØ± Ù…Ø­ÙÙˆØ¸Ø§Øª)</option>
+            <option value="MaherAlMuaiqly128kbps">Ù…Ø§Ù‡Ø± Ø§Ù„Ù…Ø¹ÛŒÙ‚Ù„ÛŒ (Ø§Ù…Ø§Ù… Ø¬Ù…Ø§Ø¹Øª Ù…Ø³Ø¬Ø¯Ø§Ù„Ø­Ø±Ø§Ù… Ù…Ú©Ù‡)</option>
+            <option value="Abu_Bakr_Ash-Shaatree_128kbps">Ø§Ø¨ÙˆØ¨Ú©Ø± Ø§Ù„Ø´Ø§Ø·Ø±ÛŒ (ØªÙ„Ø§ÙˆØª Ø³ÙˆØ²Ù†Ø§Ú© Ùˆ Ø²ÛŒØ¨Ø§)</option>
+            <option value="Ahmed_ibn_Ali_al-Ajamy_128kbps">Ø§Ø­Ù…Ø¯ Ø¨Ù† Ø¹Ù„ÛŒ Ø§Ù„Ø¹Ø¬Ù…ÛŒ (Ù„Ø­Ù† Ù¾Ø±Ø§Ù†Ø±Ú˜ÛŒ Ùˆ Ø¯Ù„Ù†Ø´ÛŒÙ†)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ø§Ù†ØªØ®Ø§Ø¨ Ø³ÙˆØ±Ù‡ Ù…Ø¨Ø§Ø±Ú©Ù‡:</label>
+          <select id="surahSelect" class="select-box" onchange="changeSurah()">
+            <option value="1">Ø³ÙˆØ±Ù‡ Û±: Ø§Ù„ÙØ§ØªØ­Ù‡ (Û· Ø¢ÛŒÙ‡ - Ù…Ú©ÛŒ)</option>
+            <option value="36">Ø³ÙˆØ±Ù‡ Û³Û¶: ÛŒØ³ (Ù‚Ù„Ø¨ Ù‚Ø±Ø¢Ù† - Û¸Û³ Ø¢ÛŒÙ‡)</option>
+            <option value="55">Ø³ÙˆØ±Ù‡ ÛµÛµ: Ø§Ù„Ø±Ø­Ù…Ù† (Ø¹Ø±ÙˆØ³ Ù‚Ø±Ø¢Ù† - Û·Û¸ Ø¢ÛŒÙ‡)</option>
+            <option value="56">Ø³ÙˆØ±Ù‡ ÛµÛ¶: Ø§Ù„ÙˆØ§Ù‚Ø¹Ù‡ (Û¹Û¶ Ø¢ÛŒÙ‡)</option>
+            <option value="67" selected>Ø³ÙˆØ±Ù‡ Û¶Û·: Ø§Ù„Ù…Ù„Ú© (Û³Û° Ø¢ÛŒÙ‡ - Ø³ÙˆØ±Ù‡ ØªØ¨Ø§Ø±Ú©)</option>
+            <option value="78">Ø³ÙˆØ±Ù‡ Û·Û¸: Ø§Ù„Ù†Ø¨Ø£ (Ø¹Ù…Ù‘ ÛŒØªØ³Ø§Ø¡Ù„ÙˆÙ† - Û´Û° Ø¢ÛŒÙ‡)</option>
+            <option value="112">Ø³ÙˆØ±Ù‡ Û±Û±Û²: Ø§Ù„Ø¥Ø®Ù„Ø§Øµ (ØªÙˆØ­ÛŒØ¯ - Û´ Ø¢ÛŒÙ‡)</option>
+            <option value="113">Ø³ÙˆØ±Ù‡ Û±Û±Û³: Ø§Ù„ÙÙ„Ù‚ (Ûµ Ø¢ÛŒÙ‡)</option>
+            <option value="114">Ø³ÙˆØ±Ù‡ Û±Û±Û´: Ø§Ù„Ù†Ø§Ø³ (Û¶ Ø¢ÛŒÙ‡)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Hifz Memorization Tools -->
+      <div class="control-card">
+        <div class="card-title">
+          <span>ðŸ§  Û². Ø§Ø³ØªÙˆØ¯ÛŒÙˆÛŒ Ø§Ø®ØªØµØ§ØµÛŒ Ø­ÙØ¸ Ù‚Ø±Ø¢Ù†</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ØªØ¹Ø¯Ø§Ø¯ ØªÚ©Ø±Ø§Ø± Ù‡Ø± Ø¢ÛŒÙ‡ Ø¨Ø±Ø§ÛŒ ØªØ«Ø¨ÛŒØª Ø­ÙØ¸:</label>
+          <div class="repeat-selector">
+            <button class="repeat-btn active" onclick="setRepeat(1, this)">Û± Ø¨Ø§Ø±</button>
+            <button class="repeat-btn" onclick="setRepeat(3, this)">Û³ Ø¨Ø§Ø±</button>
+            <button class="repeat-btn" onclick="setRepeat(5, this)">Ûµ Ø¨Ø§Ø±</button>
+            <button class="repeat-btn" onclick="setRepeat(10, this)">Û±Û° Ø¨Ø§Ø±</button>
+          </div>
+        </div>
+
+        <!-- Translation Toggle -->
+        <div class="switch-row">
+          <div class="switch-text">
+            <span class="switch-title">Ù†Ù…Ø§ÛŒØ´ ØªØ±Ø¬Ù…Ù‡ ÙØ§Ø±Ø³ÛŒ Ø²ÛŒØ± Ø¢ÛŒØ§Øª</span>
+            <span class="switch-sub">ØªØ±Ø¬Ù…Ù‡ Ø±ÙˆØ§Ù† Ùˆ Ù…ÙÙ‡ÙˆÙ…ÛŒ Ø§Ø³ØªØ§Ø¯ Ø§Ù†ØµØ§Ø±ÛŒØ§Ù†</span>
+          </div>
+          <label class="switch-toggle">
+            <input type="checkbox" id="translationToggle" checked onchange="toggleTranslation()">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Tajweed Color Toggle -->
+        <div class="switch-row">
+          <div class="switch-text">
+            <span class="switch-title">Ø±Ù†Ú¯â€ŒØ¢Ù…ÛŒØ²ÛŒ Ù‚ÙˆØ§Ø¹Ø¯ ØªØ¬ÙˆÛŒØ¯</span>
+            <span class="switch-sub">Ù†Ù…Ø§ÛŒØ´ Ø§Ø­Ú©Ø§Ù… Ù…Ø¯ØŒ ØºÙ†Ù‡ØŒ Ù‚Ù„Ù‚Ù„Ù‡ Ùˆ Ø§Ø®ÙØ§Ø¡</span>
+          </div>
+          <label class="switch-toggle">
+            <input type="checkbox" id="tajweedToggle" checked onchange="toggleTajweed()">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <!-- Bookmark Current Progress -->
+        <button class="action-btn" onclick="saveBookmark()" style="justify-content: center; padding: 12px; background: rgba(212, 175, 55, 0.15); border-color: var(--gold-primary); color: var(--gold-light);">
+          ðŸ“Œ Ø°Ø®ÛŒØ±Ù‡Ù” Ø¢Ø®Ø±ÛŒÙ† Ø¢ÛŒÙ‡ Ø­ÙØ¸â€ŒØ´Ø¯Ù‡ Ø§Ù…Ø±ÙˆØ²
+        </button>
+        <span id="bookmarkNotice" style="font-size: 0.75rem; color: #34d399; text-align: center; display: none;">Ø¢Ø®Ø±ÛŒÙ† Ø¢ÛŒÙ‡ Ø­ÙØ¸â€ŒØ´Ø¯Ù‡ Ø¨Ø§ Ù…ÙˆÙÙ‚ÛŒØª Ø¹Ù„Ø§Ù…Øªâ€ŒÚ¯Ø°Ø§Ø±ÛŒ Ø´Ø¯!</span>
+      </div>
+
+    </div>
+
+    <!-- Right: Quran Reader Area -->
+    <div class="quran-area">
+      
+      <!-- Surah Info Frame -->
+      <div class="surah-frame">
+        <div class="surah-name" id="surahHeaderTitle">Ø³ÙÙˆØ±ÙŽØ©Ù Ø§Ù„Ù…ÙÙ„Ú©Ù</div>
+        <div class="surah-details" id="surahHeaderDetails">Ø³ÙˆØ±Ù‡ Û¶Û· â€¢ Ù…Ú©ÛŒ â€¢ Û³Û° Ø¢ÛŒÙ‡ â€¢ Ø¬Ø²Ø¡ Ø¨ÛŒØ³Øª Ùˆ Ù†Ù‡Ù…</div>
+        <div class="bismillah">Ø¨ÙØ³Ù’Ù…Ù Ø§Ù„Ù„ÙŽÙ‘Ù‡Ù Ø§Ù„Ø±ÙŽÙ‘Ø­Ù’Ù…ÙŽÙ°Ù†Ù Ø§Ù„Ø±ÙŽÙ‘Ø­ÙÙŠÙ…Ù</div>
+      </div>
+
+      <!-- Verses Container -->
+      <div class="verses-container" id="versesContainer">
+        <!-- Rendered dynamically -->
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Audio Player Floating Dock -->
+  <div class="audio-dock">
+    <div class="dock-reciter-info">
+      <div class="reciter-avatar">ðŸŽ™ï¸</div>
+      <div>
+        <div class="reciter-name" id="dockQariName">Ù…Ø´Ø§Ø±ÛŒ Ø±Ø§Ø´Ø¯ Ø§Ù„Ø¹ÙØ§Ø³ÛŒ</div>
+        <div class="reciter-sub" id="dockVerseInfo">Ø¯Ø± Ø­Ø§Ù„ Ù¾Ø®Ø´: Ø³ÙˆØ±Ù‡ Ø§Ù„Ù…Ù„Ú© â€¢ Ø¢ÛŒÙ‡ Û±</div>
+      </div>
+    </div>
+
+    <div class="dock-controls">
+      <button class="dock-btn" onclick="playPrevVerse()" title="Ø¢ÛŒÙ‡ Ù‚Ø¨Ù„ÛŒ">â®ï¸</button>
+      <button class="dock-btn play-btn" onclick="togglePlay()" id="dockPlayBtn" title="Ù¾Ø®Ø´ / ØªÙˆÙ‚Ù">â–¶ï¸</button>
+      <button class="dock-btn" onclick="playNextVerse()" title="Ø¢ÛŒÙ‡ Ø¨Ø¹Ø¯ÛŒ">â­ï¸</button>
+    </div>
+
+    <div style="font-size: 0.85rem; color: var(--gold-light);" id="repeatStatusBadge">
+      ØªÚ©Ø±Ø§Ø±: Û± Ø¨Ø§Ø±
+    </div>
+  </div>
+
+  <footer>
+    Ø·Ø±Ø§Ø­ÛŒ Ø§Ø®ØªØµØ§ØµÛŒ Ù‡Ø¯ÛŒÙ‡ Ø¨Ø±Ø§ÛŒ Ø­ÙØ¸ Ù‚Ø±Ø¢Ù† Ú©Ø±ÛŒÙ… â€¢ ØªÙ„Ø§ÙˆØªâ€ŒÙ‡Ø§ÛŒ Ø¨Ø§Ú©ÛŒÙÛŒØª Ø¬Ù‡Ø§Ù†ÛŒ Ø¨Ø¯ÙˆÙ† Ù…Ø­Ø¯ÙˆØ¯ÛŒØª
+  </footer>
+
+</div>
+
+<!-- Hidden Audio Player -->
+<audio id="globalAudio"></audio>
+
+<script>
+// Quran Data with Tajweed Annotations & Persian Translation
+const surahsData = {
+  // Ø³ÙˆØ±Ù‡ Ø§Ù„Ù…Ù„Ú© (Ø³ÙˆØ±Ù‡ Ù…Ø­Ø¨ÙˆØ¨ Ø¨Ø±Ø§ÛŒ Ø­ÙØ¸ Ø´Ø¨Ø§Ù†Ù‡)
+  "67": {
+    name: "Ø³ÙÙˆØ±ÙŽØ©Ù Ø§Ù„Ù…ÙÙ„Ú©Ù",
+    details: "Ø³ÙˆØ±Ù‡ Û¶Û· â€¢ Ù…Ú©ÛŒ â€¢ Û³Û° Ø¢ÛŒÙ‡ â€¢ Ø¬Ø²Ø¡ Ø¨ÛŒØ³Øª Ùˆ Ù†Ù‡Ù…",
+    verses: [
+      {
+        num: 1,
+        arabicTajweed: "ØªÙŽØ¨ÙŽÙ€Ù°Ø±ÙŽÙƒÙŽ Ù±Ù„Ù‘ÙŽØ°ÙÙ‰ Ø¨ÙÙŠÙŽØ¯ÙÙ‡Ù <span class='t-madd'>Ù±Ù„Ù’Ù…ÙÙ„Ù’ÙƒÙ</span> ÙˆÙŽÙ‡ÙÙˆÙŽ Ø¹ÙŽÙ„ÙŽÙ‰Ù° ÙƒÙÙ„Ù‘Ù Ø´ÙŽÙ‰Ù’Ø¡Ù <span class='t-qalqalah'>Ù‚ÙŽØ¯ÙÙŠØ±ÙŒ</span>",
+        translation: "Ø¨Ø³ÛŒØ§Ø± Ø¨Ø§Ø¨Ø±Ú©Øª Ùˆ Ø¨Ù„Ù†Ø¯Ù…Ø±ØªØ¨Ù‡ Ø§Ø³Øª Ø¢Ù†Ú©Ù‡ ÙØ±Ù…Ø§Ù†Ø±ÙˆØ§ÛŒÛŒ Ø¬Ù‡Ø§Ù† Ø¨Ù‡ Ø¯Ø³Øª Ø§ÙˆØ³Øª Ùˆ Ø§Ùˆ Ø¨Ø± Ù‡Ø± Ú†ÛŒØ²ÛŒ ØªÙˆØ§Ù†Ø§Ø³Øª.",
+        audio: "067001.mp3"
+      },
+      {
+        num: 2,
+        arabicTajweed: "Ù±Ù„Ù‘ÙŽØ°ÙÙ‰ Ø®ÙŽÙ„ÙŽÙ‚ÙŽ Ù±Ù„Ù’Ù…ÙŽÙˆÙ’ØªÙŽ ÙˆÙŽÙ±Ù„Ù’Ø­ÙŽÙŠÙŽÙˆÙ°Ø©ÙŽ Ù„ÙÙŠÙŽ<span class='t-qalqalah'>Ø¨Ù’</span>Ù„ÙÙˆÙŽÙƒÙÙ…Ù’ Ø£ÙŽÙŠÙ‘ÙÙƒÙÙ…Ù’ Ø£ÙŽØ­Ù’Ø³ÙŽÙ†Ù Ø¹ÙŽÙ…ÙŽÙ„Ù‹Ø§ Ûš ÙˆÙŽÙ‡ÙÙˆÙŽ Ù±Ù„Ù’Ø¹ÙŽØ²ÙÙŠØ²Ù <span class='t-madd'>Ù±Ù„Ù’ØºÙŽÙÙÙˆØ±Ù</span>",
+        translation: "Ù‡Ù…Ø§Ù† Ú©Ø³ÛŒ Ú©Ù‡ Ù…Ø±Ú¯ Ùˆ Ø²Ù†Ø¯Ú¯ÛŒ Ø±Ø§ Ø¢ÙØ±ÛŒØ¯ ØªØ§ Ø´Ù…Ø§ Ø±Ø§ Ø¨ÛŒØ§Ø²Ù…Ø§ÛŒØ¯ Ú©Ù‡ Ú©Ø¯Ø§Ù…â€ŒÛŒÚ© Ù†ÛŒÚ©ÙˆÚ©Ø§Ø±ØªØ±ÛŒØ¯ØŒ Ùˆ Ø§Ùˆ Ù†ÛŒØ±ÙˆÙ…Ù†Ø¯ Ùˆ Ø¢Ù…Ø±Ø²Ù†Ø¯Ù‡ Ø§Ø³Øª.",
+        audio: "067002.mp3"
+      },
+      {
+        num: 3,
+        arabicTajweed: "Ù±Ù„Ù‘ÙŽØ°ÙÙ‰ Ø®ÙŽÙ„ÙŽÙ‚ÙŽ Ø³ÙŽ<span class='t-qalqalah'>Ø¨Ù’</span>Ø¹ÙŽ Ø³ÙŽÙ…ÙŽÙ€Ù°ÙˆÙŽÙ°ØªÙ <span class='t-ikhfa'>Ø·ÙØ¨ÙŽØ§Ù‚Ù‹Ø§</span> Û– Ù…Ù‘ÙŽØ§ ØªÙŽØ±ÙŽÙ‰Ù° ÙÙÙ‰ Ø®ÙŽÙ„Ù’Ù‚Ù Ù±Ù„Ø±Ù‘ÙŽØ­Ù’Ù…ÙŽÙ€Ù°Ù†Ù Ù…ÙÙ† <span class='t-ikhfa'>ØªÙŽÙÙŽÙ€Ù°ÙˆÙØªÙ</span> Û– ÙÙŽÙ±Ø±Ù’Ø¬ÙØ¹Ù Ù±Ù„Ù’Ø¨ÙŽØµÙŽØ±ÙŽ Ù‡ÙŽÙ„Ù’ ØªÙŽØ±ÙŽÙ‰Ù° Ù…ÙÙ† <span class='t-qalqalah'>ÙÙØ·ÙÙˆØ±Ù</span>",
+        translation: "Ù‡Ù…Ø§Ù† Ú©Ù‡ Ù‡ÙØª Ø¢Ø³Ù…Ø§Ù† Ø±Ø§ Ø·Ø¨Ù‚Ù‡ Ø·Ø¨Ù‚Ù‡ Ø¢ÙØ±ÛŒØ¯Ø› Ø¯Ø± Ø¢ÙØ±ÛŒÙ†Ø´ Ø®Ø¯Ø§ÛŒ Ø±Ø­Ù…Ø§Ù† Ù‡ÛŒÚ† Ø¨ÛŒâ€ŒÙ†Ø¸Ù…ÛŒ Ùˆ Ù†Ù‚ØµÛŒ Ù†Ù…ÛŒâ€ŒØ¨ÛŒÙ†ÛŒØ› Ù¾Ø³ Ø¨Ø§Ø± Ø¯ÛŒÚ¯Ø± Ø¨Ù†Ú¯Ø±ØŒ Ø¢ÛŒØ§ Ù‡ÛŒÚ† Ø´Ú©Ø§ÙÛŒ Ù…ÛŒâ€ŒØ¨ÛŒÙ†ÛŒØŸ",
+        audio: "067003.mp3"
+      },
+      {
+        num: 4,
+        arabicTajweed: "Ø«ÙÙ…Ù‘ÙŽ Ù±Ø±Ù’Ø¬ÙØ¹Ù Ù±Ù„Ù’Ø¨ÙŽØµÙŽØ±ÙŽ ÙƒÙŽØ±Ù‘ÙŽØªÙŽÙŠÙ’Ù†Ù ÙŠÙŽÙ†<span class='t-qalqalah'>Ù‚ÙŽ</span>Ù„Ù<span class='t-qalqalah'>Ø¨Ù’</span> Ø¥ÙÙ„ÙŽÙŠÙ’ÙƒÙŽ Ù±Ù„Ù’Ø¨ÙŽØµÙŽØ±Ù Ø®ÙŽØ§Ø³ÙØ¦Ù‹Ø§ ÙˆÙŽÙ‡ÙÙˆÙŽ <span class='t-madd'>Ø­ÙŽØ³ÙÙŠØ±ÙŒ</span>",
+        translation: "Ø³Ù¾Ø³ Ø¨Ø§Ø± Ø¯ÛŒÚ¯Ø± Ù†Ú¯Ø§Ù‡Øª Ø±Ø§ Ø¨Ø§Ø²Ú¯Ø±Ø¯Ø§Ù†Ø› Ú†Ø´Ù…Øª Ø®Ø³ØªÙ‡ Ùˆ Ù†Ø§ØªÙˆØ§Ù† Ø¨Ù‡ Ø³ÙˆÛŒ ØªÙˆ Ø¨Ø§Ø² Ø®ÙˆØ§Ù‡Ø¯ Ú¯Ø´Øª Ø¯Ø± Ø­Ø§Ù„ÛŒ Ú©Ù‡ Ù‡ÛŒÚ† Ø¹ÛŒØ¨ÛŒ Ù†ÛŒØ§ÙØªÙ‡ Ø§Ø³Øª.",
+        audio: "067004.mp3"
+      },
+      {
+        num: 5,
+        arabicTajweed: "ÙˆÙŽÙ„ÙŽÙ‚ÙŽ<span class='t-qalqalah'>Ø¯Ù’</span> Ø²ÙŽÙŠÙ‘ÙŽÙ†Ù‘ÙŽØ§ Ù±Ù„Ø³Ù‘ÙŽÙ…ÙŽ<span class='t-madd'>Ø¢</span>Ø¡ÙŽ Ù±Ù„Ø¯Ù‘ÙÙ†Ù’ÙŠÙŽØ§ Ø¨ÙÙ…ÙŽØµÙŽÙ€Ù°Ø¨ÙÙŠØ­ÙŽ ÙˆÙŽØ¬ÙŽØ¹ÙŽÙ„Ù’Ù†ÙŽÙ€Ù°Ù‡ÙŽØ§ Ø±ÙØ¬ÙÙˆÙ…Ù‹Ø§ Ù„Ù‘ÙÙ„Ø´Ù‘ÙŽÙŠÙŽÙ€Ù°Ø·ÙÙŠÙ†Ù Û– ÙˆÙŽØ£ÙŽØ¹Ù’ØªÙŽØ¯Ù’Ù†ÙŽØ§ Ù„ÙŽÙ‡ÙÙ…Ù’ Ø¹ÙŽØ°ÙŽØ§Ø¨ÙŽ <span class='t-madd'>Ù±Ù„Ø³Ù‘ÙŽØ¹ÙÙŠØ±Ù</span>",
+        translation: "Ùˆ Ø¨ÛŒâ€ŒØªØ±Ø¯ÛŒØ¯ Ù…Ø§ Ø¢Ø³Ù…Ø§Ù† Ø¯Ù†ÛŒØ§ Ø±Ø§ Ø¨Ø§ Ú†Ø±Ø§Øºâ€ŒÙ‡Ø§ÛŒÛŒ (Ø³ØªØ§Ø±Ú¯Ø§Ù† Ø¯Ø±Ø®Ø´Ø§Ù†) Ø¢Ø±Ø§Ø³ØªÛŒÙ… Ùˆ Ø¢Ù†Ù‡Ø§ Ø±Ø§ ØªÛŒØ±Ù‡Ø§ÛŒÛŒ Ø¨Ø±Ø§ÛŒ Ø±Ø§Ù†Ø¯Ù† Ø´ÛŒØ§Ø·ÛŒÙ† Ù‚Ø±Ø§Ø± Ø¯Ø§Ø¯ÛŒÙ… Ùˆ Ø¨Ø±Ø§ÛŒ Ø¢Ù†Ø§Ù† Ø¹Ø°Ø§Ø¨ Ø¢ØªØ´ Ø³ÙˆØ²Ø§Ù† ÙØ±Ø§Ù‡Ù… Ø³Ø§Ø®ØªÛŒÙ….",
+        audio: "067005.mp3"
+      }
+    ]
+  },
+
+  // Ø³ÙˆØ±Ù‡ Ø§Ù„ÙØ§ØªØ­Ù‡
+  "1": {
+    name: "Ø³ÙÙˆØ±ÙŽØ©Ù Ø§Ù„ÙÙŽØ§ØªÙØ­ÙŽØ©Ù",
+    details: "Ø³ÙˆØ±Ù‡ Û± â€¢ Ù…Ú©ÛŒ â€¢ Û· Ø¢ÛŒÙ‡ â€¢ Ø§Ù…â€ŒØ§Ù„Ú©ØªØ§Ø¨",
+    verses: [
+      {
+        num: 1,
+        arabicTajweed: "Ø¨ÙØ³Ù’Ù…Ù Ù±Ù„Ù„Ù‘ÙŽÙ‡Ù Ù±Ù„Ø±Ù‘ÙŽØ­Ù’Ù…ÙŽÙ€Ù°Ù†Ù <span class='t-madd'>Ù±Ù„Ø±Ù‘ÙŽØ­ÙÙŠÙ…Ù</span>",
+        translation: "Ø¨Ù‡ Ù†Ø§Ù… Ø®Ø¯Ø§ÙˆÙ†Ø¯ Ø¨Ø®Ø´Ù†Ø¯Ù‡ Ù…Ù‡Ø±Ø¨Ø§Ù†.",
+        audio: "001001.mp3"
+      },
+      {
+        num: 2,
+        arabicTajweed: "Ù±Ù„Ù’Ø­ÙŽÙ…Ù’Ø¯Ù Ù„ÙÙ„Ù‘ÙŽÙ‡Ù Ø±ÙŽØ¨Ù‘Ù <span class='t-madd'>Ù±Ù„Ù’Ø¹ÙŽÙ€Ù°Ù„ÙŽÙ…ÙÙŠÙ†ÙŽ</span>",
+        translation: "Ø³ØªØ§ÛŒØ´ Ù…Ø®ØµÙˆØµ Ø®Ø¯Ø§ÙˆÙ†Ø¯ÛŒ Ø§Ø³Øª Ú©Ù‡ Ù¾Ø±ÙˆØ±Ø¯Ú¯Ø§Ø± Ø¬Ù‡Ø§Ù†ÛŒØ§Ù† Ø§Ø³Øª.",
+        audio: "001002.mp3"
+      },
+      {
+        num: 3,
+        arabicTajweed: "Ù±Ù„Ø±Ù‘ÙŽØ­Ù’Ù…ÙŽÙ€Ù°Ù†Ù <span class='t-madd'>Ù±Ù„Ø±Ù‘ÙŽØ­ÙÙŠÙ…Ù</span>",
+        translation: "Ø¨Ø®Ø´Ù†Ø¯Ù‡ Ù…Ù‡Ø±Ø¨Ø§Ù†.",
+        audio: "001003.mp3"
+      },
+      {
+        num: 4,
+        arabicTajweed: "Ù…ÙŽÙ€Ù°Ù„ÙÙƒÙ ÙŠÙŽÙˆÙ’Ù…Ù <span class='t-madd'>Ù±Ù„Ø¯Ù‘ÙÙŠÙ†Ù</span>",
+        translation: "Ù…Ø§Ù„Ú© Ùˆ ÙØ±Ù…Ø§Ù†Ø±ÙˆØ§ÛŒ Ø±ÙˆØ² Ø¬Ø²Ø§.",
+        audio: "001004.mp3"
+      },
+      {
+        num: 5,
+        arabicTajweed: "Ø¥ÙÙŠÙ‘ÙŽØ§ÙƒÙŽ Ù†ÙŽØ¹Ù’Ø¨ÙØ¯Ù ÙˆÙŽØ¥ÙÙŠÙ‘ÙŽØ§ÙƒÙŽ <span class='t-madd'>Ù†ÙŽØ³Ù’ØªÙŽØ¹ÙÙŠÙ†Ù</span>",
+        translation: "ØªÙ†Ù‡Ø§ ØªÙˆ Ø±Ø§ Ù…ÛŒâ€ŒÙ¾Ø±Ø³ØªÛŒÙ… Ùˆ ØªÙ†Ù‡Ø§ Ø§Ø² ØªÙˆ ÛŒØ§Ø±ÛŒ Ù…ÛŒâ€ŒØ¬ÙˆÛŒÛŒÙ….",
+        audio: "001005.mp3"
+      },
+      {
+        num: 6,
+        arabicTajweed: "Ù±Ù‡Ù’Ø¯ÙÙ†ÙŽØ§ Ù±Ù„ØµÙ‘ÙØ±ÙŽÙ°Ø·ÙŽ <span class='t-madd'>Ù±Ù„Ù’Ù…ÙØ³Ù’ØªÙŽÙ‚ÙÙŠÙ…ÙŽ</span>",
+        translation: "Ù…Ø§ Ø±Ø§ Ø¨Ù‡ Ø±Ø§Ù‡ Ø±Ø§Ø³Øª Ù‡Ø¯Ø§ÛŒØª ÙØ±Ù…Ø§.",
+        audio: "001006.mp3"
+      },
+      {
+        num: 7,
+        arabicTajweed: "ØµÙØ±ÙŽÙ°Ø·ÙŽ Ù±Ù„Ù‘ÙŽØ°ÙÙŠÙ†ÙŽ Ø£ÙŽÙ†Ù’Ø¹ÙŽÙ…Ù’ØªÙŽ Ø¹ÙŽÙ„ÙŽÙŠÙ’Ù‡ÙÙ…Ù’ ØºÙŽÙŠÙ’Ø±Ù Ù±Ù„Ù’Ù…ÙŽØºÙ’Ø¶ÙÙˆØ¨Ù Ø¹ÙŽÙ„ÙŽÙŠÙ’Ù‡ÙÙ…Ù’ ÙˆÙŽÙ„ÙŽØ§ <span class='t-madd'>Ù±Ù„Ø¶Ù‘ÙŽØ¢Ù„Ù‘ÙÙŠÙ†ÙŽ</span>",
+        translation: "Ø±Ø§Ù‡ Ú©Ø³Ø§Ù†ÛŒ Ú©Ù‡ Ø¨Ù‡ Ø¢Ù†Ø§Ù† Ù†Ø¹Ù…Øª Ø¯Ø§Ø¯ÛŒØŒ Ù†Ù‡ Ø±Ø§Ù‡ ØºØ¶Ø¨â€ŒØ´Ø¯Ú¯Ø§Ù† Ùˆ Ù†Ù‡ Ú¯Ù…Ø±Ø§Ù‡Ø§Ù†.",
+        audio: "001007.mp3"
+      }
+    ]
+  },
+
+  // Ø³ÙˆØ±Ù‡ Ø§Ø®Ù„Ø§Øµ (ØªÙˆØ­ÛŒØ¯)
+  "112": {
+    name: "Ø³ÙÙˆØ±ÙŽØ©Ù Ø§Ù„Ø¥ÙØ®Ù„ÙŽØ§ØµÙ",
+    details: "Ø³ÙˆØ±Ù‡ Û±Û±Û² â€¢ Ù…Ú©ÛŒ â€¢ Û´ Ø¢ÛŒÙ‡ â€¢ Ø«Ù„Ø« Ù‚Ø±Ø¢Ù†",
+    verses: [
+      {
+        num: 1,
+        arabicTajweed: "Ù‚ÙÙ„Ù’ Ù‡ÙÙˆÙŽ Ù±Ù„Ù„Ù‘ÙŽÙ‡Ù <span class='t-qalqalah'>Ø£ÙŽØ­ÙŽØ¯ÙŒ</span>",
+        translation: "Ø¨Ú¯Ùˆ: Ø§Ùˆ Ø®Ø¯Ø§ÛŒÛŒ Ø§Ø³Øª ÛŒÚ©ØªØ§ Ùˆ Ø¨ÛŒâ€ŒÙ‡Ù…ØªØ§.",
+        audio: "112001.mp3"
+      },
+      {
+        num: 2,
+        arabicTajweed: "Ù±Ù„Ù„Ù‘ÙŽÙ‡Ù <span class='t-qalqalah'>Ù±Ù„ØµÙ‘ÙŽÙ…ÙŽØ¯Ù</span>",
+        translation: "Ø®Ø¯Ø§ÙˆÙ†Ø¯ Ø¨ÛŒâ€ŒÙ†ÛŒØ§Ø² Ø§Ø³Øª Ùˆ Ù‡Ù…Ù‡ Ø¨Ù‡ Ø§Ùˆ Ù†ÛŒØ§Ø²Ù…Ù†Ø¯Ù†Ø¯.",
+        audio: "112002.mp3"
+      },
+      {
+        num: 3,
+        arabicTajweed: "Ù„ÙŽÙ…Ù’ ÙŠÙŽÙ„Ù<span class='t-qalqalah'>Ø¯Ù’</span> ÙˆÙŽÙ„ÙŽÙ…Ù’ <span class='t-qalqalah'>ÙŠÙÙˆÙ„ÙŽØ¯Ù’</span>",
+        translation: "Ù†Ù‡ Ø²Ø§Ø¯Ù‡ Ø§Ø³Øª Ùˆ Ù†Ù‡ Ø²Ø§Ø¯Ù‡ Ø´Ø¯Ù‡ Ø§Ø³Øª.",
+        audio: "112003.mp3"
+      },
+      {
+        num: 4,
+        arabicTajweed: "ÙˆÙŽÙ„ÙŽÙ…Ù’ ÙŠÙŽÙƒÙÙ† Ù„Ù‘ÙŽÙ‡ÙÛ¥ ÙƒÙÙÙÙˆÙ‹Ø§ <span class='t-qalqalah'>Ø£ÙŽØ­ÙŽØ¯ÙŒÛ¢</span>",
+        translation: "Ùˆ Ø¨Ø±Ø§ÛŒ Ø§Ùˆ Ù‡ÛŒÚ† Ù‡Ù…ØªØ§ Ùˆ Ù…Ø§Ù†Ù†Ø¯ÛŒ Ù†Ø¨ÙˆØ¯Ù‡ Ø§Ø³Øª.",
+        audio: "112004.mp3"
+      }
+    ]
+  }
+};
+
+let currentSurahId = "67";
+let currentVerseIndex = 0;
+let repeatCount = 1;
+let currentRepeatIndex = 0;
+let isHifzTestMode = false;
+let isPlaying = false;
+
+const audioPlayer = document.getElementById('globalAudio');
+
+function renderSurah(surahId) {
+  const surah = surahsData[surahId] || surahsData["67"];
+  document.getElementById('surahHeaderTitle').textContent = surah.name;
+  document.getElementById('surahHeaderDetails').textContent = surah.details;
+  
+  const container = document.getElementById('versesContainer');
+  container.innerHTML = surah.verses.map((v, idx) => {
+    return `
+      <div class="verse-card ${idx === currentVerseIndex ? 'playing' : ''}" id="verseCard-${idx}">
+        <div class="verse-header">
+          <div class="ayah-number">${v.num}</div>
+          <div class="verse-actions">
+            <button class="action-btn" onclick="playSpecificVerse(${idx})">
+              <span>â–¶ï¸ ØªÙ„Ø§ÙˆØª Ø§ÛŒÙ† Ø¢ÛŒÙ‡</span>
+            </button>
+            <button class="action-btn" onclick="markMemorized(${v.num})">
+              <span>âœ”ï¸ Ø­ÙØ¸ Ø´Ø¯</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="arabic-text ${isHifzTestMode ? 'hidden-for-hifz' : ''}" id="arabicText-${idx}" onclick="revealHiddenVerse(${idx})" title="${isHifzTestMode ? 'Ú©Ù„ÛŒÚ© Ú©Ù†ÛŒØ¯ ØªØ§ Ù…ØªÙ† Ø¨Ø±Ø§ÛŒ Ú†Ú© Ú©Ø±Ø¯Ù† Ø¢Ø´Ú©Ø§Ø± Ø´ÙˆØ¯' : ''}">
+          ${v.arabicTajweed}
+        </div>
+
+        <div class="translation-text">
+          ${v.translation}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updateDockInfo();
+}
+
+function getAudioUrl(surahId, ayahNum) {
+  const qari = document.getElementById('qariSelect').value;
+  const sStr = String(surahId).padStart(3, '0');
+  const aStr = String(ayahNum).padStart(3, '0');
+  // High speed worldwide EveryAyah CDN
+  return `https://everyayah.com/data/${qari}/${sStr}${aStr}.mp3`;
+}
+
+function playSpecificVerse(index) {
+  currentVerseIndex = index;
+  currentRepeatIndex = 0;
+  const surah = surahsData[currentSurahId];
+  if (!surah || !surah.verses[index]) return;
+
+  const verse = surah.verses[index];
+  const url = getAudioUrl(currentSurahId, verse.num);
+
+  audioPlayer.src = url;
+  audioPlayer.play().then(() => {
+    isPlaying = true;
+    updateDockPlayState();
+    highlightCurrentVerse();
+    updateDockInfo();
+  }).catch(e => {
+    console.log("Audio play error", e);
+  });
+}
+
+function togglePlay() {
+  if (isPlaying) {
+    audioPlayer.pause();
+    isPlaying = false;
+    updateDockPlayState();
+  } else {
+    if (!audioPlayer.src) {
+      playSpecificVerse(currentVerseIndex);
+    } else {
+      audioPlayer.play();
+      isPlaying = true;
+      updateDockPlayState();
+    }
+  }
+}
+
+function updateDockPlayState() {
+  const btn = document.getElementById('dockPlayBtn');
+  btn.textContent = isPlaying ? "â¸ï¸" : "â–¶ï¸";
+}
+
+function playNextVerse() {
+  const surah = surahsData[currentSurahId];
+  if (currentVerseIndex < surah.verses.length - 1) {
+    playSpecificVerse(currentVerseIndex + 1);
+  }
+}
+
+function playPrevVerse() {
+  if (currentVerseIndex > 0) {
+    playSpecificVerse(currentVerseIndex - 1);
+  }
+}
+
+// When audio ends: handle Hifz Repeat loop
+audioPlayer.onended = function() {
+  currentRepeatIndex++;
+  if (currentRepeatIndex < repeatCount) {
+    // Replay same verse for memorization
+    audioPlayer.currentTime = 0;
+    audioPlayer.play();
+  } else {
+    // Move to next verse
+    currentRepeatIndex = 0;
+    const surah = surahsData[currentSurahId];
+    if (currentVerseIndex < surah.verses.length - 1) {
+      playSpecificVerse(currentVerseIndex + 1);
+    } else {
+      isPlaying = false;
+      updateDockPlayState();
+    }
+  }
+};
+
+function highlightCurrentVerse() {
+  document.querySelectorAll('.verse-card').forEach((card, idx) => {
+    if (idx === currentVerseIndex) {
+      card.classList.add('playing');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      card.classList.remove('playing');
+    }
+  });
+}
+
+function updateDockInfo() {
+  const surah = surahsData[currentSurahId];
+  const qariText = document.getElementById('qariSelect').options[document.getElementById('qariSelect').selectedIndex].text;
+  document.getElementById('dockQariName').textContent = qariText.split('(')[0];
+  document.getElementById('dockVerseInfo').textContent = `${surah.name} â€¢ Ø¢ÛŒÙ‡ ${surah.verses[currentVerseIndex].num}`;
+  document.getElementById('repeatStatusBadge').textContent = `ØªÚ©Ø±Ø§Ø±: ${repeatCount} Ø¨Ø§Ø± (Ø¯ÙˆØ± ${currentRepeatIndex + 1})`;
+}
+
+function setRepeat(count, btn) {
+  repeatCount = count;
+  currentRepeatIndex = 0;
+  document.querySelectorAll('.repeat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateDockInfo();
+}
+
+function changeSurah() {
+  currentSurahId = document.getElementById('surahSelect').value;
+  currentVerseIndex = 0;
+  renderSurah(currentSurahId);
+}
+
+function changeQari() {
+  if (isPlaying) {
+    playSpecificVerse(currentVerseIndex);
+  } else {
+    updateDockInfo();
+  }
+}
+
+function toggleHifzTestMode() {
+  isHifzTestMode = !isHifzTestMode;
+  const btn = document.getElementById('hifzModeBtn');
+  if (isHifzTestMode) {
+    btn.textContent = "ðŸ‘ï¸ Ø®Ø±ÙˆØ¬ Ø§Ø² Ø¢Ø²Ù…ÙˆÙ† Ø­ÙØ¸ (Ù†Ù…Ø§ÛŒØ´ Ù…ØªÙ† Ø¢ÛŒØ§Øª)";
+    btn.style.background = "#854d0e";
+    btn.style.borderColor = "#eab308";
+  } else {
+    btn.textContent = "ðŸ™ˆ ÙØ¹Ø§Ù„â€ŒØ³Ø§Ø²ÛŒ Ø­Ø§Ù„Øª Ø¢Ø²Ù…ÙˆÙ† Ø­ÙØ¸ (Ù…Ø®ÙÛŒ Ú©Ø±Ø¯Ù† Ù…ØªÙ†)";
+    btn.style.background = "#064e3b";
+    btn.style.borderColor = "#059669";
+  }
+  renderSurah(currentSurahId);
+}
+
+function revealHiddenVerse(idx) {
+  const el = document.getElementById(`arabicText-${idx}`);
+  if (el) {
+    el.classList.toggle('hidden-for-hifz');
+  }
+}
+
+function toggleTranslation() {
+  const show = document.getElementById('translationToggle').checked;
+  document.querySelectorAll('.translation-text').forEach(t => {
+    t.style.display = show ? 'block' : 'none';
+  });
+}
+
+function toggleTajweed() {
+  const enabled = document.getElementById('tajweedToggle').checked;
+  document.querySelectorAll('.arabic-text span').forEach(s => {
+    s.style.color = enabled ? '' : 'inherit';
+  });
+}
+
+function markMemorized(ayahNum) {
+  const currentCount = parseInt(localStorage.getItem('memorizedVersesCount') || "5") + 1;
+  localStorage.setItem('memorizedVersesCount', currentCount);
+  document.getElementById('memorizedCount').textContent = `${currentCount} Ø¢ÛŒÙ‡ ØªØ«Ø¨ÛŒØª Ø´Ø¯ âœ¨`;
+}
+
+function saveBookmark() {
+  const surah = surahsData[currentSurahId];
+  const bookmark = `${surah.name} - Ø¢ÛŒÙ‡ ${surah.verses[currentVerseIndex].num}`;
+  localStorage.setItem('quranBookmark', bookmark);
+  const notice = document.getElementById('bookmarkNotice');
+  notice.textContent = `Ù†Ø´Ø§Ù†Ù‡ Ø°Ø®ÛŒØ±Ù‡ Ø´Ø¯: ${bookmark}`;
+  notice.style.display = 'block';
+  setTimeout(() => notice.style.display = 'none', 4000);
+}
+
+// Initial render
+renderSurah(currentSurahId);
+</script>
+
+</body>
+</html>

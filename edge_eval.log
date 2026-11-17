@@ -1,0 +1,7 @@
+[7640:1960:1116/164313.390:ERROR:chrome\elevation_service\edge_elevation_service_browser_helper.cc:39] CoCreateInstance of Elevator failed (RunElevationServiceCommand): hr =80070005
+[7640:5436:1116/164313.437:ERROR:chrome\browser\component_updater\edge_optimization_guide_models_manifest_installer.cc:264] Edge LLM: catalog update failed: 5
+[7640:5436:1116/164313.440:ERROR:components\device_event_log\device_event_log_impl.cc:257] [16:43:13.441] USB: usb_device_win.cc:66 Failed to open \\?\usb#root_hub30#4&3089b9df&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}: Zugriff verweigert (0x5)
+[7640:5436:1116/164313.443:ERROR:components\device_event_log\device_event_log_impl.cc:257] [16:43:13.443] USB: usb_device_win.cc:66 Failed to open \\?\usb#vid_8087&pid_0024#5&26a55f68&0&1#{f18a0e88-c30c-11d0-8815-00a0c906bed8}: Zugriff verweigert (0x5)
+[7640:5436:1116/164313.444:ERROR:components\device_event_log\device_event_log_impl.cc:257] [16:43:13.444] USB: usb_device_win.cc:66 Failed to open \\?\usb#vid_0a5c&pid_4500#7&2c9a2fc6&0&1#{f18a0e88-c30c-11d0-8815-00a0c906bed8}: Zugriff verweigert (0x5)
+[7640:5436:1116/164313.446:ERROR:components\device_event_log\device_event_log_impl.cc:257] [16:43:13.446] USB: usb_device_win.cc:66 Failed to open \\?\usb#root_hub30#4&3089b9df&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}: Zugriff verweigert (0x5)
+[7640:5436:1116/164313.446:ERROR:chrome\browser\component_updater\edge_language_detection_model_installer.cc:97] Edge Language Detection Model: On-demand update failed with error: 5
