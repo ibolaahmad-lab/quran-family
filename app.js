@@ -381,6 +381,12 @@ function getTabDisplayName(tab) {
 function loadPage(pageNum) {
   state.currentPage = Math.max(1, Math.min(604, pageNum));
   state.currentVersesData = getPageVerses(state.currentPage);
+  if (state.currentVersesData && state.currentVersesData.length > 0) {
+    const curS = state.currentVersesData[0].surahNum;
+    state.currentSurah = curS;
+    const mSurahSel = document.getElementById('mushafSurahSelect');
+    if (mSurahSel && mSurahSel.value != curS) mSurahSel.value = curS;
+  }
   state.currentAyahIdx = 0;
   state.currentIteration = 1;
 
@@ -1788,7 +1794,7 @@ function updateDockDisplay() {
   // 1. Update Section 1 (Mushaf) Mini Player
   const mushafInfo = document.getElementById('mushafPlayerVerseInfo');
   if (mushafInfo) {
-    mushafInfo.textContent = `Muṣḥaf (Seite ${state.currentPage}) · Sure ${sTitle1} · Vers ${curV.num}`;
+    mushafInfo.textContent = `${sMeta1 ? sMeta1.name : ('Sure ' + curV.surahNum)} · ${curV.num}`;
   }
 
   const mushafIter = document.getElementById('mushafPlayerIterationBadge');
@@ -1811,7 +1817,7 @@ function updateDockDisplay() {
 
   const wsInfo = document.getElementById('wsPlayerVerseInfo');
   if (wsInfo) {
-    wsInfo.textContent = `Verse Studio · Sure ${sTitle2} : Vers ${wsAyah}`;
+    wsInfo.textContent = `${sMeta2 ? sMeta2.name : ('Sure ' + wsSurah)} · ${wsAyah}`;
   }
 
   const wsIter = document.getElementById('wsPlayerIterationBadge');
@@ -3313,7 +3319,7 @@ function validatePin() {
         overlay.style.opacity = '1';
       }, 300);
     }
-    showToast('خوش آمدید! رمز عبور تایید شد 🌿');
+    showToast('Willkommen! App entsperrt 🌿');
   } else {
     const errMsg = document.getElementById('lockErrorMsg');
     if (errMsg) errMsg.style.display = 'block';
@@ -3365,11 +3371,11 @@ function toggleHomeCardsLayout() {
   if (!grid) return;
   const isList = grid.classList.toggle('list-view');
   localStorage.setItem('home_card_layout', isList ? 'list' : 'grid');
-  if (label) label.textContent = isList ? 'حالت دسته‌ای' : 'حالت ردیفی';
+  if (label) label.textContent = isList ? 'Raster-Ansicht' : 'Listen-Ansicht';
   if (icon) {
     icon.className = isList ? 'fa-solid fa-table-cells-large' : 'fa-solid fa-bars-staggered';
   }
-  showToast(isList ? 'نمایش منو: حالت ردیفی ☰' : 'نمایش منو: حالت دسته‌ای ⊞');
+  showToast(isList ? 'Karten-Layout: Listen-Ansicht ☰' : 'Karten-Layout: Raster-Ansicht ⊞');
 }
 window.toggleHomeCardsLayout = toggleHomeCardsLayout;
 
@@ -3381,11 +3387,11 @@ function applySavedHomeLayout() {
   if (!grid) return;
   if (saved === 'list') {
     grid.classList.add('list-view');
-    if (label) label.textContent = 'حالت دسته‌ای';
+    if (label) label.textContent = 'Raster-Ansicht';
     if (icon) icon.className = 'fa-solid fa-table-cells-large';
   } else {
     grid.classList.remove('list-view');
-    if (label) label.textContent = 'حالت ردیفی';
+    if (label) label.textContent = 'Listen-Ansicht';
     if (icon) icon.className = 'fa-solid fa-bars-staggered';
   }
 }
@@ -3509,8 +3515,39 @@ window.updateHifzCounter = function() {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     applySavedHomeLayout();
+    populateMushafSurahDropdown();
     updateWordStudioPageInput();
     updateTafsirPageInput();
     if (typeof updateHifzCounter === 'function') updateHifzCounter();
   }, 200);
 });
+
+
+// ============================================================
+// MUSHAF SURAH DROPDOWN & SYNC
+// ============================================================
+function populateMushafSurahDropdown() {
+  const sel = document.getElementById('mushafSurahSelect');
+  if (!sel || typeof ALL_114_SURAHS === 'undefined') return;
+  sel.innerHTML = '';
+  ALL_114_SURAHS.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.id}. ${s.name} (${s.arabic})`;
+    if (s.id === state.currentSurah) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+window.populateMushafSurahDropdown = populateMushafSurahDropdown;
+
+function onMushafSurahSelect(surahId) {
+  const sNum = parseInt(surahId, 10);
+  if (typeof ALL_114_SURAHS !== 'undefined') {
+    const s = ALL_114_SURAHS.find(item => item.id === sNum);
+    if (s && s.startPage) {
+      jumpToPage(s.startPage);
+      showToast(`Sure ${s.name} (Seite ${s.startPage})`);
+    }
+  }
+}
+window.onMushafSurahSelect = onMushafSurahSelect;
