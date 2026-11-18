@@ -2552,7 +2552,7 @@
       <div class="lock-bismillah">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>
       <h2 class="lock-title">Koran Hifz &amp; Muṣḥaf Studio</h2>
       <p class="lock-subtitle">☽ Für meine geliebte Frau · Exklusive Familien-Edition</p>
-      <p class="lock-hint">Bitte 4-stellige PIN eingeben:</p>
+      <p class="lock-hint" dir="ltr" style="direction: ltr !important; text-align: center;">Bitte 4-stellige PIN eingeben:</p>
 
       <div class="lock-dots-container" id="lockDots">
         <span class="lock-dot" id="dot0"></span>
@@ -2561,7 +2561,7 @@
         <span class="lock-dot" id="dot3"></span>
       </div>
 
-      <div id="lockErrorMsg" class="lock-error-msg" style="display: none;">رمز عبور نادرست است!</div>
+      <div id="lockErrorMsg" class="lock-error-msg" style="display: none;" dir="ltr">Falsche PIN! Bitte erneut versuchen.</div>
 
       <div class="lock-keypad">
         <button type="button" class="lock-key" onclick="handlePinKey('1')">1</button>
@@ -2575,7 +2575,7 @@
         <button type="button" class="lock-key" onclick="handlePinKey('9')">9</button>
         <button type="button" class="lock-key lock-key-clear" onclick="clearPinInput()" title="Löschen">✕</button>
         <button type="button" class="lock-key" onclick="handlePinKey('0')">0</button>
-        <button type="button" class="lock-key lock-key-back" onclick="deletePinLast()" title="Löschen"><i class="fa-solid fa-delete-left"></i></button>
+        <button type="button" class="lock-key lock-key-back" onclick="deletePinLast()" title="Löschen" style="font-size: 1.15rem; color: #fca5a5;"><i class="fa-solid fa-delete-left"></i></button>
       </div>
     </div>
   </div>
@@ -3010,31 +3010,30 @@
         </div>
 
         <!-- Section 1 Dedicated Sleek Capsule Player -->
-        <div class="section-player mushaf-section-player" id="mushafSectionPlayer" style="display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 12px; border-radius: 24px; margin-bottom: 12px; background: linear-gradient(90deg, rgba(16, 22, 18, 0.95), rgba(26, 20, 14, 0.95)); border: 1px solid rgba(229, 184, 76, 0.35);">
-          <div class="sec-player-left" style="display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1;">
-            <i class="fa-solid fa-book-quran" style="color: #10b981; font-size: 1rem; flex-shrink: 0;"></i>
-            <span id="mushafPlayerVerseInfo" style="color: var(--gold-light); font-weight: 700; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Al-Faatiha · 1:1</span>
-            <span id="mushafPlayerIterationBadge" class="sec-loop-badge" style="font-size: 0.72rem; padding: 2px 6px; border-radius: 6px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; font-weight: 800; flex-shrink: 0;">1/1</span>
+        <div class="section-player mushaf-section-player" id="mushafSectionPlayer" style="display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 5px 10px; border-radius: 24px; margin-bottom: 12px; background: linear-gradient(90deg, rgba(16, 22, 18, 0.96), rgba(26, 20, 14, 0.96)); border: 1px solid rgba(229, 184, 76, 0.35); box-sizing: border-box; width: 100%;">
+          <div class="sec-player-left" style="display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0;">
+            <span id="mushafPlayerVerseInfo" style="color: var(--gold-light); font-weight: 700; font-size: 0.78rem; white-space: nowrap;">Al-Faatiha · 1:1</span>
+            <span id="mushafPlayerIterationBadge" class="sec-loop-badge" style="font-size: 0.68rem; padding: 1px 5px; border-radius: 5px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; font-weight: 800; flex-shrink: 0;">1/1</span>
           </div>
 
-          <div class="sec-player-center" style="display: flex; align-items: center; gap: 5px; flex-shrink: 0;">
-            <button onclick="playPrevAyah()" class="sec-player-btn" title="Vorheriger Vers" style="width: 30px; height: 30px; font-size: 0.75rem;">
+          <div class="sec-player-center" style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+            <button onclick="playPrevAyah()" class="sec-player-btn" title="Vorheriger Vers" style="width: 28px; height: 28px; font-size: 0.72rem;">
               <i class="fa-solid fa-backward-step"></i>
             </button>
-            <button onclick="toggleMushafAudioPlay()" class="sec-player-play-btn" id="mushafPlayBtn" title="Play / Pause" style="width: 36px; height: 36px; font-size: 0.95rem;">
+            <button onclick="toggleMushafAudioPlay()" class="sec-player-play-btn" id="mushafPlayBtn" title="Play / Pause" style="width: 32px; height: 32px; font-size: 0.88rem;">
               <i id="mushafPlayIcon" class="fa-solid fa-play"></i>
             </button>
-            <button onclick="playNextAyah()" class="sec-player-btn" title="Nächster Vers" style="width: 30px; height: 30px; font-size: 0.75rem;">
+            <button onclick="playNextAyah()" class="sec-player-btn" title="Nächster Vers" style="width: 28px; height: 28px; font-size: 0.72rem;">
               <i class="fa-solid fa-forward-step"></i>
             </button>
-            <button onclick="cycleRepeatTarget('mushaf')" class="sec-player-btn" title="Wiederholen" style="width: 30px; height: 30px; font-size: 0.75rem;">
+            <button onclick="cycleRepeatTarget('mushaf')" class="sec-player-btn" title="Wiederholen" style="width: 28px; height: 28px; font-size: 0.72rem;">
               <i class="fa-solid fa-repeat"></i>
-              <span id="mushafLoopBadge" style="font-size: 0.68rem; font-weight: 800; margin-left: 1px;">1×</span>
+              <span id="mushafLoopBadge" style="font-size: 0.64rem; font-weight: 800;">1×</span>
             </button>
           </div>
 
-          <div class="sec-player-right" style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-            <select id="mushafPlayerSpeedSelect" class="sec-select" onchange="changeSpeed(this.value)" title="Geschwindigkeit" style="padding: 3px 6px; font-size: 0.76rem; border-radius: 8px; background: rgba(18, 14, 12, 0.95); border: 1px solid rgba(229, 184, 76, 0.3); color: #fef08a; font-weight: 700;">
+          <div class="sec-player-right" style="display: flex; align-items: center; gap: 2px; flex-shrink: 0;">
+            <select id="mushafPlayerSpeedSelect" class="sec-select" onchange="changeSpeed(this.value)" title="Geschwindigkeit" style="padding: 2px 4px; font-size: 0.72rem; border-radius: 6px; background: rgba(18, 14, 12, 0.95); border: 1px solid rgba(229, 184, 76, 0.3); color: #fef08a; font-weight: 700;">
               <option value="0.75">0.75×</option>
               <option value="1.0" selected>1.0×</option>
               <option value="1.25">1.25×</option>
@@ -3052,13 +3051,15 @@
 
         <!-- Facsimile Scan Stage (CRISP HD 1920px MADINA SCAN - Authentic RTL Reading) -->
         <div id="mushafScanStage" style="display: none;">
-          <div class="scan-nav-bar" dir="rtl" style="display: flex; justify-content: center; align-items: center; gap: 12px; margin-bottom: 14px; background: rgba(22, 17, 14, 0.7); padding: 8px 16px; border-radius: 12px; border: 1px solid var(--gold-border); max-width: 620px; margin-left: auto; margin-right: auto;">
-            <button class="action-btn" onclick="jumpToPage(state.currentPage - 1)" title="Vorherige Seite">► Vorherige Seite</button>
-            <span id="scanPageNumberBadge" style="font-size: 0.95rem; font-weight: 800; color: var(--gold-light);">Seite 1</span>
-            <button class="action-btn" onclick="jumpToPage(state.currentPage + 1)" title="Nächste Seite">Nächste Seite ◄</button>
-            <div style="margin-right: 10px; display: flex; gap: 6px;">
-              <button id="scanSingleBtn" class="sub-btn active" onclick="setScanDoubleSpread(false)">1 Seite</button>
-              <button id="scanDoubleBtn" class="sub-btn" onclick="setScanDoubleSpread(true)">2 Seiten (Doppelseite)</button>
+          <div class="scan-nav-bar" dir="ltr" style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 12px; background: rgba(22, 17, 14, 0.9); padding: 8px 12px; border-radius: 14px; border: 1px solid var(--gold-border); width: 100%; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 6px;">
+              <button class="action-btn" onclick="jumpToPage(state.currentPage - 1)" style="flex: 1; padding: 5px 8px; font-size: 0.78rem; font-weight: 700;" title="Vorherige Seite">◄ Zurück</button>
+              <span id="scanPageNumberBadge" style="font-size: 0.88rem; font-weight: 800; color: var(--gold-light); white-space: nowrap; padding: 0 6px;">Seite 1</span>
+              <button class="action-btn" onclick="jumpToPage(state.currentPage + 1)" style="flex: 1; padding: 5px 8px; font-size: 0.78rem; font-weight: 700;" title="Nächste Seite">Weiter ►</button>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 8px; width: 100%;">
+              <button id="scanSingleBtn" class="sub-btn active" onclick="setScanDoubleSpread(false)" style="flex: 1; padding: 4px 8px; font-size: 0.75rem;">1 Seite (Einzel)</button>
+              <button id="scanDoubleBtn" class="sub-btn" onclick="setScanDoubleSpread(true)" style="flex: 1; padding: 4px 8px; font-size: 0.75rem;">2 Seiten (Doppelseite)</button>
             </div>
           </div>
           <!-- RTL Scan Sheets Container: Page N is on Right, Page N+1 is on Left -->
@@ -3699,7 +3700,7 @@
           </div>
         </div>
 
-        <button onclick="closeTafsirNamiPdfModal()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+        <button onclick="closeTafsirNamiPdfModal()" aria-label="Schließen" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>

@@ -325,6 +325,7 @@ function switchTab(tabName) {
 
   // Synchronize bottom navigation buttons
   const abnMap = {
+    tafsir: 'abnTafsir',
     home: 'abnHome',
     mushaf: 'abnMushaf',
     wordStudio: 'abnHifz',
@@ -1199,7 +1200,7 @@ function populateTafsirDropdowns() {
     ALL_114_SURAHS.forEach(s => {
       const opt = document.createElement('option');
       opt.value = s.id;
-      opt.textContent = `${s.id}. ${s.name} (${s.arabic}) - ${s.versesCount} Verse`;
+      opt.textContent = `${s.id}. ${s.name} (${s.arabic})`;
       sSelect.appendChild(opt);
     });
   }
