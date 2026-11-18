@@ -2480,7 +2480,52 @@
     }
 
 
-  </style>
+    .app-header { display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
+
+  /* Full Width High-Definition Facsimile Scan for Mobile Devices */
+  @media (max-width: 900px) {
+    #mushafScanStage {
+      width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .scan-nav-bar {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 6px 8px !important;
+      gap: 6px !important;
+      border-radius: 10px !important;
+    }
+    .scan-stage-container {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .scan-sheet {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 2px !important;
+      border-width: 1px !important;
+      margin: 0 !important;
+      border-radius: 8px !important;
+    }
+    .scan-page-card {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    .scan-page-img {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: auto !important;
+      display: block !important;
+      object-fit: contain !important;
+    }
+  }
+  
+</style>
 
   <!-- Clean Offline Core Assets (NO query strings) -->
   <script src="surahs_data.js"></script>
@@ -2507,7 +2552,7 @@
       <div class="lock-bismillah">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>
       <h2 class="lock-title">Koran Hifz &amp; Muṣḥaf Studio</h2>
       <p class="lock-subtitle">☽ Für meine geliebte Frau · Exklusive Familien-Edition</p>
-      <p class="lock-hint">لطفاً برای ورود، رمز ۴ رقمی را وارد کنید:</p>
+      <p class="lock-hint">Bitte 4-stellige PIN eingeben:</p>
 
       <div class="lock-dots-container" id="lockDots">
         <span class="lock-dot" id="dot0"></span>
@@ -2530,7 +2575,7 @@
         <button type="button" class="lock-key" onclick="handlePinKey('9')">9</button>
         <button type="button" class="lock-key lock-key-clear" onclick="clearPinInput()" title="Löschen">✕</button>
         <button type="button" class="lock-key" onclick="handlePinKey('0')">0</button>
-        <button type="button" class="lock-key lock-key-back" onclick="deletePinLast()" title="حذف رقم آخر"><i class="fa-solid fa-delete-left"></i></button>
+        <button type="button" class="lock-key lock-key-back" onclick="deletePinLast()" title="Löschen"><i class="fa-solid fa-delete-left"></i></button>
       </div>
     </div>
   </div>
@@ -2538,28 +2583,7 @@
   <!-- ======================================================= -->
   <!-- 1. TOP APP HEADER                                       -->
   <!-- ======================================================= -->
-  <header class="app-header">
-    <div class="brand-title" onclick="switchMainTab('mushaf')" style="cursor: pointer;">
-      <i class="fa-solid fa-moon"></i>
-      <span>Koran Hifz &amp; Muṣḥaf Studio</span>
-      <span style="font-size: 0.85rem; font-weight: 500; opacity: 0.75; margin-left: 4px;">☽ Für meine geliebte Frau</span>
-    </div>
-
-    <div class="header-controls">
-      <!-- Hifz Total Badge with Percentage -->
-      <div class="badge-counter" onclick="switchMainTab('memorized')" title="Klicke um dein Hifz-Archiv zu öffnen" style="cursor: pointer;">
-        <i class="fa-solid fa-star" style="color: var(--gold-light);"></i>
-        <span>Hifz: <strong id="headerHifzCount">0</strong> (<span id="headerHifzPercent">0.0%</span> · <span id="memorizedCountBadge">0 / 6236</span>)</span>
-      </div>
-
-      <!-- Settings & Design Drawer Button (3 lines / Einstellungen) -->
-      <button class="action-btn" onclick="openAndroidDrawer()" style="display: flex; align-items: center; gap: 8px; padding: 7px 16px; font-weight: 700; border-radius: 12px; font-size: 0.88rem;" title="Einstellungen, Design & Themes">
-        <i class="fa-solid fa-palette"></i>
-        <i class="fa-solid fa-bars"></i>
-        <span data-i18n="settings_design">Design &amp; Menü</span>
-      </button>
-    </div>
-  </header>
+  <!-- App Header Removed for Clean Mobile Experience -->
 
   <!-- ======================================================= -->
   <!-- 2. TWO-COLUMN LAYOUT: SIDEBAR + MAIN WORKSPACE          -->
@@ -2784,12 +2808,22 @@
       <!-- TAB 0: ANDROID HOME DASHBOARD (STARTBILDSCHIRM)          -->
       <!-- ======================================================= -->
       <div id="paneHome" class="tab-pane active">
-        <!-- View Layout Switcher (Compact Bar) -->
-        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 8px; padding: 2px 4px;">
-          <button id="homeLayoutToggleBtn" class="action-btn" onclick="toggleHomeCardsLayout()" style="padding: 4px 10px; font-weight: 700; font-size: 0.78rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; background: rgba(229, 184, 76, 0.12); border: 1px solid var(--gold-border); color: var(--gold-light);" title="Karten-Layout: Raster oder Liste">
-            <i id="homeLayoutIcon" class="fa-solid fa-bars-staggered"></i>
-            <span id="homeLayoutLabel">Listen-Ansicht</span>
-          </button>
+        <!-- Modern Clean Mobile Header Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding: 6px 10px; background: rgba(22, 17, 13, 0.7); border: 1px solid rgba(229, 184, 76, 0.25); border-radius: 14px; backdrop-filter: blur(10px);">
+          <div style="font-size: 0.95rem; font-weight: 800; color: var(--gold-light); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-moon" style="color: var(--gold-primary); font-size: 1.1rem;"></i>
+            <span>Koran Hifz &amp; Muṣḥaf Studio</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <button id="homeLayoutToggleBtn" class="action-btn" onclick="toggleHomeCardsLayout()" style="padding: 5px 10px; font-weight: 700; font-size: 0.78rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; background: rgba(229, 184, 76, 0.15); border: 1px solid var(--gold-border); color: var(--gold-light);" title="Karten-Layout: Raster oder Liste">
+              <i id="homeLayoutIcon" class="fa-solid fa-bars-staggered"></i>
+              <span id="homeLayoutLabel">Liste</span>
+            </button>
+            <button class="action-btn" onclick="openAndroidDrawer()" style="padding: 5px 10px; font-weight: 700; font-size: 0.78rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; background: rgba(229, 184, 76, 0.15); border: 1px solid var(--gold-border); color: var(--gold-light);" title="Menü &amp; Einstellungen">
+              <i class="fa-solid fa-bars"></i>
+              <span>Menü</span>
+            </button>
+          </div>
         </div>
 
         <!-- 7 Modern Android Feature Cards -->
@@ -2936,7 +2970,7 @@
                 <option value="Husary_128kbps">محمود خليل الحصري - مرتل</option>
                 <option value="Husary_128kbps_Mujawwad">محمود خليل الحصري - مجود</option>
                 <option value="Mansour_Al_Salimi">منصور السالمي (Ganze Sure)</option>
-                <option value="Ghamadi_40kbps">سعد الغامدی (Saad Al-Ghamdi)</option>
+                <option value="Ghamadi_40kbps">Saad Al-Ghamdi (سعد الغامدي)</option>
                 <option value="MaherAlMuaiqly128kbps">ماهر المعيقلي</option>
                 <option value="Yasser_Ad-Dussary_128kbps">ياسر الدوسري</option>
                 <option value="Abu_Bakr_Ash-Shaatree_128kbps">أبو بكر الشاطري</option>
@@ -2975,56 +3009,32 @@
           </div>
         </div>
 
-        <!-- Section 1 Dedicated Mini Player (Section 1 Player: Muṣḥaf) -->
-        <div class="section-player mushaf-section-player" id="mushafSectionPlayer">
-          <div class="sec-player-left">
-            <div class="sec-player-info">
-              <i class="fa-solid fa-book-quran" style="color: #10b981; font-size: 1.15rem;"></i>
-              <span id="mushafPlayerVerseInfo" style="color: var(--gold-light);">Muṣḥaf (Seite 1) · Sure Al-Fatiha · Vers 1</span>
-              <span id="mushafPlayerIterationBadge" class="sec-loop-badge">1 / 1</span>
-            </div>
+        <!-- Section 1 Dedicated Sleek Capsule Player -->
+        <div class="section-player mushaf-section-player" id="mushafSectionPlayer" style="display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 12px; border-radius: 24px; margin-bottom: 12px; background: linear-gradient(90deg, rgba(16, 22, 18, 0.95), rgba(26, 20, 14, 0.95)); border: 1px solid rgba(229, 184, 76, 0.35);">
+          <div class="sec-player-left" style="display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1;">
+            <i class="fa-solid fa-book-quran" style="color: #10b981; font-size: 1rem; flex-shrink: 0;"></i>
+            <span id="mushafPlayerVerseInfo" style="color: var(--gold-light); font-weight: 700; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Al-Faatiha · 1:1</span>
+            <span id="mushafPlayerIterationBadge" class="sec-loop-badge" style="font-size: 0.72rem; padding: 2px 6px; border-radius: 6px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; font-weight: 800; flex-shrink: 0;">1/1</span>
           </div>
 
-          <div class="sec-player-center">
-            <button onclick="playPrevAyah()" class="sec-player-btn" title="Vorheriger Vers">
+          <div class="sec-player-center" style="display: flex; align-items: center; gap: 5px; flex-shrink: 0;">
+            <button onclick="playPrevAyah()" class="sec-player-btn" title="Vorheriger Vers" style="width: 30px; height: 30px; font-size: 0.75rem;">
               <i class="fa-solid fa-backward-step"></i>
             </button>
-            <button onclick="toggleMushafAudioPlay()" class="sec-player-play-btn" id="mushafPlayBtn" title="Diesen Vers abspielen / pausieren">
+            <button onclick="toggleMushafAudioPlay()" class="sec-player-play-btn" id="mushafPlayBtn" title="Play / Pause" style="width: 36px; height: 36px; font-size: 0.95rem;">
               <i id="mushafPlayIcon" class="fa-solid fa-play"></i>
             </button>
-            <button onclick="playNextAyah()" class="sec-player-btn" title="Nächster Vers">
+            <button onclick="playNextAyah()" class="sec-player-btn" title="Nächster Vers" style="width: 30px; height: 30px; font-size: 0.75rem;">
               <i class="fa-solid fa-forward-step"></i>
             </button>
-            <button onclick="cycleRepeatTarget('mushaf')" class="sec-player-btn" title="Vers wiederholen (Hifz)">
+            <button onclick="cycleRepeatTarget('mushaf')" class="sec-player-btn" title="Wiederholen" style="width: 30px; height: 30px; font-size: 0.75rem;">
               <i class="fa-solid fa-repeat"></i>
-              <span id="mushafLoopBadge" style="font-size: 0.72rem; font-weight: 800; margin-left: 2px;">1×</span>
+              <span id="mushafLoopBadge" style="font-size: 0.68rem; font-weight: 800; margin-left: 1px;">1×</span>
             </button>
           </div>
 
-          <div class="sec-player-right">
-            <select id="mushafPlayerQariSelect" class="sec-select" onchange="onQariChanged(this.value)" title="Rezitator für Muṣḥaf">
-              <option value="Alafasy_128kbps" selected>مشاري راشد العفاسي (Alafasy)</option>
-              <option value="Mansour_Al_Salimi">منصور السالمي (Ganze Sure)</option>
-              <option value="Abdul_Basit_Murattal_192kbps">عبد الباسط عبد الصمد - مرتل</option>
-              <option value="Abdul_Basit_Mujawwad_128kbps">عبد الباسط عبد الصمد - مجود</option>
-              <option value="Minshawy_Murattal_128kbps">محمد صديق المنشاوي - مرتل</option>
-              <option value="Minshawy_Mujawwad_192kbps">محمد صديق المنشاوي - مجود</option>
-              <option value="Husary_128kbps">محمود خليل الحصري - مرتل</option>
-              <option value="Husary_128kbps_Mujawwad">محمود خليل الحصري - مجود</option>
-              <option value="Ghamadi_40kbps">سعد الغامدی (Saad Al-Ghamdi)</option>
-              <option value="MaherAlMuaiqly128kbps">ماهر المعيقلي</option>
-              <option value="Yasser_Ad-Dussary_128kbps">ياسر الدوسري</option>
-              <option value="Abu_Bakr_Ash-Shaatree_128kbps">أبو بكر الشاطري</option>
-              <option value="Abdurrahmaan_As-Sudais_192kbps">عبد الرحمن السديس</option>
-              <option value="Saood_ash-Shuraym_128kbps">سعود الشريم</option>
-              <option value="Nasser_Alqatami_128kbps">ناصر القطامي</option>
-              <option value="Ali_Jaber_64kbps">علي جابر</option>
-              <option value="Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net">أحمد بن علي العجمي</option>
-              <option value="Fares_Abbad_64kbps">فارس عباد</option>
-              <option value="Hani_Rifai_192kbps">هاني الرفاعي</option>
-              <option value="Abdullaah_3awwaad_Al-Juhaynee_128kbps">عبد الله عواد الجهني</option>
-            </select>
-            <select id="mushafPlayerSpeedSelect" class="sec-select" onchange="changeSpeed(this.value)" title="Geschwindigkeit">
+          <div class="sec-player-right" style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+            <select id="mushafPlayerSpeedSelect" class="sec-select" onchange="changeSpeed(this.value)" title="Geschwindigkeit" style="padding: 3px 6px; font-size: 0.76rem; border-radius: 8px; background: rgba(18, 14, 12, 0.95); border: 1px solid rgba(229, 184, 76, 0.3); color: #fef08a; font-weight: 700;">
               <option value="0.75">0.75×</option>
               <option value="1.0" selected>1.0×</option>
               <option value="1.25">1.25×</option>
@@ -3151,7 +3161,7 @@
               <option value="Minshawy_Mujawwad_192kbps">محمد صديق المنشاوي - مجود</option>
               <option value="Husary_128kbps">محمود خليل الحصري - مرتل</option>
               <option value="Husary_128kbps_Mujawwad">محمود خليل الحصري - مجود</option>
-              <option value="Ghamadi_40kbps">سعد الغامدی (Saad Al-Ghamdi)</option>
+              <option value="Ghamadi_40kbps">Saad Al-Ghamdi (سعد الغامدي)</option>
               <option value="MaherAlMuaiqly128kbps">ماهر المعيقلي</option>
               <option value="Yasser_Ad-Dussary_128kbps">ياسر الدوسري</option>
               <option value="Abu_Bakr_Ash-Shaatree_128kbps">أبو بكر الشاطري</option>
@@ -3240,8 +3250,8 @@
             <button id="voiceRecordBtn" class="mic-action-btn" onclick="toggleVoiceRecording()" style="background: linear-gradient(135deg, #059669, #047857);" title="Direkte Sprachaufnahme für iPad Safari und alle Browser">
               <i class="fa-solid fa-microphone"></i> 🎙️ Mikrofon-Aufnahme (Alle Browser)
             </button>
-            <button id="voicePlayBtn" class="mic-action-btn" onclick="playUserRecordedAudio()" style="display: none; background: linear-gradient(135deg, #d97706, #b45309);" title="شنیدن صدای ضبط شده">
-              <i class="fa-solid fa-headphones"></i> 🎧 شنیدن صدای من
+            <button id="voicePlayBtn" class="mic-action-btn" onclick="playUserRecordedAudio()" style="display: none; background: linear-gradient(135deg, #d97706, #b45309);" title="Aufnahme abspielen">
+              <i class="fa-solid fa-headphones"></i> 🎧 Aufnahme abhören
             </button>
           </div>
           <div id="voiceRecordStatus" style="font-size: 0.85rem; color: #a7f3d0; text-align: center; margin-bottom: 8px;"></div>
@@ -3278,22 +3288,22 @@
           <div style="font-weight: 800; color: #f472b6;" data-i18n="card4_title">4. Tafsīr &amp; Übersetzungen</div>
           
         </div>
-        <div class="tafsir-top-bar">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-weight: 700; color: var(--gold-light);">Sure:</span>
-            <select id="tafsirSurahSelect" class="nav-select" onchange="onTafsirSurahChange(this.value)"></select>
+        <div class="tafsir-top-bar" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; background: rgba(26, 18, 22, 0.85); border: 1px solid rgba(244, 114, 182, 0.3); border-radius: 14px; margin-bottom: 10px;">
+          <div style="display: flex; align-items: center; gap: 6px; flex: 2; min-width: 140px;">
+            <span style="font-weight: 700; color: #fbcfe8; font-size: 0.82rem; white-space: nowrap;">Sure:</span>
+            <select id="tafsirSurahSelect" class="nav-select" onchange="onTafsirSurahChange(this.value)" style="width: 100%; max-width: 100%; padding: 4px 6px; font-size: 0.82rem; font-weight: 700; background: #08140f; color: #fef08a; border: 1px solid #f472b6; border-radius: 6px; cursor: pointer;"></select>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-weight: 700; color: var(--gold-light);">Vers:</span>
-            <select id="tafsirAyahSelect" class="nav-select" style="max-width: 140px;" onchange="onTafsirAyahChange(this.value)"></select>
+          <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 90px; max-width: 120px;">
+            <span style="font-weight: 700; color: #fbcfe8; font-size: 0.82rem; white-space: nowrap;">Vers:</span>
+            <select id="tafsirAyahSelect" class="nav-select" style="width: 100%; padding: 4px 6px; font-size: 0.82rem; font-weight: 700; background: #08140f; color: #fef08a; border: 1px solid #f472b6; border-radius: 6px; cursor: pointer;" onchange="onTafsirAyahChange(this.value)"></select>
           </div>
 
-          <div style="display: flex; gap: 8px;">
-            <button id="tafsirScopeSurahBtn" class="scope-btn active" onclick="setTafsirScope('surah')">
-              <i class="fa-solid fa-list-ol"></i> Gesamte Sure
+          <div style="display: flex; gap: 6px; flex-shrink: 0;">
+            <button id="tafsirScopeSurahBtn" class="scope-btn active" onclick="setTafsirScope('surah')" style="padding: 4px 8px; font-size: 0.78rem;">
+              <i class="fa-solid fa-list-ol"></i> Ganze Sure
             </button>
-            <button id="tafsirScopeSingleBtn" class="scope-btn" onclick="setTafsirScope('single')">
+            <button id="tafsirScopeSingleBtn" class="scope-btn" onclick="setTafsirScope('single')" style="padding: 4px 8px; font-size: 0.78rem;">
               <i class="fa-solid fa-magnifying-glass"></i> Einzelvers
             </button>
           </div>
@@ -3605,8 +3615,8 @@
         <div class="typo-section-title">Arabische Kalligraphie &amp; Schriftarten</div>
         <div class="font-cards-grid">
           <div id="fCardMadani" class="font-card-btn active" onclick="setQuranFont('KFGQPC Uthman Taha Naskh')">
-            <div style="font-weight: 700; font-size: 0.92rem; color: var(--gold-light);">۱. عثمان طه (مدینه منوره)</div>
-            <div style="font-size: 0.74rem; color: #94a3b8;">مصحف رسمی مجمع ملک فهد (۱۵ سطری)</div>
+            <div style="font-weight: 700; font-size: 0.92rem; color: var(--gold-light);">1. Uthmān Taha (Madinah)</div>
+            <div style="font-size: 0.74rem; color: #94a3b8;">Offizieller King Fahd Komplex (15 Zeilen)</div>
             <span class="font-sample-arabic" style="font-family: 'KFGQPC Uthman Taha Naskh', serif; font-size: 1.45rem;">كٓهيعٓصٓ ﴿١﴾</span>
           </div>
 
@@ -3618,13 +3628,13 @@
 
           <div id="fCardDigital" class="font-card-btn" onclick="setQuranFont('UthmanicHafs')">
             <div style="font-weight: 700; font-size: 0.92rem; color: var(--gold-light);">3. Uthmanic Modern (QuranLoop)</div>
-            <div style="font-size: 0.74rem; color: #94a3b8;">فونت دیجیتال بسیار خوانا و شفاف</div>
+            <div style="font-size: 0.74rem; color: #94a3b8;">Hochauflösende digitale Schrift</div>
             <span class="font-sample-arabic" style="font-family: 'UthmanicHafs', serif; font-size: 1.45rem;">كٓهيعٓصٓ ﴿١﴾</span>
           </div>
 
           <div id="fCardScheherazade" class="font-card-btn" onclick="setQuranFont('Scheherazade New')">
             <div style="font-weight: 700; font-size: 0.92rem; color: var(--gold-light);">4. Scheherazade New (نسخ روان)</div>
-            <div style="font-size: 0.74rem; color: #94a3b8;">طراحی نرم و راحت برای مطالعه طولانی</div>
+            <div style="font-size: 0.74rem; color: #94a3b8;">Optimiert für ermüdungsfreies Lesen</div>
             <span class="font-sample-arabic" style="font-family: 'Scheherazade New', serif; font-size: 1.45rem;">كٓهيعٓصٓ ﴿١﴾</span>
           </div>
 
@@ -3788,7 +3798,7 @@
 
       <!-- Theme & Design Customization -->
       <div class="drawer-section">
-        <div class="drawer-sec-title"><i class="fa-solid fa-palette"></i> <span data-i18n="themes_title">Farbdesign &amp; Themes (دیزاین و قالب)</span></div>
+        <div class="drawer-sec-title"><i class="fa-solid fa-palette"></i> <span data-i18n="themes_title">Farbdesign &amp; Themes</span></div>
         
         <div style="margin-bottom: 10px;">
           <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">1-Klick Theme:</label>

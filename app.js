@@ -1,3 +1,9 @@
+// Clear any outdated WebView caches
+try {
+  if (window.caches) {
+    caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+  }
+} catch (e) {}
 ﻿/**
  * QURAN HIFZ MASTER - PROFESSIONAL ENGINE (app.js)
  * Architecture: Clean, Event-Driven, Fully Offline-Capable
@@ -1680,7 +1686,7 @@ function playNextWordStudioCard() {
     } else {
       state.isPlaying = false;
       updateDockDisplay();
-      showToast('به پایان آیات استودیو رسیدید ✨');
+      showToast('Ende der Verse erreicht ✨');
     }
   }
 }
@@ -2300,7 +2306,7 @@ function updateMicButtonsUI(isRecording) {
 function toggleSpeechTest(autoMode) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    showToast("روی مرورگر سافاری آی‌پد، تشخیص خودکار نیاز به لینک امن HTTPS دارد؛ دکمه ضبط مستقیم صدا در زیر فعال است 🎙️");
+    showToast('Auf Safari/iOS bitte Mikrofon-Berechtigung erteilen 🎙️');
     const vBtn = document.getElementById('voiceRecordBtn');
     if (vBtn) vBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
@@ -2406,17 +2412,17 @@ async function toggleVoiceRecording() {
   if (mediaRecorderInstance && mediaRecorderInstance.state === 'recording') {
     mediaRecorderInstance.stop();
     if (recBtn) {
-      recBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> 🎙️ ضبط صدا (میکروفون)';
+      recBtn.innerHTML = '<i class="fa-solid fa-microphone"></i> 🎙️ Audio aufnehmen';
       recBtn.classList.remove('recording');
       recBtn.style.background = 'linear-gradient(135deg, #059669, #047857)';
     }
-    if (statusEl) statusEl.textContent = '✅ ضبط تلاوت به پایان رسید. روی «شنیدن صدای من» کلیک کنید.';
+    if (statusEl) statusEl.textContent = '✅ Aufnahme beendet. Klicke auf Aufnahme abhören.';
     showToast('صدا ضبط شد! ✅');
     return;
   }
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    showToast('مرورگر شما ضبط مستقیم صدا را پشتیبانی نمی‌کند.');
+    showToast('Audioaufnahme wird nicht unterstützt.');
     return;
   }
 
@@ -2446,11 +2452,11 @@ async function toggleVoiceRecording() {
       recBtn.classList.add('recording');
       recBtn.style.background = 'linear-gradient(135deg, #dc2626, #b91c1c)';
     }
-    if (statusEl) statusEl.textContent = '🎙️ در حال ضبط صدای شما... آیه را با آرامش بخوانید و پس از پایان، دکمه توقف را بزنید.';
+    if (statusEl) statusEl.textContent = '🎙️ Aufnahme läuft... Rezitiere den Vers und tippe auf Stopp.';
     showToast('در حال ضبط صدا... 🎙️');
   } catch (err) {
     console.warn('Voice Recording error:', err);
-    showToast('دسترسی به میکروفون تایید نشد یا مسدود است.');
+    showToast('Mikrofonzugriff nicht gestattet.');
   }
 }
 window.toggleVoiceRecording = toggleVoiceRecording;
@@ -2459,9 +2465,9 @@ function playUserRecordedAudio() {
   if (recordedAudioBlobUrl) {
     const audio = new Audio(recordedAudioBlobUrl);
     audio.play();
-    showToast('در حال پخش تلاوت شما 🎧');
+    showToast('Spiele deine Aufnahme ab 🎧');
   } else {
-    showToast('هنوز صدایی ضبط نشده است.');
+    showToast('Noch keine Aufnahme vorhanden.');
   }
 }
 window.playUserRecordedAudio = playUserRecordedAudio;
@@ -2835,7 +2841,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 // ============================================================
-// MURAJA'A QUIZ ENGINE (الهام گرفته از اپ Murajaa - com.murajaa.org)
+// MURAJA'A QUIZ ENGINE (Murajaa Quiz)
 // ============================================================
 let currentMurajaaQuiz = {
   surah: 1,
@@ -3019,14 +3025,14 @@ function setQuranFont(fontName) {
   if (state.activeTab === 'wordStudio') renderWordStudio();
   if (state.activeTab === 'tafsir') renderTafsirStudio();
 
-  const fontPersianName = {
-    'KFGQPC Uthman Taha Naskh': 'عثمان طه (مصحف مدینه منوره - مجمع ملک فهد)',
-    'Amiri Quran': 'امیری قرآن (نسخ شاهی قاهره با کشیدگی)',
-    'UthmanicHafs': 'عثمانی مدرن دیجیتال (QuranLoop)',
-    'Scheherazade New': 'شهرزاد نوین (نسخ روان SIL)',
-    'IndoPak': 'نستعلیق شبه‌قاره (هند و پاکستان)'
+  const fontGermanName = {
+    'KFGQPC Uthman Taha Naskh': '1. Uthmān Taha (Madinah)',
+    'Amiri Quran': '2. Amiri Quran (Kairo)',
+    'UthmanicHafs': '3. Uthmānisch Digital (QuranLoop)',
+    'Scheherazade New': '4. Scheherazade New',
+    'IndoPak': '5. IndoPak Nastaliq'
   }[fontName] || fontName;
-  showToast(`✨ قلم قرآن تغییر یافت: ${fontPersianName}`);
+  showToast(`✨ Schriftart geändert: ${fontGermanName}`);
 }
 window.setQuranFont = setQuranFont;
 
@@ -3363,7 +3369,7 @@ window.addEventListener('keydown', (e) => {
 // 16. COMPREHENSIVE UI EXTENSIONS (STEPPERS, LAYOUT, SYNC)
 // ============================================================
 
-// Toggle Home Menu Cards Layout (Grid vs List / دسته‌ای یا ردیفی)
+// Toggle Home Menu Cards Layout (Grid vs List)
 function toggleHomeCardsLayout() {
   const grid = document.querySelector('.android-cards-grid');
   const icon = document.getElementById('homeLayoutIcon');
