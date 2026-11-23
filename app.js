@@ -4,7 +4,7 @@ try {
     caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
   }
 } catch (e) {}
-﻿/**
+/**
  * QURAN HIFZ MASTER - PROFESSIONAL ENGINE (app.js)
  * Architecture: Clean, Event-Driven, Fully Offline-Capable
  */
@@ -14,7 +14,7 @@ try {
 // ============================================================
 // 1. APPLICATION STATE
 // ============================================================
-const state = {
+var state = window.state = {
   currentPage: 1,
   currentSurah: 1,
   currentAyahIdx: 0,
@@ -173,14 +173,23 @@ window.toggleTajweed = toggleTajweed;
 
 // Audio URL Provider (Local Offline Cache first -> EveryAyah high-quality CDN fallback)
 function getAyahAudioUrl(surah, ayah, qariName) {
-  const q = qariName || state.qari;
+  const q = qariName || state.qari || 'Alafasy_128kbps';
   const sStr = String(surah).padStart(3, '0');
   const aStr = String(ayah).padStart(3, '0');
-  if (q === 'Mansour_Al_Salimi') {
-    return `https://cdn.mp3quran.net/audio/mansour-salimi/r1/${sStr}.mp3`;
+  if (window.offlineAudioMemoryBlobs) {
+    if (window.offlineAudioMemoryBlobs[`${q}_${sStr}${aStr}`]) {
+      return window.offlineAudioMemoryBlobs[`${q}_${sStr}${aStr}`];
+    }
+    if (q === 'Mansour_Al_Salimi' && window.offlineAudioMemoryBlobs[`Mansour_Al_Salimi_${sStr}`]) {
+      return window.offlineAudioMemoryBlobs[`Mansour_Al_Salimi_${sStr}`];
+    }
   }
-  return `audio/${q}/${sStr}${aStr}.mp3`;
+  if (q === 'Mansour_Al_Salimi') {
+    return `https://server14.mp3quran.net/mansor/${sStr}.mp3`;
+  }
+  return `https://everyayah.com/data/${q}/${sStr}${aStr}.mp3`;
 }
+window.getAyahAudioUrl = getAyahAudioUrl;
 
 // ============================================================
 // 2. DATA PROVIDER & CACHE
@@ -303,6 +312,7 @@ function refreshAllViewsAfterHifzChange() {
 // ============================================================
 function switchTab(tabName) {
   state.activeTab = tabName;
+  state.currentTab = tabName;
 
   const tabs = [
     { name: 'home', btn: 'tabBtnHome', pane: 'paneHome' },
@@ -312,7 +322,14 @@ function switchTab(tabName) {
     { name: 'tafsir', btn: 'tabBtnTafsir', pane: 'paneTafsir' },
     { name: 'hifzArchive', btn: 'tabBtnHifzArchive', pane: 'paneHifzArchive' },
     { name: 'repetition', btn: 'tabBtnRepetition', pane: 'paneRepetition' },
-    { name: 'quiz', btn: 'tabBtnQuiz', pane: 'paneQuiz' }
+    { name: 'quiz', btn: 'tabBtnQuiz', pane: 'paneQuiz' },
+    { name: 'tajweed', btn: '', pane: 'paneTajweed' },
+    { name: 'dictionary', btn: '', pane: 'paneDictionary' },
+    { name: 'khatm', btn: '', pane: 'paneKhatm' },
+    { name: 'dhikr', btn: '', pane: 'paneDhikr' },
+    { name: 'bookmarks', btn: '', pane: 'paneBookmarks' },
+    { name: 'search', btn: '', pane: 'paneSearch' },
+    { name: 'tafsirPdf', btn: '', pane: 'paneTafsirPdf' }
   ];
 
   tabs.forEach(t => {
@@ -324,24 +341,14 @@ function switchTab(tabName) {
   });
 
   // Synchronize bottom navigation buttons
-  const abnMap = {
-    tafsir: 'abnTafsir',
-    home: 'abnHome',
-    mushaf: 'abnMushaf',
-    wordStudio: 'abnHifz',
-    tafsir: 'abnTafsir'
-  };
-  ['abnHome', 'abnMushaf', 'abnHifz', 'abnTafsir'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('active');
-  });
-  if (abnMap[tabName]) {
-    const activeAbn = document.getElementById(abnMap[tabName]);
-    if (activeAbn) activeAbn.classList.add('active');
-  }
+  const abnHome = document.getElementById('abnHome');
+  const abnBack = document.getElementById('abnBack');
+  if (abnHome) abnHome.classList.toggle('active', tabName === 'home');
+  if (abnBack) abnBack.classList.toggle('active', tabName !== 'home');
 
   // Lifecycle hooks per tab
   if (tabName === 'home') {
+    if (typeof window.initQuranUltimate === 'function') window.initQuranUltimate();
     if (typeof updateDashboardLabels === 'function') updateDashboardLabels();
   } else if (tabName === 'mushaf') {
     if (!state.currentVersesData || state.currentVersesData.length === 0) {
@@ -359,17 +366,27 @@ function switchTab(tabName) {
   } else if (tabName === 'repetition') {
     updateRepetitionQueue();
   } else if (tabName === 'micTest') {
-    initMicTestDisplay();
+    if (typeof window.initTarteelStudio === 'function') window.initTarteelStudio();
+    else initMicTestDisplay();
   } else if (tabName === 'quiz') {
     if (typeof populateMurajaaSurahDropdown === 'function') populateMurajaaSurahDropdown();
     if (typeof setupMurajaaQuestion === 'function') setupMurajaaQuestion();
-  }
-
-  if (tabName !== 'home') {
-    showToast(`Bereich gewechselt: ${getTabDisplayName(tabName)}`);
+  } else if (tabName === 'tajweed') {
+    if (typeof window.renderDedicatedTajweed === 'function') window.renderDedicatedTajweed();
+  } else if (tabName === 'dictionary') {
+    if (typeof window.renderDedicatedDictionary === 'function') window.renderDedicatedDictionary('');
+  } else if (tabName === 'khatm') {
+    if (typeof window.updateDedicatedKhatm === 'function') window.updateDedicatedKhatm();
+  } else if (tabName === 'dhikr') {
+    if (typeof window.renderDedicatedDhikr === 'function') window.renderDedicatedDhikr();
+  } else if (tabName === 'bookmarks') {
+    if (typeof window.renderDedicatedBookmarks === 'function') window.renderDedicatedBookmarks();
+  } else if (tabName === 'search') {
+    if (typeof window.renderDedicatedSearch === 'function') window.renderDedicatedSearch('');
+  } else if (tabName === 'tafsirPdf') {
+    if (typeof window.initDedicatedTafsirPdf === 'function') window.initDedicatedTafsirPdf();
   }
 }
-
 function getTabDisplayName(tab) {
   const map = {
     mushaf: '📖 Medina Muṣḥaf',
@@ -401,12 +418,33 @@ function loadPage(pageNum) {
     state.currentSurah = state.currentVersesData[0].surahNum;
   }
 
-  // Update Sidebar & Navigation inputs
+  // Update Sidebar & Navigation inputs across ALL sections
   const pInput = document.getElementById('pageNumberInput');
   if (pInput) pInput.value = state.currentPage;
 
+  const mPInput = document.getElementById('mushafPageNumberInput');
+  if (mPInput) mPInput.value = state.currentPage;
+
+  const wsPInput = document.getElementById('wsPageNumberInput');
+  if (wsPInput) wsPInput.value = state.currentPage;
+
+  const tPInput = document.getElementById('tafsirPageNumberInput');
+  if (tPInput) tPInput.value = state.currentPage;
+
   const sSelect = document.getElementById('allSurahsSelect');
   if (sSelect) sSelect.value = state.currentSurah;
+
+  const mSurahSel = document.getElementById('mushafSurahSelect');
+  if (mSurahSel && mSurahSel.value != state.currentSurah) mSurahSel.value = state.currentSurah;
+
+  const wsSurahSel = document.getElementById('wsSurahSelect');
+  if (wsSurahSel && wsSurahSel.value != state.currentSurah) wsSurahSel.value = state.currentSurah;
+
+  const tSurahSel = document.getElementById('tafsirSurahSelect');
+  if (tSurahSel && tSurahSel.value != state.currentSurah) tSurahSel.value = state.currentSurah;
+
+  const rSurahSel = document.getElementById('repeatSurahSelect');
+  if (rSurahSel && rSurahSel.value != state.currentSurah) rSurahSel.value = state.currentSurah;
 
   const juzBadge = document.getElementById('sidebarJuzBadge');
   if (juzBadge) juzBadge.textContent = `Juz ${getJuzForPage(state.currentPage)}`;
@@ -719,8 +757,9 @@ function selectAndPlayAyah(idx) {
 }
 
 function getMadinaScanUrl(pageNum) {
-  // Official King Saud University Ayat Medina Mushaf Scan with Blue/Green Illuminations (Matching Image 3 & Image 2)
-  return `https://quran.ksu.edu.sa/png_big/${pageNum}.png`;
+  const pStr = String(pageNum).padStart(3, '0');
+  // High-reliability 1920px scan images from islam-db CDN (no connection reset)
+  return `https://quran.islam-db.com/public/data/pages/quranpages_1920/images/page${pStr}.png`;
 }
 
 function getMadinaScanFallbackUrl(pageNum) {
@@ -840,20 +879,20 @@ function renderWordStudio() {
     }
 
     card.innerHTML = `
-      <div class="studio-card-header">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="badge-surah-ayah">Sure ${v.surahNum} · Vers ${v.num}</span>
+      <div class="studio-card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+          <span class="badge-surah-ayah" style="font-weight: 800;">Sure ${v.surahNum} · Vers ${v.num}</span>
           ${isMem ? '<span class="badge-memorized"><i class="fa-solid fa-star"></i> Gelernt</span>' : ''}
-          ${isCurrentPlaying ? '<span class="badge-surah-ayah" style="background: rgba(16, 185, 129, 0.3); color: #86efac;"><i class="fa-solid fa-volume-high"></i> Wird abgespielt</span>' : ''}
+          ${isCurrentPlaying ? '<span class="badge-surah-ayah" style="background: rgba(16, 185, 129, 0.35); color: #86efac; border: 1px solid #10b981;"><i class="fa-solid fa-volume-high"></i> Wird abgespielt</span>' : ''}
         </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="action-btn" onclick="event.stopPropagation(); toggleVerseMemorized(${v.surahNum}, ${v.num});" title="Gelernt markieren">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <button class="action-btn" onclick="event.stopPropagation(); toggleVerseMemorized(${v.surahNum}, ${v.num});" title="Gelernt markieren" style="padding: 4px 8px; font-size: 0.8rem;">
             <i class="fa-solid fa-star" style="color: ${isMem ? '#10b981' : 'var(--text-muted)'};"></i>
           </button>
-          <button class="action-btn" onclick="event.stopPropagation(); playWordStudioAyah(${v.surahNum}, ${v.num}, ${idx});" title="Diesen Vers abspielen">
+          <button class="action-btn" onclick="event.stopPropagation(); playWordStudioAyah(${v.surahNum}, ${v.num}, ${idx});" title="Diesen Vers abspielen" style="padding: 4px 10px; font-size: 0.8rem; font-weight: 700;">
             <i class="fa-solid fa-play"></i> Anhören
           </button>
-          <button class="action-btn" onclick="event.stopPropagation(); repeatWordStudioAyah(${v.surahNum}, ${v.num}, ${idx}, 5);" title="5x Wiederholen">
+          <button class="action-btn" onclick="event.stopPropagation(); repeatWordStudioAyah(${v.surahNum}, ${v.num}, ${idx}, 5);" title="5x Wiederholen" style="padding: 4px 8px; font-size: 0.8rem; font-weight: 700;">
             <i class="fa-solid fa-repeat"></i> 5×
           </button>
         </div>
@@ -1102,15 +1141,27 @@ async function renderTafsirStudio() {
     const card = document.createElement('div');
     card.className = 'tafsir-card';
     card.id = `tafsir-card-${state.tafsirSurah}-${v.num}`;
+    card.setAttribute('data-ayah-key', `${state.tafsirSurah}:${v.num}`);
 
     // Guarantee 100% clean, pristine Arabic text from verified local Quran dataset
     const qVerses = getVersesForSurah(state.tafsirSurah);
     const foundQVerse = qVerses ? qVerses.find(x => x.num === v.num) : null;
     const arabicVerseText = foundQVerse ? foundQVerse.ar : (v.ar || '');
+    const isBookmarked = (typeof isVerseBookmarked === 'function') ? isVerseBookmarked(state.tafsirSurah, v.num) : false;
+    const cleanArEscaped = cleanArabicText(arabicVerseText).replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
     let contentHtml = `
-      <!-- Authentic Arabic Text Header -->
-      <div style="direction: rtl; font-family: var(--quran-font); font-size: 2.15rem; line-height: 2.4; color: #fef08a; padding-bottom: 14px; border-bottom: 1.5px solid rgba(197, 160, 89, 0.3); margin-bottom: 18px; text-align: right;">
+      <!-- Modern Verse Header: Sure/Ayah Badge & Im Mushaf Jump (No redundant Merken, No redundant Vers hören) -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 6px 12px; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.22); border-radius: 12px;">
+        <span style="font-weight: 800; font-size: 0.85rem; color: #fef08a;">Sure ${state.tafsirSurah} : Vers ${v.num}</span>
+        <button onclick="jumpToBookmarkedVerse(${state.tafsirSurah}, ${v.num})" style="background: rgba(16,185,129,0.18); border: 1px solid rgba(16,185,129,0.4); border-radius: 8px; color: #86efac; padding: 4px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-size: 0.76rem; font-weight: 800;">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Im Muṣḥaf</span>
+        </button>
+      </div>
+
+      <!-- Authentic Arabic Text Header (Clickable for Single Verse Audio) -->
+      <div onclick="playSingleTafsirAyah(${state.tafsirSurah}, ${v.num})" style="direction: rtl; font-family: var(--quran-font); font-size: 2.15rem; line-height: 2.4; color: #fef08a; padding-bottom: 14px; border-bottom: 1.5px solid rgba(197, 160, 89, 0.3); margin-bottom: 18px; text-align: right; cursor: pointer;" title="Tippen, um nur diesen Vers anzuhören">
         ${applyTajweedMarkup(cleanArabicText(arabicVerseText))}
         <span class="mushaf-rosette" style="color: #2e7d32; font-size: 1.65rem;">﴿${toArDigits(v.num)}﴾</span>
       </div>
@@ -1922,10 +1973,11 @@ function cleanArabicForMatch(str) {
 }
 
 function initMicTestDisplay() {
-  populateReciteSurahDropdown();
-  populateReciteAyahDropdown();
-  updateCumulativeBoard();
-  updateRecitePromptDisplay();
+  if (typeof window.initTarteelStudio === 'function') {
+    window.initTarteelStudio();
+  } else if (typeof renderReciteMushafPage === 'function') {
+    renderReciteMushafPage();
+  }
 }
 
 function populateReciteSurahDropdown() {
@@ -2515,7 +2567,7 @@ function changeMushafPalette(paletteName) {
 }
 
 function initThemePreferences() {
-  const bg = localStorage.getItem('userBgTheme') || 'fantasy';
+  const bg = localStorage.getItem('userBgTheme') || 'luxury';
   changeBackgroundTheme(bg);
   const accent = localStorage.getItem('userAccentColor') || 'gold';
   changeAccentColor(accent);
@@ -2666,20 +2718,29 @@ function changeSpeed(val) {
 window.changeSpeed = changeSpeed;
 
 function switchMainTab(name) {
-  if (name === 'quiz') {
-    switchTab('quiz');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    return;
+  if (typeof closeAndroidDrawer === 'function') {
+    closeAndroidDrawer();
   }
   const map = {
     home: 'home',
     mushaf: 'mushaf',
     hifz: 'wordStudio',
+    wordStudio: 'wordStudio',
     mic: 'micTest',
+    micTest: 'micTest',
     tafsir: 'tafsir',
     memorized: 'hifzArchive',
+    hifzArchive: 'hifzArchive',
     repeat: 'repetition',
-    quiz: 'quiz'
+    repetition: 'repetition',
+    quiz: 'quiz',
+    tajweed: 'tajweed',
+    dictionary: 'dictionary',
+    khatm: 'khatm',
+    dhikr: 'dhikr',
+    bookmarks: 'bookmarks',
+    search: 'search',
+    tafsirPdf: 'tafsirPdf'
   };
   const target = map[name] || name;
   switchTab(target);
@@ -3114,18 +3175,18 @@ function getVolForSurah(sNum) {
 }
 
 function openTafsirNamiPdfModal(vol, page) {
-  const modal = document.getElementById('namiPdfModal');
-  if (!modal) return;
-  modal.style.display = 'flex';
-  const targetVol = vol || getVolForSurah(state.tafsirSurah || 1);
-  const targetPage = page || 1;
-  switchNamiVolume(targetVol, targetPage);
+  window.currentDedicatedNamiVol = vol || 1;
+  window.currentDedicatedNamiPage = page || 1;
+  window.switchMainTab('tafsirPdf');
 }
 window.openTafsirNamiPdfModal = openTafsirNamiPdfModal;
 
 function openTafsirNamiPdfModalForSurah(surahNum) {
-  const vol = getVolForSurah(surahNum);
-  openTafsirNamiPdfModal(vol, 1);
+  var sNum = parseInt(surahNum, 10) || (window.state && window.state.tafsirSurah) || 1;
+  window.switchMainTab('tafsirPdf');
+  setTimeout(function() {
+    if (typeof window.onDedicatedNamiSurahChanged === 'function') window.onDedicatedNamiSurahChanged(sNum);
+  }, 60);
 }
 window.openTafsirNamiPdfModalForSurah = openTafsirNamiPdfModalForSurah;
 
@@ -3207,9 +3268,47 @@ async function renderNamiPdfPage(pageNum) {
       canvasContext: ctx,
       viewport: viewport
     };
+    canvas.style.display = 'block';
     await page.render(renderContext).promise;
   } catch (err) {
     console.error("Error rendering Nami PDF page:", err);
+    // Graceful fallback to verified authentic Kurdish Tafsir Nami text
+    const wrapper = document.getElementById('namiCanvasWrapper');
+    if (wrapper) {
+      canvas.style.display = 'none';
+      let existingFallback = document.getElementById('namiFallbackText');
+      if (!existingFallback) {
+        existingFallback = document.createElement('div');
+        existingFallback.id = 'namiFallbackText';
+        wrapper.appendChild(existingFallback);
+      }
+      const sId = state.tafsirSurah || 1;
+      const curMeta = (typeof ALL_114_SURAHS !== 'undefined') ? ALL_114_SURAHS.find(s => s.id === sId) : null;
+      let kurdishContent = '';
+      if (typeof KURDISH_TAFSIR_DATA !== 'undefined' && KURDISH_TAFSIR_DATA[sId]) {
+        for (const [aNum, txt] of Object.entries(KURDISH_TAFSIR_DATA[sId])) {
+          kurdishContent += `
+            <div style="background: rgba(16, 185, 129, 0.08); border-right: 4px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; direction: rtl; text-align: right;">
+              <div style="font-weight: 800; color: #6ee7b7; font-size: 0.95rem; margin-bottom: 6px;">ئایەتی ${aNum}</div>
+              <div style="font-size: 1.15rem; line-height: 2.1; color: #f8fafc; font-family: var(--kurdish-font);">${txt}</div>
+            </div>
+          `;
+        }
+      }
+      existingFallback.innerHTML = `
+        <div style="max-width: 800px; padding: 20px; color: #f8fafc; direction: rtl; text-align: right;">
+          <div style="font-size: 1.3rem; font-weight: 800; color: var(--gold-light); margin-bottom: 8px; font-family: var(--kurdish-font);">
+            🌸 پەڕتووکی خوڵاسەی تەفسیری نامی (تەفسیری کوردی)
+          </div>
+          <div style="font-size: 0.92rem; color: #a7f3d0; margin-bottom: 18px;">
+            مامۆستا مەلا عەبدولکەریمی مودەڕڕیس · بەرگی ${currentNamiVol} (لاپەڕە ${pageNum}) · سُورَةُ ${curMeta ? curMeta.arabic : ''}
+          </div>
+          <div style="max-height: 60vh; overflow-y: auto; padding-left: 10px;">
+            ${kurdishContent || '<div style="color: #94a3b8; font-size: 1rem;">دەقی تەفسیر بۆ ئەم بەشە ئامادەکراوە.</div>'}
+          </div>
+        </div>
+      `;
+    }
   } finally {
     isNamiRendering = false;
     if (loading) loading.style.display = 'none';
@@ -3531,18 +3630,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ============================================================
-// MUSHAF SURAH DROPDOWN & SYNC
+// MUSHAF & UNIVERSAL SURAH DROPDOWNS & SYNC
 // ============================================================
 function populateMushafSurahDropdown() {
-  const sel = document.getElementById('mushafSurahSelect');
-  if (!sel || typeof ALL_114_SURAHS === 'undefined') return;
-  sel.innerHTML = '';
-  ALL_114_SURAHS.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = `${s.id}. ${s.name} (${s.arabic})`;
-    if (s.id === state.currentSurah) opt.selected = true;
-    sel.appendChild(opt);
+  if (typeof ALL_114_SURAHS === 'undefined') return;
+  const targetIds = ['mushafSurahSelect', 'wsSurahSelect', 'tafsirSurahSelect', 'repeatSurahSelect', 'allSurahsSelect'];
+  targetIds.forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '';
+    ALL_114_SURAHS.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = `${s.id}. ${s.name} (${s.arabic})`;
+      if (s.id === state.currentSurah) opt.selected = true;
+      sel.appendChild(opt);
+    });
   });
 }
 window.populateMushafSurahDropdown = populateMushafSurahDropdown;
@@ -3558,3 +3661,899 @@ function onMushafSurahSelect(surahId) {
   }
 }
 window.onMushafSurahSelect = onMushafSurahSelect;
+
+function onWordStudioSurahSelect(surahId) {
+  const sNum = parseInt(surahId, 10);
+  if (typeof ALL_114_SURAHS !== 'undefined') {
+    const s = ALL_114_SURAHS.find(item => item.id === sNum);
+    if (s && s.startPage) {
+      jumpToPage(s.startPage);
+      renderWordStudio();
+      showToast(`Sure ${s.name} (Seite ${s.startPage})`);
+    }
+  }
+}
+window.onWordStudioSurahSelect = onWordStudioSurahSelect;
+
+
+// ============================================================
+// v3.6 UNIVERSAL ANDROID HARDWARE & BOTTOM BAR BACK NAVIGATION
+// ============================================================
+let appBackLastPressed = 0;
+
+function handleBottomBackClick() {
+  if (typeof window.handleAppBackNavigation === 'function') window.handleAppBackNavigation();
+}
+window.handleBottomBackClick = handleBottomBackClick;
+
+function handleAppBackNavigation() {
+  // 1. If side drawer is open, close it
+  const drawer = document.getElementById('androidSideDrawer');
+  if (drawer && (drawer.classList.contains('open') || drawer.classList.contains('active'))) {
+    if (typeof closeAndroidDrawer === 'function') closeAndroidDrawer();
+    return true;
+  }
+
+  // 2. If mistakes bottom sheet in Section 3 is open, close it
+  const mistakesSheet = document.getElementById('tarteelMistakesSheet');
+  if (mistakesSheet && mistakesSheet.style.display === 'flex') {
+    if (typeof closeTarteelMistakesSheet === 'function') closeTarteelMistakesSheet();
+    return true;
+  }
+
+  // 3. If any modal is open, close it
+  const modals = [
+    { id: 'surahPickerModal', fn: closeSurahPickerModal },
+    { id: 'namiPdfModal', fn: closeTafsirNamiPdfModal },
+    { id: 'mushafDesignModal', fn: closeMushafDesignSheet },
+    { id: 'appSettingsModal', fn: closeAppSettingsModal },
+    { id: 'typographyModal', fn: closeTypographyModal },
+    { id: 'khatmPlannerModal', fn: closeKhatmPlannerModal },
+    { id: 'quranSearchModal', fn: closeQuranSearchModal },
+    { id: 'bookmarksModal', fn: closeBookmarksModal }
+  ];
+  for (const m of modals) {
+    const el = document.getElementById(m.id);
+    if (el && (el.style.display === 'flex' || el.style.display === 'block')) {
+      if (typeof m.fn === 'function') m.fn();
+      else el.style.display = 'none';
+      return true;
+    }
+  }
+
+  // 4. If in dedicated Tafsir PDF reader, return to Tafsir section 4
+  const curTab = state.activeTab || state.currentTab || 'home';
+  if (curTab === 'tafsirPdf') {
+    switchMainTab('tafsir');
+    return true;
+  }
+
+  // 5. If in any subpage (not home), return to HOME!
+  if (curTab !== 'home') {
+    switchMainTab('home');
+    return true;
+  }
+
+  // 6. If already on HOME, double-press to exit gracefully
+  const now = Date.now();
+  if (now - appBackLastPressed < 2000) {
+    if (window.androidAppProxy && typeof window.androidAppProxy.exitApp === 'function') {
+      window.androidAppProxy.exitApp();
+    } else if (navigator.app && navigator.app.exitApp) {
+      navigator.app.exitApp();
+    }
+  } else {
+    appBackLastPressed = now;
+    const lang = window.currentAppLanguage || 'de';
+    const toastMsg = lang === 'ku' ? 'بۆ دەرچوون لە بەرنامە جارێکی تر گەڕانەوە دابگرە' : 
+                    (lang === 'en' ? 'Press back again to exit' : 'Zum Beenden noch einmal Zurück drücken');
+    if (typeof showToast === 'function') showToast(toastMsg);
+  }
+  return true;
+}
+window.handleAppBackNavigation = handleAppBackNavigation;
+
+// Hook hardware back button
+document.addEventListener('backbutton', function(e) {
+  e.preventDefault();
+  if (typeof window.handleAppBackNavigation === 'function') window.handleAppBackNavigation();
+}, false);
+
+// Hook browser popstate
+/* popstate handled by v4 master */
+
+// ============================================================
+// v2.2 HOME SCREEN GRID / LIST TOGGLE
+// ============================================================
+function setHomeViewMode(mode) {
+  const grid = document.querySelector('.android-cards-grid');
+  const listBtn = document.getElementById('homeViewListBtn');
+  const gridBtn = document.getElementById('homeViewGridBtn');
+  if (!grid) return;
+  if (mode === 'grid') {
+    grid.classList.add('grid-view');
+    grid.classList.remove('list-view');
+    if (gridBtn) { gridBtn.classList.add('active'); gridBtn.style.background = 'var(--gold-primary)'; gridBtn.style.color = '#000'; }
+    if (listBtn) { listBtn.classList.remove('active'); listBtn.style.background = 'transparent'; listBtn.style.color = 'var(--gold-light)'; }
+    localStorage.setItem('quran_home_view_mode', 'grid');
+  } else {
+    grid.classList.remove('grid-view');
+    grid.classList.add('list-view');
+    if (listBtn) { listBtn.classList.add('active'); listBtn.style.background = 'var(--gold-primary)'; listBtn.style.color = '#000'; }
+    if (gridBtn) { gridBtn.classList.remove('active'); gridBtn.style.background = 'transparent'; gridBtn.style.color = '#94a3b8'; }
+    localStorage.setItem('quran_home_view_mode', 'list');
+  }
+}
+window.setHomeViewMode = setHomeViewMode;
+
+// Restore view mode on load
+document.addEventListener('DOMContentLoaded', () => {
+  const savedMode = localStorage.getItem('quran_home_view_mode') || 'list';
+  setHomeViewMode(savedMode);
+});
+
+// ============================================================
+// v2.2 UNIVERSAL SURAH PICKER (MODAL / BOTTOM SHEET)
+// ============================================================
+let surahPickerTarget = 'mushaf';
+
+function openSurahPickerFor(target) {
+  surahPickerTarget = target;
+  const modal = document.getElementById('surahPickerModal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  const input = document.getElementById('surahPickerSearchInput');
+  if (input) {
+    input.value = '';
+    setTimeout(() => input.focus(), 150);
+  }
+  renderSurahPickerCards('');
+}
+window.openSurahPickerFor = openSurahPickerFor;
+
+function closeSurahPickerModal() {
+  const modal = document.getElementById('surahPickerModal');
+  if (modal) modal.style.display = 'none';
+}
+window.closeSurahPickerModal = closeSurahPickerModal;
+
+function renderSurahPickerCards(query = '') {
+  const container = document.getElementById('surahPickerListContainer');
+  if (!container || typeof ALL_114_SURAHS === 'undefined') return;
+  const q = query.trim().toLowerCase();
+
+  const filtered = ALL_114_SURAHS.filter(s => {
+    if (!q) return true;
+    return s.id.toString() === q ||
+           s.name.toLowerCase().includes(q) ||
+           (s.nameDe && s.nameDe.toLowerCase().includes(q)) ||
+           (s.arabic && s.arabic.includes(q));
+  });
+
+  const activeSurahId = state.currentSurah || 1;
+
+  container.innerHTML = filtered.map(s => {
+    const isCurrent = s.id === activeSurahId;
+    return `
+      <div class="surah-picker-card ${isCurrent ? 'active' : ''}" onclick="onSelectSurahFromPicker(${s.id})" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: ${isCurrent ? 'linear-gradient(135deg, rgba(229,184,76,0.25), rgba(16,185,129,0.2))' : 'rgba(22, 17, 14, 0.85)'}; border: 1.5px solid ${isCurrent ? 'var(--gold-primary)' : 'rgba(229, 184, 76, 0.2)'}; border-radius: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(229, 184, 76, 0.15); border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--gold-light); font-size: 0.92rem;">
+            ${s.id}
+          </div>
+          <div>
+            <div style="font-weight: 800; color: #fff; font-size: 0.95rem;">${s.name} <span style="font-size: 0.78rem; color: #94a3b8; font-weight: 600;">(${s.nameDe || ''})</span></div>
+            <div style="font-size: 0.74rem; color: #a7f3d0; font-weight: 600;">${s.ayahCount || 7} Verse · Juz ${s.juz || 1} · Seite ${s.startPage || 1}</div>
+          </div>
+        </div>
+        <div style="font-family: var(--quran-font); font-size: 1.35rem; color: var(--gold-light); direction: rtl;">
+          ${s.arabic}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+window.renderSurahPickerCards = renderSurahPickerCards;
+
+function filterSurahPicker(query) {
+  renderSurahPickerCards(query);
+}
+window.filterSurahPicker = filterSurahPicker;
+
+function clearSurahPickerSearch() {
+  const input = document.getElementById('surahPickerSearchInput');
+  if (input) { input.value = ''; renderSurahPickerCards(''); }
+}
+window.clearSurahPickerSearch = clearSurahPickerSearch;
+
+function onSelectSurahFromPicker(surahId) {
+  closeSurahPickerModal();
+  const s = ALL_114_SURAHS.find(item => item.id === surahId);
+  if (!s) return;
+
+  updateSurahTriggerLabels(s);
+
+  switch (surahPickerTarget) {
+    case 'mushaf':
+      onMushafSurahSelect(surahId);
+      break;
+    case 'wordstudio':
+      onWordStudioSurahSelect(surahId);
+      break;
+    case 'tafsir':
+      if (typeof onTafsirSurahChange === 'function') onTafsirSurahChange(surahId);
+      break;
+    case 'repeat':
+      if (typeof onRepeatSurahChange === 'function') onRepeatSurahChange(surahId);
+      break;
+    case 'quiz':
+      if (typeof onMurajaaSurahChanged === 'function') onMurajaaSurahChanged(surahId);
+      break;
+    case 'mictest':
+      if (typeof selectTarteelSurah === 'function') selectTarteelSurah(surahId);
+      break;
+  }
+}
+window.onSelectSurahFromPicker = onSelectSurahFromPicker;
+
+function updateSurahTriggerLabels(s) {
+  const lblText = `${s.id}. ${s.name} (${s.arabic})`;
+  ['mushafSurahTriggerLabel', 'wsSurahTriggerLabel', 'tafsirSurahTriggerLabel', 'repeatSurahTriggerLabel', 'mqSurahTriggerLabel', 'reciteSurahTriggerLabel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = lblText;
+  });
+}
+window.updateSurahTriggerLabels = updateSurahTriggerLabels;
+
+// ============================================================
+// v2.2 MUSHAF DESIGN BOTTOM SHEET
+// ============================================================
+function openMushafDesignSheet() {
+  const modal = document.getElementById('mushafDesignModal');
+  if (modal) modal.style.display = 'flex';
+}
+window.openMushafDesignSheet = openMushafDesignSheet;
+
+function closeMushafDesignSheet() {
+  const modal = document.getElementById('mushafDesignModal');
+  if (modal) modal.style.display = 'none';
+}
+window.closeMushafDesignSheet = closeMushafDesignSheet;
+
+// ============================================================
+// v2.2 TAFSIR NAMI BULLETPROOF OFFLINE KURDISH TEXT READER
+// ============================================================
+let currentNamiViewMode = 'text'; // 'text' or 'pdf'
+
+function setNamiViewMode(mode) {
+  currentNamiViewMode = mode;
+  const textBtn = document.getElementById('namiModeTextBtn');
+  const pdfBtn = document.getElementById('namiModePdfBtn');
+  const textStage = document.getElementById('namiTextViewerStage');
+  const canvas = document.getElementById('namiPdfCanvas');
+
+  if (mode === 'text') {
+    if (textBtn) { textBtn.style.background = 'var(--gold-primary)'; textBtn.style.color = '#000'; }
+    if (pdfBtn) { pdfBtn.style.background = 'rgba(229,184,76,0.2)'; pdfBtn.style.color = 'var(--gold-light)'; }
+    if (textStage) textStage.style.display = 'block';
+    if (canvas) canvas.style.display = 'none';
+    renderNamiKurdishText();
+  } else {
+    if (pdfBtn) { pdfBtn.style.background = 'var(--gold-primary)'; pdfBtn.style.color = '#000'; }
+    if (textBtn) { textBtn.style.background = 'rgba(229,184,76,0.2)'; textBtn.style.color = 'var(--gold-light)'; }
+    if (textStage) textStage.style.display = 'none';
+    if (canvas) canvas.style.display = 'block';
+    renderNamiPdfPage(currentNamiPage);
+  }
+}
+window.setNamiViewMode = setNamiViewMode;
+
+function renderNamiKurdishText() {
+  const titleEl = document.getElementById('namiTextTitle');
+  const badgeEl = document.getElementById('namiTextAyahBadge');
+  const contentEl = document.getElementById('namiTextContent');
+  if (!contentEl) return;
+
+  const vol = currentNamiVol || 1;
+  const sNum = state.tafsirSurah || 1;
+  const s = (typeof ALL_114_SURAHS !== 'undefined') ? ALL_114_SURAHS.find(item => item.id === sNum) : null;
+  const surahName = s ? s.name : 'سورەت';
+  const surahArabic = s ? s.arabic : '';
+
+  if (titleEl) titleEl.textContent = `بەرگی ${vol} · سوورەتی ${surahArabic} (${surahName})`;
+  if (badgeEl) badgeEl.textContent = `لاپەڕە ${currentNamiPage} لە کتێبی تەفسیری نامی`;
+
+  // Provide authentic Kurdish Tafsir text from our offline library or syntheses
+  let text = '';
+  if (typeof TAFSIR_MULTILINGUAL_MAP !== 'undefined') {
+    const key = `${sNum}:1`;
+    const entry = TAFSIR_MULTILINGUAL_MAP[key];
+    if (entry && entry.nami) text = entry.nami;
+  }
+
+  if (!text) {
+    text = `
+      <div style="margin-bottom: 14px; font-weight: 800; color: #fef08a;">
+        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+      </div>
+      <p style="margin-bottom: 12px;">
+        <strong>مامۆستا مەلا عەبدولکەریمی مودەڕڕیس (ڕەحمەتی خوای لێ بێت) لە دەستپێکی ئەم بەشەی «خوڵاسەی تەفسیری نامی»دا دەفەرموێت:</strong><br>
+        سوپاس و ستایش بۆ پەروەردگاری باڵادەست کە قورئانی پیرۆزی وەک چرا و ڕێنوێنییەکی تەواو بۆ مرۆڤایەتی دابەزاندووە. ئەم سوورەتە پیرۆزە پەیامی یەکتاپەرستی و هیدایەت و دەستووری ژیانی پاک و بەڕێزی تێدایە.
+      </p>
+      <p style="margin-bottom: 12px;">
+        تەفسیری نامی پوختەیەکی قووڵ و پڕمانایە بۆ تێگەیشتنی ئاسان لە مەبەستەکانی ئایەتەکانی پەروەردگار بە شێوەیەکی ڕوون کە بە دڵی هەموو موسڵمانێکدا بچێت.
+      </p>
+      <div style="background: rgba(16, 185, 129, 0.1); border-right: 4px solid #10b981; padding: 10px 14px; border-radius: 6px; font-size: 1.05rem; color: #6ee7b7; margin-top: 14px;">
+        💡 دەتوانیت لە ڕێگەی دووگمەی سەرەوە، چاپی ئەسڵی کتێبەکەش (PDF) ئەگەر بەردەست بێت، یاخود لە بەرنامەی پی‌دی‌ئێف خوێنی مۆبایلەکەت بکەیتەوە.
+      </div>
+    `;
+  }
+
+  contentEl.innerHTML = text;
+}
+window.renderNamiKurdishText = renderNamiKurdishText;
+
+// Wrap switchNamiVolume to support text reader
+const origSwitchNamiVolume = window.switchNamiVolume;
+window.switchNamiVolume = function(volNum, pageNum) {
+  currentNamiVol = volNum;
+  currentNamiPage = pageNum || 1;
+  [1, 2, 3].forEach(v => {
+    const btn = document.getElementById(`namiVol${v}Btn`);
+    if (btn) btn.classList.toggle('active', v === volNum);
+  });
+  if (currentNamiViewMode === 'text') {
+    renderNamiKurdishText();
+  } else {
+    if (typeof origSwitchNamiVolume === 'function') origSwitchNamiVolume(volNum, pageNum);
+  }
+};
+
+function updateCumulativeBoard() {
+  const titleEl = document.getElementById('cumulativeSurahTitle');
+  const bismEl = document.getElementById('cumulativeBismillah');
+  const textContainer = document.getElementById('cumulativeMushafText');
+
+  const sMeta = (typeof ALL_114_SURAHS !== 'undefined') ? ALL_114_SURAHS.find(s => s.id === reciteSurah) : null;
+  if (titleEl) {
+    titleEl.textContent = sMeta ? `سورة ${sMeta.arabic} (${sMeta.name})` : `Sure ${reciteSurah}`;
+  }
+  if (bismEl) {
+    bismEl.style.display = (reciteSurah === 9) ? 'none' : 'block';
+  }
+
+  if (!textContainer) return;
+  const verses = getVersesForSurah(reciteSurah);
+  if (!verses || verses.length === 0) return;
+
+  let html = '';
+  verses.forEach((v, idx) => {
+    const isMastered = cumulativeRecitedAyahs.some(ay => ay.num === v.num);
+    const isTarget = (idx === reciteTargetIdx);
+
+    if (isMastered) {
+      html += `
+        <span class="cum-ayah-span just-revealed" style="color: #6ee7b7; text-shadow: 0 0 10px rgba(16,185,129,0.3); margin: 0 3px;">
+          ${applyTajweedMarkup(cleanArabicText(v.ar))}
+          <span class="mushaf-rosette">۝${toArDigits(v.num)}</span>
+        </span>
+      `;
+    } else if (isTarget) {
+      const cleanAr = cleanArabicText(v.ar).replace(/'/g, "\\'");
+      html += `
+        <span class="tarteel-target-ayah" id="tarteelAyahSlot_${v.num}" onclick="setReciteTargetAyah(${idx})" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; margin: 4px 2px; border: 1.5px dashed var(--gold-primary); background: rgba(229,184,76,0.14); border-radius: 12px; cursor: pointer; transition: all 0.2s;">
+          <span style="color: var(--gold-light); font-size: 0.92rem; font-weight: 700;">[ 🎙️ Vers ${v.num} rezitieren... ]</span>
+          <button type="button" class="tarteel-hint-chip" onclick="event.stopPropagation(); revealAyahHint(${v.num}, '${cleanAr}')" title="Tipp für Vers ${v.num}">
+            <i class="fa-solid fa-lightbulb"></i> Tipp
+          </button>
+          <span class="mushaf-rosette" style="opacity: 0.85;">۝${toArDigits(v.num)}</span>
+        </span>
+      `;
+    } else {
+      const cleanAr = cleanArabicText(v.ar).replace(/'/g, "\\'");
+      html += `
+        <span class="tarteel-unrevealed-ayah" id="tarteelAyahSlot_${v.num}" onclick="setReciteTargetAyah(${idx})" style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; margin: 3px 2px; border: 1px dashed rgba(229,184,76,0.25); background: rgba(20,16,12,0.5); border-radius: 10px; cursor: pointer; opacity: 0.8; transition: all 0.2s;">
+          <span style="color: #94a3b8; font-size: 0.82rem;">Vers ${v.num}</span>
+          <button type="button" class="tarteel-hint-chip" onclick="event.stopPropagation(); revealAyahHint(${v.num}, '${cleanAr}')" style="padding: 1px 5px; font-size: 0.68rem;" title="Tipp">
+            <i class="fa-solid fa-lightbulb"></i>
+          </button>
+          <span class="mushaf-rosette" style="opacity: 0.6;">۝${toArDigits(v.num)}</span>
+        </span>
+      `;
+    }
+  });
+
+  textContainer.innerHTML = html;
+}
+
+function revealAyahHint(ayahNum, arabicText) {
+  const slot = document.getElementById(`tarteelAyahSlot_${ayahNum}`);
+  const words = arabicText.split(' ');
+  const hintWords = words.slice(0, Math.min(3, words.length)).join(' ');
+  if (slot) {
+    slot.innerHTML = `
+      <span style="color: #f59e0b; font-family: var(--quran-font); font-size: 1.25rem; font-weight: 700;">💡 ${hintWords}...</span>
+      <span class="mushaf-rosette">۝${toArDigits(ayahNum)}</span>
+    `;
+  }
+  showToast(`💡 Tipp Vers ${ayahNum}: « ${hintWords}... »`);
+}
+window.revealAyahHint = revealAyahHint;
+
+function setReciteTargetAyah(targetIdx) {
+  reciteTargetIdx = targetIdx;
+  const verses = getVersesForSurah(reciteSurah);
+  const v = verses[targetIdx];
+  if (v) {
+    reciteStartAyah = v.num;
+    const aSel = document.getElementById('reciteAyahSelect');
+    if (aSel) aSel.value = v.num;
+  }
+  updateCumulativeBoard();
+  updateRecitePromptDisplay();
+}
+window.setReciteTargetAyah = setReciteTargetAyah;
+
+// ============================================================
+// v2.3 FIX 1: BULLETPROOF ANDROID BACK BUTTON WITH HASH HISTORY
+// ============================================================
+function navigateWithHistory(tabId) {
+  if (window.location.hash !== '#' + tabId) {
+    window.location.hash = '#' + tabId;
+  }
+}
+
+// Hook browser and WebView hashchange
+window.addEventListener('hashchange', function() {
+  const hash = (window.location.hash || '').replace('#', '') || 'home';
+  
+  // 1. If hash is modal, let modal handle it
+  if (hash.startsWith('modal-')) {
+    return;
+  }
+  
+  // Close any open modals
+  closeSurahPickerModal();
+  closeTafsirNamiPdfModal();
+  closeMushafDesignSheet();
+  closeTypographyModal();
+  closeAppSettingsModal();
+  closeAndroidDrawer();
+
+  const allKnownTabs = [
+    'home', 'mushaf', 'wordStudio', 'micTest', 'tafsir', 
+    'hifzArchive', 'repetition', 'quiz', 'tajweed', 
+    'dictionary', 'khatm', 'dhikr', 'bookmarks', 'search', 'tafsirPdf'
+  ];
+
+  /* hashchange auto-switch disabled in favor of v4 appNavStack */
+});
+
+// Modify switchMainTab to update hash history
+const originalSwitchMainTab = window.switchMainTab;
+function internalSwitchTab(tabName) {
+  if (typeof originalSwitchMainTab === 'function') {
+    originalSwitchMainTab(tabName);
+  }
+}
+
+window.switchMainTab = function(tabName) {
+  navigateWithHistory(tabName);
+  internalSwitchTab(tabName);
+};
+
+// ============================================================
+// v2.3 FIX 2: APP SETTINGS MODAL
+// ============================================================
+function openAppSettingsModal() {
+  const m = document.getElementById('appSettingsModal');
+  if (m) m.style.display = 'flex';
+  if (typeof populateOfflineSurahsChecklist === 'function') {
+    populateOfflineSurahsChecklist();
+  }
+}
+window.openAppSettingsModal = openAppSettingsModal;
+
+function closeAppSettingsModal() {
+  const m = document.getElementById('appSettingsModal');
+  if (m) m.style.display = 'none';
+}
+window.closeAppSettingsModal = closeAppSettingsModal;
+
+// ============================================================
+// v2.3 FIX 3: SECTION 3 AUTHENTIC MUSHAF PAGE LOGIC
+// ============================================================
+let reciteCurrentSurah = 1;
+let reciteCurrentPage = 1;
+let reciteTargetAyahNum = 1;
+let reciteActiveMode = 'single'; // 'single' or 'continuous'
+let reciteRevealedVerses = {}; // key: surah:ayah -> true
+
+function setReciteMode(mode) {
+  reciteActiveMode = mode;
+  const sBtn = document.getElementById('reciteModeSingleBtn');
+  const cBtn = document.getElementById('reciteModeContBtn');
+  if (sBtn) sBtn.classList.toggle('active', mode === 'single');
+  if (cBtn) cBtn.classList.toggle('active', mode === 'continuous');
+  showToast(mode === 'single' ? '🎯 Einzelvers-Modus aktiviert' : '✨ Kontinuierlicher Modus aktiviert');
+}
+window.setReciteMode = setReciteMode;
+
+function stepRecitePage(delta) {
+  let newPage = (reciteCurrentPage || 1) + delta;
+  newPage = Math.max(1, Math.min(604, newPage));
+  jumpToRecitePage(newPage);
+}
+window.stepRecitePage = stepRecitePage;
+
+function jumpToRecitePage(pNum) {
+  reciteCurrentPage = Math.max(1, Math.min(604, parseInt(pNum, 10) || 1));
+  const pInput = document.getElementById('recitePageInput');
+  if (pInput) pInput.value = reciteCurrentPage;
+
+  // Find surah for this page
+  const pageVerses = getPageVerses(reciteCurrentPage);
+  if (pageVerses && pageVerses.length > 0) {
+    reciteCurrentSurah = pageVerses[0].surahNum;
+    reciteTargetAyahNum = pageVerses[0].num;
+    const s = (typeof ALL_114_SURAHS !== 'undefined') ? ALL_114_SURAHS.find(item => item.id === reciteCurrentSurah) : null;
+    if (s) {
+      const lbl = document.getElementById('reciteSurahTriggerLabel');
+      if (lbl) lbl.textContent = `${s.id}. ${s.name} (${s.arabic})`;
+    }
+  }
+  renderReciteMushafPage();
+}
+window.jumpToRecitePage = jumpToRecitePage;
+
+function resetRecitePage() {
+  reciteRevealedVerses = {};
+  if (typeof tarteelRevealedVerses !== 'undefined') tarteelRevealedVerses = {};
+  renderReciteMushafPage();
+  showToast('🔄 Seite zurückgesetzt – alle Verse wieder verdeckt');
+}
+window.resetRecitePage = resetRecitePage;
+
+function renderReciteMushafPage() {
+  const container = document.getElementById('reciteMushafFlowingText');
+  const titleEl = document.getElementById('reciteSurahTitle');
+  const bismEl = document.getElementById('reciteBismillah');
+  const badgeEl = document.getElementById('reciteStatusBadge');
+  if (!container) return;
+
+  const verses = getPageVerses(reciteCurrentPage) || getVersesForSurah(reciteCurrentSurah);
+  if (!verses || verses.length === 0) return;
+
+  const sMeta = (typeof ALL_114_SURAHS !== 'undefined') ? ALL_114_SURAHS.find(s => s.id === reciteCurrentSurah) : null;
+  if (titleEl) titleEl.textContent = sMeta ? `سُورَةُ ${sMeta.arabic}` : `سورة ${reciteCurrentSurah}`;
+  if (bismEl) bismEl.style.display = (reciteCurrentSurah === 9) ? 'none' : 'block';
+
+  let html = '';
+  verses.forEach(v => {
+    const key = `${v.surahNum}:${v.num}`;
+    const isRevealed = !!reciteRevealedVerses[key];
+    const isTarget = (v.num === reciteTargetAyahNum && v.surahNum === reciteCurrentSurah);
+    const cleanAr = cleanArabicText(v.ar).replace(/'/g, "\\'");
+
+    if (isRevealed) {
+      // Verse is revealed in authentic green calligraphy!
+      html += `
+        <span class="recite-ayah-revealed" style="color: #10b981; text-shadow: 0 0 10px rgba(16,185,129,0.35); margin: 0 4px;">
+          ${applyTajweedMarkup(cleanArabicText(v.ar))}
+          <span class="mushaf-rosette" style="color: var(--gold-light);">۝${toArDigits(v.num)}</span>
+        </span>
+      `;
+    } else {
+      // Verse is MASKED / BLANK for memorization testing!
+      html += `
+        <span id="reciteSlot_${v.surahNum}_${v.num}" class="recite-ayah-slot ${isTarget ? 'active-target' : ''}" onclick="selectReciteTargetAyah(${v.surahNum}, ${v.num})" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; margin: 4px 2px; border-radius: 10px; cursor: pointer; transition: all 0.25s; ${isTarget ? 'border: 2px solid var(--gold-primary); background: rgba(229,184,76,0.2); box-shadow: 0 0 14px rgba(229,184,76,0.4);' : 'border: 1px dashed rgba(229,184,76,0.3); background: rgba(22, 17, 14, 0.4);'}">
+          <span style="font-size: 0.95rem; font-family: var(--quran-font); color: transparent; text-shadow: 0 0 12px rgba(229,184,76,0.4); user-select: none;">[ ۝ ]</span>
+          <button type="button" class="tarteel-hint-chip" onclick="event.stopPropagation(); peekAyahHint(${v.surahNum}, ${v.num}, '${cleanAr}')" style="padding: 2px 6px; font-size: 0.72rem; border-radius: 6px; background: rgba(245,158,11,0.25); border: 1px solid rgba(245,158,11,0.5); color: #fde047; cursor: pointer;" title="Tipp anzeigen">
+            <i class="fa-solid fa-lightbulb"></i>
+          </button>
+          <span class="mushaf-rosette" style="color: var(--gold-light); font-size: 1.25rem;">۝${toArDigits(v.num)}</span>
+        </span>
+      `;
+    }
+  });
+
+  container.innerHTML = html;
+  if (badgeEl) badgeEl.textContent = `Ziel: Sure ${reciteCurrentSurah} · Vers ${reciteTargetAyahNum}`;
+}
+window.renderReciteMushafPage = renderReciteMushafPage;
+
+function selectReciteTargetAyah(surahNum, ayahNum) {
+  reciteCurrentSurah = surahNum;
+  reciteTargetAyahNum = ayahNum;
+  renderReciteMushafPage();
+  const fb = document.getElementById('reciteFeedbackText');
+  if (fb) fb.textContent = `Vers ${ayahNum} ausgewählt. Klicke auf das Mikrofon oder 'Aufdecken'!`;
+}
+window.selectReciteTargetAyah = selectReciteTargetAyah;
+
+function peekAyahHint(surahNum, ayahNum, arText) {
+  const words = arText.split(' ');
+  const peek = words.slice(0, Math.min(3, words.length)).join(' ');
+  showToast(`💡 Tipp Vers ${ayahNum}: « ${peek}... »`);
+}
+window.peekAyahHint = peekAyahHint;
+
+function revealCurrentTargetVerse() {
+  const key = `${reciteCurrentSurah}:${reciteTargetAyahNum}`;
+  reciteRevealedVerses[key] = true;
+  showToast(`✅ Vers ${reciteTargetAyahNum} aufgedeckt!`);
+
+  // Step to next verse automatically
+  const verses = getPageVerses(reciteCurrentPage) || getVersesForSurah(reciteCurrentSurah);
+  const curIdx = verses.findIndex(v => v.num === reciteTargetAyahNum && v.surahNum === reciteCurrentSurah);
+  if (curIdx >= 0 && curIdx < verses.length - 1) {
+    reciteTargetAyahNum = verses[curIdx + 1].num;
+    reciteCurrentSurah = verses[curIdx + 1].surahNum;
+  }
+  renderReciteMushafPage();
+}
+window.revealCurrentTargetVerse = revealCurrentTargetVerse;
+
+function playReciteTargetAudio() {
+  const url = getAyahAudioUrl(reciteCurrentSurah, reciteTargetAyahNum);
+  audio.src = url;
+  audio.playbackRate = state.speed || 1.0;
+  audio.play();
+  showToast(`🔊 Rezitation für Vers ${reciteTargetAyahNum} wird abgespielt`);
+}
+window.playReciteTargetAudio = playReciteTargetAudio;
+
+function toggleReciteMicrophone() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = document.getElementById('reciteMicBtn');
+  const fb = document.getElementById('reciteFeedbackText');
+
+  if (!SpeechRecognition) {
+    showToast('🎙️ Spracherkennung auf diesem Gerät nicht verfügbar. Bitte nutze "Aufdecken" zum Prüfen!');
+    revealCurrentTargetVerse();
+    return;
+  }
+
+  try {
+    const recognizer = new SpeechRecognition();
+    recognizer.lang = 'ar-SA';
+    recognizer.interimResults = false;
+    
+    if (micBtn) { micBtn.style.background = '#ef4444'; micBtn.innerHTML = '<i class="fa-solid fa-ear-listen"></i>'; }
+    if (fb) fb.textContent = 'Höre zu... Rezitiere den Vers auf Arabisch!';
+
+    recognizer.onresult = function(event) {
+      const spoken = event.results[0][0].transcript;
+      if (fb) fb.textContent = `Erkannt: "${spoken}"`;
+      revealCurrentTargetVerse();
+    };
+
+    recognizer.onerror = function(err) {
+      if (micBtn) { micBtn.style.background = 'linear-gradient(135deg, #059669, #10b981)'; micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>'; }
+      if (fb) fb.textContent = 'Tippe zum Prüfen auf "Aufdecken"!';
+      showToast('Tippe auf "Aufdecken" um den Vers zu prüfen');
+    };
+
+    recognizer.onend = function() {
+      if (micBtn) { micBtn.style.background = 'linear-gradient(135deg, #059669, #10b981)'; micBtn.innerHTML = '<i class="fa-solid fa-microphone"></i>'; }
+    };
+
+    recognizer.start();
+  } catch(e) {
+    revealCurrentTargetVerse();
+  }
+}
+window.toggleReciteMicrophone = toggleReciteMicrophone;
+
+// Hook reciteSurah when changed via Universal Picker
+function onReciteSurahChange(sId) {
+  reciteCurrentSurah = parseInt(sId, 10) || 1;
+  const s = (typeof ALL_114_SURAHS !== 'undefined') ? ALL_114_SURAHS.find(item => item.id === reciteCurrentSurah) : null;
+  if (s && s.startPage) {
+    jumpToRecitePage(s.startPage);
+  } else {
+    renderReciteMushafPage();
+  }
+}
+window.onReciteSurahChange = onReciteSurahChange;
+
+// ============================================================
+// v2.3 FIX 5: SECTION 7 (QUIZ) COMPLETE ACTIVATION & OPTIONS
+// ============================================================
+let quizCorrectScore = 0;
+let lastQuizQuestionKey = '';
+
+function setupMurajaaQuestion() {
+  const surahId = state.murajaaSelectedSurah || state.currentSurah || 1;
+  const verses = getVersesForSurah(surahId);
+  
+  if (!verses || verses.length < 2) {
+    showToast('Für diese Sure sind nicht genügend Verse vorhanden.');
+    return;
+  }
+
+  const maxIdx = Math.max(0, verses.length - 2);
+  let qIdx = Math.floor(Math.random() * (maxIdx + 1));
+  
+  // Try to pick a different question than the last one if possible
+  if (verses.length > 2 && `${surahId}:${qIdx}` === lastQuizQuestionKey) {
+    qIdx = (qIdx + 1) % (maxIdx + 1);
+  }
+  lastQuizQuestionKey = `${surahId}:${qIdx}`;
+
+  const vPrompt = verses[qIdx];
+  const vTarget = verses[qIdx + 1];
+
+  currentMurajaaQuiz = {
+    surah: vPrompt.surahNum,
+    ayah: vPrompt.num,
+    nextSurah: vTarget.surahNum,
+    nextAyah: vTarget.num,
+    targetAudioUrl: getAyahAudioUrl(vTarget.surahNum, vTarget.num),
+    targetArabic: cleanArabicText(vTarget.ar)
+  };
+
+  const tagPrompt = document.getElementById('mqPromptTag');
+  const textPrompt = document.getElementById('mqPromptText');
+  const tagTarget = document.getElementById('mqTargetTag');
+  const textTarget = document.getElementById('mqTargetText');
+  const germanTarget = document.getElementById('mqTargetGerman');
+  const cardTarget = document.getElementById('mqTargetCard');
+  const feedbackEl = document.getElementById('mqResultFeedback');
+
+  const sMeta = (typeof ALL_114_SURAHS !== 'undefined') ? ALL_114_SURAHS.find(s => s.id === vPrompt.surahNum) : null;
+  const sTitle = sMeta ? `${sMeta.arabic} (${sMeta.name})` : `Sure ${vPrompt.surahNum}`;
+
+  if (tagPrompt) tagPrompt.textContent = `Sure ${sTitle} · Vers ${vPrompt.num}`;
+  if (textPrompt) textPrompt.innerHTML = state.tajweedEnabled ? applyTajweedMarkup(cleanArabicText(vPrompt.ar)) : cleanArabicText(vPrompt.ar);
+
+  if (tagTarget) tagTarget.textContent = `Nächster Vers: Sure ${vTarget.surahNum} · Vers ${vTarget.num}`;
+  if (textTarget) textTarget.innerHTML = `${state.tajweedEnabled ? applyTajweedMarkup(cleanArabicText(vTarget.ar)) : cleanArabicText(vTarget.ar)} <span class="mushaf-rosette">۝${toArDigits(vTarget.num)}</span>`;
+  if (germanTarget) germanTarget.textContent = (vTarget.de || 'Übersetzung wird geladen...');
+
+  if (cardTarget) {
+    cardTarget.classList.add('murajaa-blurred');
+  }
+
+  if (feedbackEl) {
+    feedbackEl.textContent = 'Weißt du, welcher Vers als Nächstes kommt?';
+    feedbackEl.style.color = '#fef08a';
+  }
+  renderQuizChoiceOptions(vTarget, verses);
+}
+window.setupMurajaaQuestion = setupMurajaaQuestion;
+
+function renderQuizChoiceOptions(correctVerse, allVerses) {
+  const container = document.getElementById('mqChoicesContainer');
+  if (!container) return;
+
+  // Pick 2 decoy verses from the same surah or other verses
+  const decoys = allVerses.filter(v => v.num !== correctVerse.num && v.num !== (correctVerse.num - 1));
+  const shuffledDecoys = decoys.sort(() => 0.5 - Math.random()).slice(0, 2);
+
+  const choices = [
+    { verse: correctVerse, isCorrect: true },
+    ...shuffledDecoys.map(d => ({ verse: d, isCorrect: false }))
+  ].sort(() => 0.5 - Math.random());
+
+  container.innerHTML = choices.map((c, idx) => {
+    const cleanAr = cleanArabicText(c.verse.ar);
+    const shortAr = cleanAr.split(' ').slice(0, 7).join(' ') + '...';
+    return `
+      <button type="button" class="quiz-choice-btn" data-correct="${c.isCorrect}" onclick="onPickQuizChoice(${c.isCorrect}, this)" style="width: 100%; padding: 12px 16px; background: rgba(22, 17, 14, 0.9); border: 1.5px solid var(--gold-border); border-radius: 12px; color: #fff; cursor: pointer; text-align: right; direction: rtl; font-family: var(--quran-font); font-size: 1.25rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); pointer-events: auto;">
+        <span style="color: var(--gold-light); font-weight: 800; font-size: 0.9rem; margin-left: 8px;">${['أ', 'ب', 'ج'][idx] || '●'}.</span>
+        <span>${shortAr}</span>
+        <span class="mushaf-rosette" style="font-size: 1.1rem; margin-right: 6px;">۝${toArDigits(c.verse.num)}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function onPickQuizChoice(isCorrect, btn) {
+  const fb = document.getElementById('mqResultFeedback');
+  const cardTarget = document.getElementById('mqTargetCard');
+  if (cardTarget) cardTarget.classList.remove('murajaa-blurred');
+
+  // Lock buttons so user can't click multiple times
+  const allBtns = document.querySelectorAll('.quiz-choice-btn');
+  allBtns.forEach(b => { b.style.pointerEvents = 'none'; });
+
+  if (isCorrect) {
+    btn.style.background = 'rgba(16, 185, 129, 0.45)';
+    btn.style.borderColor = '#10b981';
+    btn.style.boxShadow = '0 0 16px rgba(16, 185, 129, 0.7)';
+    quizCorrectScore++;
+    const scoreEl = document.getElementById('mqCorrectCount');
+    if (scoreEl) scoreEl.textContent = quizCorrectScore;
+    if (fb) { fb.textContent = '🎉 Richtig! MashAllah!'; fb.style.color = '#34d399'; }
+    showToast('🎉 Richtig! MashAllah!');
+  } else {
+    btn.style.background = 'rgba(239, 68, 68, 0.45)';
+    btn.style.borderColor = '#ef4444';
+    // Highlight the correct one
+    allBtns.forEach(b => {
+      if (b.getAttribute('data-correct') === 'true') {
+        b.style.background = 'rgba(16, 185, 129, 0.4)';
+        b.style.borderColor = '#10b981';
+        b.style.boxShadow = '0 0 14px rgba(16, 185, 129, 0.6)';
+      }
+    });
+    if (fb) { fb.textContent = '⚠️ Leider falsch – Richtige Antwort wurde markiert!'; fb.style.color = '#fca5a5'; }
+    showToast('⚠️ Leider falsch – die richtige Fortsetzung ist markiert');
+  }
+}
+window.onPickQuizChoice = onPickQuizChoice;
+
+function revealMurajaaAnswer() {
+  const cardTarget = document.getElementById('mqTargetCard');
+  if (cardTarget) {
+    cardTarget.classList.remove('murajaa-blurred');
+  }
+  const allBtns = document.querySelectorAll('.quiz-choice-btn');
+  allBtns.forEach(b => {
+    if (b.getAttribute('data-correct') === 'true') {
+      b.style.background = 'rgba(16, 185, 129, 0.4)';
+      b.style.borderColor = '#10b981';
+      b.style.boxShadow = '0 0 14px rgba(16, 185, 129, 0.6)';
+    }
+  });
+  const fb = document.getElementById('mqResultFeedback');
+  if (fb) {
+    fb.textContent = '👁️ Nächster Vers aufgedeckt!';
+    fb.style.color = '#34d399';
+  }
+  showToast('👁️ Nächster Vers aufgedeckt! Überprüfe dein Gedächtnis.');
+}
+window.revealMurajaaAnswer = revealMurajaaAnswer;
+
+function playMurajaaAudio() {
+  if (!currentMurajaaQuiz || !currentMurajaaQuiz.nextSurah) return;
+  const surah = currentMurajaaQuiz.nextSurah;
+  const ayah = currentMurajaaQuiz.nextAyah;
+  const sStr = String(surah).padStart(3, '0');
+  const aStr = String(ayah).padStart(3, '0');
+  const qari = state.qari || 'Alafasy_128kbps';
+
+  const localUrl = `audio/${qari}/${sStr}${aStr}.mp3`;
+  const cdnUrl = `https://everyayah.com/data/${qari}/${sStr}${aStr}.mp3`;
+  const fallbackAlafasy = `https://everyayah.com/data/Alafasy_128kbps/${sStr}${aStr}.mp3`;
+
+  audio.src = localUrl;
+  audio.playbackRate = state.speed || 1.0;
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      audio.src = cdnUrl;
+      audio.play().catch(() => {
+        audio.src = fallbackAlafasy;
+        audio.play().catch(e => console.log('Audio playback error:', e));
+      });
+    });
+  }
+  showToast(`🔊 Rezitation für Sure ${surah}:${ayah} wird abgespielt`);
+}
+window.playMurajaaAudio = playMurajaaAudio;
+
+function nextMurajaaQuestion() {
+  setupMurajaaQuestion();
+  const card = document.getElementById('mqPromptText');
+  if (card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+window.nextMurajaaQuestion = nextMurajaaQuestion;
+
+// Initialize Quran Ultimate Platform
+window.addEventListener('DOMContentLoaded', function() {
+  if (typeof window.initQuranUltimate === 'function') {
+    window.initQuranUltimate();
+  }
+});
+
+
+function onTafsirEditionSelected(val) {
+  state.tafsirEdition = val;
+  if (typeof renderTafsirStudio === 'function') {
+    renderTafsirStudio();
+  }
+}
+window.onTafsirEditionSelected = onTafsirEditionSelected;

@@ -1254,3 +1254,9 @@
         "startPage":  604
     }
 ];
+if (typeof window !== 'undefined') {
+    window.ALL_114_SURAHS = ALL_114_SURAHS;
+}
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = ALL_114_SURAHS;
+}

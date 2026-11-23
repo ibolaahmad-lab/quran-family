@@ -530,15 +530,18 @@ function renderScholarlyGermanTafsirHtml(surahNum, ayahNum, ayahArabic, ayahGerm
             ${data.surahName}
           </h2>
         </div>
-        <div style="text-align: right;">
+        <div style="text-align: right; display: flex; align-items: center; gap: 8px;">
+          <button onclick="playSingleTafsirAyah(${surahNum}, ${ayahNum})" class="neo3d-pill-btn" style="background: rgba(245, 158, 11, 0.2); color: #fde68a; border-color: rgba(245, 158, 11, 0.45); padding: 5px 12px; font-size: 0.8rem; cursor: pointer;">
+            <i class="fa-solid fa-volume-high"></i> Vers hören
+          </button>
           <span style="font-size: 1.05rem; color: #6ee7b7; font-weight: 800; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; padding: 5px 14px; border-radius: 12px;">
             <i class="fa-solid fa-book-open-reader"></i> Vers ${surahNum}:${ayahNum}
           </span>
         </div>
       </div>
 
-      <!-- Ayah Arabic & Translation -->
-      <div style="background: rgba(0,0,0,0.55); border-left: 4px solid var(--gold-primary); border-radius: 14px; padding: 18px 22px; margin-bottom: 22px;">
+      <!-- Ayah Arabic & Translation (Clickable for Single Verse Audio) -->
+      <div onclick="playSingleTafsirAyah(${surahNum}, ${ayahNum})" style="background: rgba(0,0,0,0.55); border-left: 4px solid var(--gold-primary); border-radius: 14px; padding: 18px 22px; margin-bottom: 22px; cursor: pointer;" title="Tippen, um nur diesen Vers anzuhören">
         <div style="font-family: var(--quran-font); font-size: 2rem; color: var(--gold-light); text-align: right; direction: rtl; line-height: 2.3; margin-bottom: 12px;">
           ${typeof cleanQuranText === 'function' ? cleanQuranText(ayahArabic) : ayahArabic}
         </div>
