@@ -1,0 +1,246 @@
+{
+  "lockedModules": [
+    {
+      "id": "sacredDailyAyahCard",
+      "title": "Hero Daily Ayah & Audio Multi-Part Card",
+      "titleFa": "بخش آیه روزانه و پخش صوت چندبخشی با ترجمه سه زبانه",
+      "status": "PERMANENTLY_LOCKED",
+      "approvedAt": "2026-11-21T23:25:21.323Z",
+      "backupPath": "backup_approved_hero_daily_verse_final",
+      "inviolableRules": [
+        "Do not alter #sacredDailyAyahCard DOM or styles",
+        "Do not remove bismillah_transparent.png centerpiece",
+        "Keep authentic Medina Uthmanic font with zero 3D text-shadow",
+        "Keep multi-part auto-splitter max 2 lines per phrase",
+        "Keep golden glass jewel shuffle button under translation"
+      ]
+    },
+    {
+      "id": "homeCleanIslamicHeader",
+      "title": "Home Screen Floating Islamic Header & Unified Celestial Theme",
+      "titleFa": "هدر شناور معنوی اسلامی با کتیبه زرین، قرآن و رحل، چراغ‌های اسلیمی، ماه و ستاره‌های ۸‌پر اسلامی و پس‌زمینه یکدست سرمه‌ای",
+      "status": "PERMANENTLY_LOCKED",
+      "approvedAt": "2026-11-21T23:56:44.646Z",
+      "backupPath": "backup_approved_checkpoint_3_header_locked",
+      "inviolableRules": [
+        "Do not add rectangular borders or corner flourishes",
+        "Keep clean midnight navy background (#050b16 / #09152a)",
+        "Strictly retain authentic Islamic 8-pointed and 5-pointed stars (never add 6-pointed stars)",
+        "Keep smooth gradient mask fade into the page background"
+      ]
+    },
+    {
+      "id": "homePrayerTimesAndAdhanWidget",
+      "title": "Mawaqit Studio Luxury Prayer Times & Adhan Audio System",
+      "titleFa": "سیستم اوقات شرعی و انتخاب اذان‌های استودیویی مواقیت با پرچم‌های رسمی، پخش مستقیم، قابلیت بای‌پَس حالت بی‌صدا و بدون خطای زبانی",
+      "status": "PERMANENTLY_LOCKED",
+      "approvedAt": "2026-11-22T02:23:45.000Z",
+      "backupPath": "backup_approved_checkpoint_4_prayer_times_locked",
+      "inviolableRules": [
+        "Do not change authentic Mawaqit flag circular avatars (Palestine for Qods, Saudi flag for others)",
+        "Keep synchronous audio play on user card tap without DOM re-render",
+        "Keep high-definition studio adhan mp3 files in audio/adhan/ with CDN fallbacks",
+        "Strictly maintain German and Kurdish Sorani localization with zero Persian text",
+        "Keep compact 310px width with gold-emerald midnight luxury styling and silent bypass toggle"
+      ]
+    },
+    {
+      "id": "homeTwinStickersWidget",
+      "title": "Twin Floating Glass Stickers (Continue Reading & Hifz Progress Duo)",
+      "titleFa": "ویجت دوتایی استیکرهای شیشه‌ای شناور مدرن (ادامه تلاوت قرآن و درصد پیشرفت حفظ و ختم)",
+      "status": "PERMANENTLY_LOCKED",
+      "approvedAt": "2026-11-22T08:57:35.478Z",
+      "backupPath": "backup_approved_checkpoint_5_twin_stickers_locked",
+      "inviolableRules": [
+        "Model 1 twin sticker layout (50/50 compact grid, min-height 94px) with subtle ambient corner glow",
+        "Left sticker jumps to exact Mushaf bookmark and page via resumeLastReadingPosition()",
+        "Right sticker opens Hifz Studio and updates radial gauge ring and page count dynamically",
+        "Bilingual German and Kurdish Sorani localization with zero Persian text",
+        "Clean typography using Amiri and Noto Sans Arabic for perfect Kurdish and Arabic glyph rendering"
+      ]
+    },
+    {
+      "id": "neo3dSideNavigationDrawer",
+      "title": "Neo-3D Collapsible Side Menu with Smart Back-to-Menu Navigation",
+      "titleFa": "منوی کناری تاشو مدرن نئو سه‌بعدی با بسته بودن پیش‌فرض زیرمجموعه‌ها، حذف کارت خانه و بازگشت هوشمند به منو با دکمه بازگشت",
+      "status": "PERMANENTLY_LOCKED",
+      "approvedAt": "2026-11-22T09:15:16.174Z",
+      "backupPath": "backup_approved_checkpoint_6_drawer_menu_locked",
+      "inviolableRules": [
+        "All drawer subcategories (studios, lernen, tracking, duas) must start completely collapsed/closed upon initial opening",
+        "Home/Start card is permanently excluded from drawer (already in bottom nav)",
+        "Clicking category expands its accordion submenu and collapses others cleanly",
+        "Selecting any item routes via openItemFromDrawer and closes drawer",
+        "Pressing Back navigation (hardware/popstate/in-app) from a drawer-launched section directly returns to the drawer with that same submenu expanded"
+      ]
+    },
+    {
+      "id": "unifiedCompactAudioPlayer",
+      "title": "Model 3 Studio Scrubber & Timecode Audio Player (Mushaf & Word Studio)",
+      "titleFa": "کنسول صوتی استودیویی مدل ۳ یکپارچه با نوار پیمایش زمان‌دار، کد زمانی زنده و طراحی فوق‌العاده مدرن و جمع‌وجور",
+      "status": "PERMANENTLY_LOCKED",
+      "approvedAt": "2026-11-22T10:05:44.817Z",
+      "backupPath": "backup_approved_checkpoint_7_model3_player_locked",
+      "inviolableRules": [
+        "Model 3 Studio Scrubber & Timecode layout (exact height 48px, cyan/blue studio theme)",
+        "Top micro scrubber track with interactive touch/click seeking (seekQuranAudio) and real-time elapsed/duration timecodes (formatTimecodeDisplay)",
+        "Left zone: glowing cyan microphone icon + clean Arabic surah title (الفاتحة: ۱) + iteration badge (1/1)",
+        "Center zone: prev ayah, glowing gradient Play/Pause centerpiece, next ayah",
+        "Right zone: repeat loop pill (1×/3×/5×/∞) + speed selector (0.75× to 1.5×)",
+        "Unified identical design and functional parity across both Mushaf (#mushafSectionPlayer) and Word Studio (#wsSectionPlayer)",
+        "Zero visual bulkiness, zero horizontal overflow on mobile viewports (412px)"
+      ]
+    },
+    {
+      "id": "tarteelSmartRecitationEngine",
+      "title": "Tarteel Smart Recitation & Dual-Mode Quran Voice Recognition Engine",
+      "titleFa": "موتور هوشمند تلاوت ترتیل و تشخیص صوت قرآن دومنظوره (تک‌آیه‌ای و پیوسته با اعتبارسنجی دقیق کلمات)",
+      "status": "PERMANENTLY_LOCKED",
+      "approvedAt": "2026-11-22T11:11:09.525Z",
+      "backupPath": "backup_approved_checkpoint_8_smart_recitation_engine_locked",
+      "inviolableRules": [
+        "Mode 1 (Einzelvers / تک‌آیه‌ای): Verifies single target ayah with >= 70% word accuracy. On success: reveals only this ayah, plays chime, and stops listening without auto-advancing. On failure: stays blank, displays warning, does not advance.",
+        "Mode 2 (Fortlaufend / پیوسته): Continuous recitation. On success: reveals ayah, advances to next ayah, auto-flips page upon page completion. On failure: does not reveal or advance.",
+        "Real Quran Speech Matching (Zero volume auto-reveal): Volume analysis is purely for waveform visual pulse, NEVER triggers verse completion.",
+        "High-precision Arabic Quran text normalization (handles all tashkeel, pause marks, alef variants, taa marbuta, joined prepositions).",
+        "Unified sleek bottom dock (max-width 356px, fully nested 32px mic button, zero overflow or clipping on mobile viewports).",
+        "All bottom controls functional: Fehler settings sheet, Reading/Hifz test toggle, Peek eye toggle, Step ayah, Page rewind, Sheikh help audio."
+      ]
+    },
+    {
+      "id": "mushafMobilePureFullscreenAndUnifiedToolbar",
+      "title": "Pure Mobile Edge-to-Edge Quran Fullscreen & Reorganized Non-Overflow Toolbar",
+      "titleFa": "حالت تمام‌صفحه خالص قرآن برای موبایل (بدون منو و پلیر) و مرتب‌سازی تولبار بدون بیرون‌زدگی",
+      "status": "PERMANENTLY_LOCKED",
+      "approvedAt": "2026-11-22T14:01:55.530Z",
+      "backupPath": "backup_approved_checkpoint_14_pure_quran_mobile_fullscreen_locked",
+      "inviolableRules": [
+        "Row 1 of Mushaf toolbar must strictly remain 2 buttons: Text (Uthmani) and Scan (Medina HD) with 50/50 grid",
+        "Do not add a 3rd button to Row 1 to prevent mobile overflow",
+        "Row 2: Surah Picker (50%) and Qari Selector (50%) with zero clipping",
+        "Row 3: Tajweed, Design, and Markieren (1/3 each)",
+        "In Fullscreen Mode (body.mushaf-fullscreen-active), ONLY the Quran page is displayed filling 100% of the mobile screen",
+        "In Fullscreen Mode, hide app-header, toolbar, player (#mushafSectionPlayer), and android-bottom-nav completely",
+        "Tapping Text when active or Scan when active or tapping the Quran page toggles mobile fullscreen",
+        "Floating pill at top-left and ESC key cleanly restore normal mode"
+      ]
+    }
+  ],
+  "checkpoints": {
+    "checkpoint_9_rubaiyat_reorganization_locked": {
+      "status": "LOCKED_AND_VERIFIED",
+      "timestamp": "2026-11-22T12:26:57.577Z",
+      "description": "Top Rubaiyat row (Surah, Qari, Hören, Star), Recitation modes capsule, Canvas Page Stepper, Bottom Dock center capsule with 4 functions (Book/All, Eye/Target, Rewind, Next Ayah), Al-Baqarah title and Bismillah header separation, Compact centered Fehler sheet."
+    },
+    "checkpoint_10_top_space_fixed_and_fehler_lifted_locked": {
+      "status": "LOCKED_AND_VERIFIED",
+      "timestamp": "2026-11-22T12:39:18.609Z",
+      "description": "Completely eliminated empty black space at the top of the window by fixing div nesting in main-workspace, and elevated the Fehler modal completely above the bottom navigation bar with compact height and elegant spacing."
+    },
+    "checkpoint_11_bottom_nav_smart_audio_locked": {
+      "status": "LOCKED_AND_VERIFIED",
+      "timestamp": "2026-11-22T13:50:00.000Z",
+      "description": "Added Smart Audio (Smarte Rezitation / Tarteel) button to the bottom navigation bar with elegant squircle 3D orb icons modeled after the drawer menu icons. All 6 buttons (Start, Muṣḥaf, Hifz Studio, Smart Audio, Koran-Suche, Menü) feature vibrant individual gradients, glowing active state rings, crisp typography, and seamless synchronization with tab switching."
+    },
+    "checkpoint_12_mushaf_toolbar_and_design_modal_locked": {
+      "status": "LOCKED_AND_VERIFIED",
+      "timestamp": "2026-11-22T14:01:00.000Z",
+      "description": "Reorganized Mushaf top toolbar into three compact, balanced rows: 1. Text & Scan (two 50/50 compact buttons with icon + short text), 2. Surah picker, Qari selector, and Markieren button (three neatly aligned items side-by-side with zero wasted space), 3. Tajweed and Design buttons (50/50 pair). Completely removed redundant bottom page stepper from Mushaf canvas (page changer already present at the top). Replaced classical design modal with a modern, centered Neo-3D luxury card that never overflows or gets cut off."
+    },
+    "checkpoint_13_mushaf_fullscreen_and_unified_design_locked": {
+      "status": "LOCKED_AND_VERIFIED",
+      "timestamp": "2026-11-22T14:23:00.000Z",
+      "description": "Unified all font & design options inside the compact Neo-3D Design sheet (live working font-size stepper [A- / 100% / A+ / Reset], ink thickness [Standard / Mittel / Kräftig], authentic calligraphy fonts, paper themes, tajweed and hifz toggles - completely eliminating background overlap and brown classic styling). Added seamless Fullscreen reading mode for both Text (Uthmānī) and Scan (Medina HD) with dedicated Vollbild button in toolbar, floating exit pill, and ESC key support. Replaced brown select dropdown backgrounds with luxury midnight navy."
+    },
+    "checkpoint_14_pure_quran_mobile_fullscreen_locked": {
+      "status": "LOCKED_AND_VERIFIED",
+      "timestamp": "2026-11-22T15:23:00.000Z",
+      "description": "Reorganized Mushaf toolbar into strictly 3 rows: Row 1 (Text & Scan 50/50), Row 2 (Surah picker & Qari select 50/50), Row 3 (Tajweed, Design, Markieren, and dedicated Vollbild ⛶ expand icon). In fullscreen mode, all UI (header, toolbar, player, bottom bar) is completely hidden so only the pure Quran page covers 100% of the mobile screen. Connected seamlessly to mobile hardware/gesture back button."
+    },
+    "checkpoint_15_hifz_studio_inline_audio_and_typography_locked": {
+      "status": "LOCKED_AND_VERIFIED",
+      "timestamp": "2026-11-22T16:03:00.000Z",
+      "description": "Completely removed redundant global audio player deck (#wsSectionPlayer) from Hifz Studio (paneWordStudio). Added independent inline Play/Stop toggle button (Anhören / Stopp) and repeat cycle button (1× to 5×) directly on each ayah card. Preserved direct tap on Arabic Quran text to trigger/stop recitation. Inverted typography in Ganze Verse mode so Quranic Arabic text is prominently large (1.85rem, authentic Royal Amiri Quran calligraphy font [Option 2 approved by user], crystal-clear Tashkeel and elegant rosettes) and translation/Tafsir (German, English, Kurdish) is secondary, compact, and elegant (0.84rem)."
+    },
+    "checkpoint_16_arabic_letter_joining_fixed_locked": {
+      "status": "LOCKED_AND_VERIFIED",
+      "timestamp": "2026-11-22T16:47:00.000Z",
+      "description": "Completely resolved cursive letter disconnections and word over-stretching across the entire application, with dedicated focus on the Mushaf Text view (قسمت متن مصحف / Text Uthmānī). 1. Replaced broken text-align: justify in .mushaf-flowing-text with text-align: center and natural word-spacing: 5px, completely eliminating artificial wide gaps between words on mobile and desktop. 2. Set authentic Amiri Quran as primary --quran-font with robust font fallback. 3. Upgraded cleanArabicText() and applyTajweedMarkup() with Zero-Width Joiners (‍) and proper wasla ligature preservation. 4. Strictly enforced letter-spacing: normal !important on all Quran elements. Verified with live screenshots across Page 1, Page 2, Tajweed ON/OFF, and Fullscreen modes."
+    }
+  },
+  "checkpoint_17_drawer_studios_and_hifz_relocation_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T17:35:00.000Z",
+    "description": "Drawer menu & Studio navigation overhaul according to user architectural plan: 1. Permanently removed 'Koran- & Wort-Suche' from drawer. 2. Promoted Tafsir & Uebersetzungen into the primary 'Koran-Studios' category, turning it into 4 studios: 1. Mushaf & Lesung, 2. Wort-fuer-Wort Studio, 3. Smarte Rezitation & Hifz, 4. Tafsir & Uebersetzungen. 3. Completely removed the emptied 'Lernen & Studieren' drawer category. 4. Integrated '5-Stufen Hifz-Lernstudio' directly into the top toolbar of Wort-fuer-Wort Studio (Tab 2) as a 3-pill switcher ([ Wort-fuer-Wort ] [ Ganze Verse ] [ 5-Stufen Hifz ]), allowing seamless switching between Word analysis, full verse study, and 5-stage loop recitation without any DOM id duplicates or broken audio loop callbacks."
+  },
+  "checkpoint_18_stufen_hifz_streamlining_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T17:55:00.000Z",
+    "description": "Streamlined Stufen-Hifz studio according to user markings: 1. Renamed 3rd top pill from '5-Stufen Hifz' to 'Stufen-Hifz' (removed number 5). 2. Completely eliminated bottom queue list card ('Vers-Warteschlange'). 3. Completely removed 'Alle Verse dieser Sure' dropdown, bloated 5-button loop row (1x, 3x, 5x, 10x, ∞), and 5 stage pills (1. Hören, 2. Mitlesen, 3. Lücken, 4. Blind, 5. Loop). 4. Created unified compact 2-row menu directly above the Ayah card: Row 1 (Surah picker trigger + Merken star button), Row 2 (Ayah stepper ◄ Vers 1 von 7 ► + single cycling repeat button 🔁 1x/2x/3x/5x/10x/∞). 5. Streamlined Ayah card header (removed Durchgang badge and helper banner, keeping clean Surah & Vers title, prominent Royal Amiri calligraphy Ayah text, translation, and large transport controls)."
+  },
+  "checkpoint_19_tafsir_studio_and_nami_reader_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T18:30:00.000Z",
+    "description": "Comprehensive modernization of Tafsir Studio (Tab 4) and Tafsir Nami Book Reader: 1. Eliminated outdated brown/classical styling, replacing with luxury Neo-3D dark glass cards. 2. Modern 3-row toolbar in Tafsir Studio: Row 1 (Surah selector, Ayah stepper, Star), Row 2 (Qari selector), Row 3 (Tafsir source picker button + compact Nami Book button). 3. Tafsir Source Picker modal supporting individual or simultaneous display of all 4 sources (Bubenheim, Zaidan, Abu Rida, Nami). 4. In Ayah cards: removed redundant 'Im Mushaf' button; added unified single-toggle Play/Stop button ('Vers hören' / 'Stopp') directly on each ayah. 5. Tafsir Nami Book Reader overhaul: removed cluttered top header and clumsy back button; added 3-volume switcher, Surah & Qari selectors, page stepper, and compact audio player (play/stop, prev/next ayah); fixed Kurdish typography with natural right-alignment and normal word spacing; synchronized Volume 1 Page 1 to start strictly at Surah Al-Faatiha Ayah 1."
+  },
+  "checkpoint_20_tafsir_nami_dual_modes_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T19:08:00.000Z",
+    "description": "Segregated Tafsir Nami Book Reader into two distinct top modes: [ دەق (Text) ] and [ پەڕتووک (PDF) ]. In Text mode, the 3 volume tabs (بەرگی ١، ۲، ۳) are cleanly hidden and the authentic typeset Kurdish sheet is shown right-aligned with normal word spacing, Surah picker, Qari picker, page stepper, and compact audio player. In PDF mode, the 3 volume tabs are shown, rendering the high-resolution scanned book pages via PDF.js on canvas using direct in-memory ArrayBuffer loading (100% offline, built-in, completely eliminating HTTP 206 range negotiation errors on both desktop and mobile)."
+  },
+  "checkpoint_21_khatm_planer_mushaf_toolbar_and_soft_highlight_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T19:35:00.000Z",
+    "description": "Comprehensive execution of user 3-image specifications: 1. Drawer: Permanently removed 'Hifz- & Fortschrittsarchiv ⭐' from 'Verfolgen & Prüfung'. 2. Mushaf Toolbar: Reorganized Row 2 to hold Surah picker, Qari select, and compact star button ([ ⭐ Markieren / نیشانه‌کردن ]); Row 3 now holds [ 🎓 Tajweed ], [ 🎨 Design ], [ 📅 Khatm ], and [ ⛶ Vollbild ]. 3. Mushaf Text Ayah Highlight: Replaced thick, high-bleed green overlay (#c8e6c9 / solid border) with delicate, translucent emerald tint (rgba(16, 185, 129, 0.13)) with zero-bleed vertical padding (1px 4px) and faint soft border, completely preventing vertical overlap or text obscuration. 4. Khatm-Koranplaner: Plan Duration selector (30 Tage, 60 Tage, 90 Tage) positioned at the top for instant switching; automatic calculation of daily page quotas and date ranges; interactive 30-Juz completion checklist (علامت‌داری و ثبت ۳۰ جزء قورئان) with persistent state in localStorage and direct jump to any Juz in Mushaf Text mode."
+  },
+  "checkpoint_22_khatm_refinements_and_studio3_quiz_integration_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T19:48:00.000Z",
+    "description": "Executed all refinements from the 3 user images: 1. Plan buttons (30 Tage, 60 Tage, 90 Tage) fixed into a strict 4-column grid (repeat(3, 1fr) 34px) completely eliminating horizontal overflow on mobile viewports. 2. Permanently removed redundant big green button ('Im Mushaf lesen') as requested. 3. Replaced wide yellow quota completion button with a compact, elegant emerald badge button (32px height, refined theme-matched styling). 4. Converted the 30-Juz checklist into an interactive collapsible Accordion with dynamic bilingual localization (German and Kurdish Sorani), real-time checkbox toggles with persistance, and direct Mushaf jumping. 5. Unified Studio 3 ('Smarte Rezitation & Hifz') and 'Hifz-Quiz & Prüfung' with dual-mode top switchers matching Image 3 drawer arrow."
+  },
+  "checkpoint_23_juz_checkbox_soft_highlight_tajweed_and_stickers_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T20:10:00.000Z",
+    "description": "Comprehensive execution of the 6 user image requests: 1. Image 1: Added explicit interactive checkbox button ([ ☑️ ] / [ ⬜ ]) directly beside each Juz title (Juz 1, Juz 2...) in the 30-Juz checklist with dynamic real-time checkmark state and persistent tracking. 2. Image 2: Made ayah highlight in Mushaf text view ultra-subtle (background rgba(16, 185, 129, 0.05) and border line rgba(16, 185, 129, 0.08) with zero-bleed 0 2px padding), preventing distracting borders or multi-line bleeding. 3. Image 3: Activated authentic Tajweed coloring in applyTajweedMarkup() (Madd=Crimson, Ghunnah=Emerald, Qalqalah=Cyan Blue, Iqlab=Violet) when Tajweed is toggled ON, while keeping original clean text when OFF. 4. Image 4: Removed numbers 1., 2., 4., and (1–4) from Koran-Studios in drawer; moved 'Smarte Rezitation & Hifz' down into 'Verfolgen & Prüfung'. 5. Image 5: Permanently removed 'Khatm-Koranplaner' from Drawer menu. 6. Image 6: Dedicated Left Home Sticker to Khatm-Planer (with progress ring gauge, page count, and direct jump to Khatm) and Right Sticker to Wort-für-Wort & Ayah Repetition Studio (with surah, ayah, and direct jump to Word Studio)."
+  },
+  "checkpoint_24_hifz_quiz_pure_voice_recitation_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T20:34:00.000Z",
+    "description": "Comprehensive execution of the 3 Sheikh-Quiz/Hifz-Prüfung user images: 1. Image 1: Permanently removed the top dual-mode switcher buttons ([ 🎙️ Smarte Rezitation ] & [ 🎓 Hifz-Quiz & Prüfung ]) from the Quiz pane. 2. Image 2: Permanently removed all multiple-choice guess boxes ([ أ، ب، ج ]), eliminating multiple-choice guessing entirely. 3. Image 3 & Voice Recognition Engine: Completely overhauled toggleSheikhQuizMic() to use the authentic SpeechRecognition / webkitSpeechRecognition engine with Arabic language model ('ar-SA'); eliminated dummy WebAudio volume-based auto-triggers; added dedicated live recitation transcription box (#sqLiveReciteBox / #sqLiveSpokenText) that writes out the user's spoken Arabic words in real time; matches spoken words against the expected target continuation verse using cleanArabicForMatch() and isArabicWordMatch(); upon correct recitation (>=60% accuracy or short verse match), reveals the solution, awards +1 point to trophy counter 🏆, and displays celebration feedback in German or Kurdish Sorani."
+  },
+  "checkpoint_25_dalail_alkhayrat_exact_site_overhaul_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T20:55:00.000Z",
+    "description": "Exact implementation of Dalā'il al-Khayrāt modeled 100% after dalailalkhayrat.com as specified in user prompt and 2 images: 1. Image 1: Dynamic bilingual/multilingual localization of the Dalā'il header card, adapting title and subtitle strictly to system language (German, Kurdish Sorani, Farsi). 2. Complete 13-part exact division scraped and integrated with 607 authentic passages: Opening Dua, Dua of Intention, Part 1 through Part 8 (daily Ahzab Monday to Monday II), Dua of Completion, 99 Names of Allah, and 201 Names of the Prophet ﷺ. 3. Downloaded and integrated all authentic MP3 audio files into audio/dalail/ with online fallback. 4. Real-time audio-text synchronization using dialogueTimings array: active passage highlights (.speaking with emerald glow), auto-scrolls into view smoothly, and clicking any passage seeks audio immediately. 5. Image 2: Exact Dalā'il Settings modal featuring translations limited strictly to English and Farsi toggles, font size steppers for Arabic and Translation, and Arabic font style selector between authentic Uthmani (PDMS_IslamicFont.ttf) and IndoPak (PDMS_Saleem_QuranFontQEShip.ttf) with local persistence."
+  },
+  "checkpoint_26_dalail_silent_prayers_cleanup_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T21:05:00.000Z",
+    "description": "Comprehensive execution of the two silent prayer cleanup requests for Dalā'il al-Khayrāt: 1. In 'Opening Dua / Eröffnungsgebet vor der Lesung' (opening), permanently removed the top play button [ ▶️ Rezitation abspielen & Mitlesen ] and all per-passage listen buttons [ 🔊 Anhören ]. 2. In 'Dua of Intention / Gebet der Absicht (Niyyah)' (intention), permanently removed the top play button [ ▶️ Rezitation abspielen & Mitlesen ] and all per-passage listen buttons [ 🔊 Anhören ]. 3. Strictly preserved authentic audio recitation and real-time synchronized highlight for Parts 1 to 8 and all other chapters with recordings."
+  },
+  "checkpoint_27_qasida_burda_exact_site_overhaul_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T21:26:00.000Z",
+    "description": "Comprehensive implementation of Qasīda al-Burdah modeled 100% after qasidaburda.com and the 2 user screenshots: 1. Image 1: Dedicated Burdah Settings Modal featuring Translations restricted strictly to English toggle, font size steppers for Arabic and Translation, and Arabic font style selector between authentic Uthmani ('Islamic') and IndoPak ('IndoPak_PDMS') with localStorage persistence. 2. Image 2: Exact chapter reader layout with Alle 10 Kapitel (Übersicht) back navigation, Chapter heading, dedicated authentic Chorus banner (مَوْلَايَ صَلِّ وَسَلِّمْ دَائِمًا أَبَدًا * عَلَىٰ حَبِيبِكَ خَيْرِ الْخَلْقِ كُلِّهِمِ), Settings button, and full-width amber play button (Kapitel abspielen & Mitlesen). 3. Audio & Synchronization Engine: Downloaded all 10 authentic MP3 audio files to audio/burda/ (Burda_1.mp3 to Burda_10.mp3) for instant offline playback; synchronized playback using exact dialogueTimings with glowing amber active highlight (.speaking), smooth auto-scroll into view, and per-couplet listen button seeking. 4. Complete 10-chapter dataset in burda_chapters_data.js with authentic Arabic couplets, English translations, and localized titles."
+  },
+  "checkpoint_28_authentic_duas_azkar_overhaul_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T20:58:17.445Z",
+    "description": "Complete overhaul of Duas and Adhkār section modeled with authentic data from azkar.me, Hisnul Muslim, and Holy Quran (EveryAyah Alafasy Recitations): 1. Full authentic dataset in authentic_duas_azkar_data.js containing 105 verified prayers: 31 Morning Adhkar, 30 Evening Adhkar, 35 Quranic Duas with exact Surah/Ayah, 3 Night/Sleep prayers, and 6 Daily Tasbihat. 2. 68 local offline audio files downloaded to audio/adhkar/ and audio/quran_duas/ providing 100% offline playback resilience with online fallback. 3. Luxury Islamic UI featuring 6 category tabs with counts, Dual-view mode (All Cards Grid vs. Focus Reader), Live Instant Search bar, per-card audio play/pause toggle with emerald glow indicator, and interactive tactile Tasbih counter pill with target count, vibration feedback, completion toast, and reset button."
+  },
+  "checkpoint_29_asmaa_allah_and_home_dua_interactive_widget_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T21:11:37.465Z",
+    "description": "Execution of user requests from 3 images and Islamic Relief 99 Names: 1. Image 2: Updated drawer menu icon from pressed hands to authentic Islamic palms-up supplication gesture (🤲, two hands open and facing upwards). 2. Images 1 & 3: Created floating Islamic Dua 3D Interactive Audio Widget on Home screen below twin stickers featuring the 3D \"دعاء / Dua\" artwork, flanked by two open praying hands (🤲) with golden-emerald celestial styling; tapping anywhere toggles playback of the authentic Day/Night Adhkar with live pulsing equalizer animation and status updates; second tap stops audio. 3. Added Asmā' Allāh al-Ḥusnā (99 Names of Allah) to Duas section based on islamicrelief.de with all 99 names in Medina Uthmanic Arabic, transliterations, and full 4-language translations (German, Persian, Kurdish, English); downloaded offline studio recitation MP3 by Sheikh Mishary Rashid Alafasy with full-length audio player and individual pronunciation on card tap."
+  },
+  "checkpoint_30_twin_spiritual_stickers_and_drawer_cleanup_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T21:43:42.706Z",
+    "description": "Execution of user requests from 4 images and 2 YouTube audio links: 1. Image 3: Completely removed \"Bittgebete & Adhkār\" from the drawer menu, keeping only Dalā'il al-Khayrāt and Qasīda al-Burdah. 2. Images 1 & 2: Removed old wide player widget; replaced with Twin Spiritual Stickers side-by-side on Home screen. Sticker 1 features the 3D \"دعاء / Dua\" artwork in center, flanked by right hands (أَذْكَارُ الصَّبَاحِ) and left hands (أَذْكَارُ المَسَاءِ); clicking right hands plays morning adhkar, clicking left hands plays evening adhkar, clicking center image toggles play/stop based on day/night with minimal subtle bottom indicator and zero bulky player clutter. 3. Downloaded offline audio from user YouTube links: Morning Adhkar (https://youtu.be/UjvJ2s7_bdA -> audio/adhkar/adhkar_sabah_youtube.mp3) and Evening Adhkar (https://youtu.be/RobuaFejHkY -> audio/adhkar/adhkar_masaa_youtube.mp3). 4. Image 4: Sticker 2 features the majestic \"الله\" calligraphy; clicking it plays the complete 99 Names of Allah recitation (audio/asmaa_allah/Asmaa_Allah_AlAfasy.mp3), with instant stop on second tap and tiny bottom pulse indicator."
+  },
+  "checkpoint_31_peshawa_adhkar_and_center_dua_audio_fixed_locked": {
+    "status": "LOCKED_AND_VERIFIED",
+    "timestamp": "2026-11-22T21:59:48.656Z",
+    "description": "Completely fixed audio mapping and eliminated old audios: 1. Deleted all 27 old numbered audio files (75.mp3..98.mp3). 2. Correctly mapped Peshawa Kurdi YouTube audios: Morning Adhkar (https://youtu.be/RobuaFejHkY) -> audio/adhkar/adhkar_sabah_peshawa.mp3; Evening Adhkar (https://youtu.be/UjvJ2s7_bdA) -> audio/adhkar/adhkar_masaa_peshawa.mp3; Center Dua artwork (https://youtu.be/rPVoS_Qnq0w) -> audio/adhkar/dua_center_peshawa.mp3. 3. Explicitly arranged positions: Right side = أَذْكَارُ الصَّبَاحِ (Morning), Left side = أَذْكَارُ المَسَاءِ (Evening), Center image = دُعَاء (Center Dua), Second sticker = أَسْمَاءُ اللَّهِ الحُسْنَى (99 Names). 4. Dedicated HTML5 audio engine directly plays offline files without old fallback chains, with instant toggle stop on second click and minimal subtle indicators."
+  }
+}

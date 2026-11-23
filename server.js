@@ -27,12 +27,19 @@ const MIME_TYPES = {
 
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Range, Content-Type, Accept, *');
+  res.setHeader('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Range, Content-Length');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
 
   let reqUrl = decodeURI(req.url || '/');
   const [cleanPath, queryStr] = reqUrl.split('?');
 
-  // Proxy Quran API
   if (cleanPath.startsWith('/quran-api/')) {
     const subPath = cleanPath.slice('/quran-api/'.length);
     const targetUrl = `https://api.alquran.cloud/v1/${subPath}${queryStr ? '?' + queryStr : ''}`;
@@ -50,11 +57,9 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Static File Serving
   let filePath = cleanPath === '/' ? '/index.html' : cleanPath;
   let fullPath = path.join(ROOT, filePath.replace(/\//g, path.sep));
 
-  // Security: prevent directory traversal
   if (!fullPath.startsWith(ROOT)) {
     res.writeHead(403);
     res.end('Forbidden');
@@ -71,6 +76,19 @@ const server = http.createServer((req, res) => {
     const ext = path.extname(fullPath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
     const totalSize = stats.size;
+
+    // For PDF files, always return full 200 OK stream with Accept-Ranges: none, completely preventing range 206 conflicts
+    if (ext === '.pdf') {
+      res.writeHead(200, {
+        'Content-Length': totalSize,
+        'Content-Type': 'application/pdf',
+        'Accept-Ranges': 'none',
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
+      });
+      fs.createReadStream(fullPath).pipe(res);
+      return;
+    }
+
     const range = req.headers.range;
 
     if (range) {
@@ -106,15 +124,13 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-  console.log(`Quran Ultimate Server running on http://127.0.0.1:${PORT}`);
+  console.log(`Quran Desktop Server running on http://127.0.0.1:${PORT}`);
 });
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.log(`Port ${PORT} is already in use, assuming server is running.`);
     process.exit(0);
   } else {
-    console.error('Server error:', err);
     process.exit(1);
   }
 });

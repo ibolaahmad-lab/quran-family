@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=412, initial-scale=1.0">
+  <title>Continue Reading Models Preview</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Noto+Kufi+Arabic:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-midnight: #030a16;
+      --gold-primary: #fbbf24;
+      --emerald-glow: #10b981;
+    }
+    body {
+      margin: 0;
+      padding: 16px 14px 40px;
+      background: #030812;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      box-sizing: border-box;
+      max-width: 412px;
+      margin: 0 auto;
+    }
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin: 22px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge-pill {
+      font-size: 0.65rem;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+      font-weight: 800;
+    }
+
+    /* ======================================================== */
+    /* MODEL 1: TWIN FLOATING GLASS STICKERS (Side-by-Side 50/50) */
+    /* ======================================================== */
+    .m1-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .m1-sticker {
+      position: relative;
+      background: linear-gradient(155deg, rgba(13, 24, 44, 0.92) 0%, rgba(6, 12, 24, 0.96) 100%);
+      border: 1.2px solid rgba(251, 191, 36, 0.28);
+      border-radius: 16px;
+      padding: 10px 11px 9px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 92px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+      overflow: hidden;
+    }
+    .m1-sticker:hover {
+      transform: translateY(-2px);
+      border-color: rgba(251, 191, 36, 0.55);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75), 0 0 15px rgba(251, 191, 36, 0.15);
+    }
+    .m1-sticker.hifz {
+      border-color: rgba(52, 211, 153, 0.32);
+      background: linear-gradient(155deg, rgba(8, 30, 32, 0.92) 0%, rgba(4, 16, 20, 0.96) 100%);
+    }
+    .m1-sticker.hifz:hover {
+      border-color: rgba(52, 211, 153, 0.6);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75), 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Radial Circular Gauge for Model 1 */
+    .circle-chart {
+      width: 38px;
+      height: 38px;
+    }
+    .circle-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 3.5;
+    }
+    .circle-progress {
+      fill: none;
+      stroke: #10b981;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-dasharray: 100 100;
+      stroke-dashoffset: 85; /* Example ~15% */
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      filter: drop-shadow(0 0 4px #10b981);
+    }
+
+    /* ======================================================== */
+    /* MODEL 2: DYNAMIC HORIZONTAL CAPSULE DUO                  */
+    /* ======================================================== */
+    .m2-container {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .m2-capsule {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 13px;
+      background: linear-gradient(145deg, rgba(12, 22, 38, 0.9) 0%, rgba(6, 12, 22, 0.95) 100%);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+    .m2-capsule:hover {
+      border-color: rgba(251, 191, 36, 0.5);
+      background: linear-gradient(145deg, rgba(18, 32, 54, 0.92) 0%, rgba(8, 16, 30, 0.98) 100%);
+    }
+
+    /* ======================================================== */
+    /* MODEL 3: ASYMMETRIC HERO & SATELLITE STICKER             */
+    /* ======================================================== */
+    .m3-wrapper {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 8px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .m3-hero-sticker {
+      background: linear-gradient(155deg, rgba(15, 27, 48, 0.95) 0%, rgba(5, 11, 22, 0.98) 100%);
+      border: 1.2px solid rgba(251, 191, 36, 0.35);
+      border-radius: 16px;
+      padding: 10px 12px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 98px;
+      box-sizing: border-box;
+    }
+    .m3-stat-sticker {
+      background: linear-gradient(155deg, rgba(6, 26, 28, 0.95) 0%, rgba(3, 14, 18, 0.98) 100%);
+      border: 1.2px solid rgba(52, 211, 153, 0.35);
+      border-radius: 16px;
+      padding: 10px 10px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 98px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================== -->
+  <!-- OPTION 1: TWIN FLOATING GLASS STICKERS     -->
+  <!-- ========================================== -->
+  <div class="section-title">
+    <span>Modell 1: استیکرهای دوقلوی شیشه‌ای (Twin Glass Stickers)</span>
+    <span class="badge-pill">پیشنهاد اول</span>
+  </div>
+
+  <div class="m1-grid">
+    <!-- Sticker 1: Continue Reading / Bookmark -->
+    <div class="m1-sticker" onclick="alert('Öffnet Mushaf bei Seite 1')">
+      <!-- Glow effect -->
+      <div style="position: absolute; right: -15px; top: -15px; width: 60px; height: 60px; background: radial-gradient(circle, rgba(251, 191, 36, 0.18) 0%, transparent 70%); filter: blur(10px); pointer-events: none;"></div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 0.62rem; font-weight: 800; color: #fbbf24; display: flex; align-items: center; gap: 4px;">
+          <i class="fa-solid fa-bookmark" style="font-size: 0.58rem;"></i> WEITERLESEN
+        </span>
+        <span style="font-size: 0.55rem; color: #94a3b8; font-weight: 700; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 5px;">Juz 1</span>
+      </div>
+
+      <div style="margin: 4px 0 2px;">
+        <div style="font-family: 'Amiri Quran', serif; font-size: 1.12rem; color: #fff; line-height: 1.2; text-shadow: 0 1px 4px rgba(0,0,0,0.8);">سورة الفاتحة</div>
+        <div style="font-size: 0.62rem; color: #cbd5e1; font-weight: 600;">Seite 1 · Vers 1</div>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 5px; margin-top: 2px;">
+        <span style="font-size: 0.58rem; color: #6ee7b7; font-weight: 800;">Muṣḥaf ➔</span>
+        <div style="width: 18px; height: 18px; border-radius: 50%; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.4); display: flex; align-items: center; justify-content: center; color: #34d399; font-size: 0.55rem;">
+          <i class="fa-solid fa-play"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticker 2: Hifz & Khatm Progress Dial -->
+    <div class="m1-sticker hifz" onclick="alert('Öffnet Hifz Studio')">
+      <!-- Glow effect -->
+      <div style="position: absolute; right: -15px; top: -15px; width: 60px; height: 60px; background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, transparent 70%); filter: blur(10px); pointer-events: none;"></div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 0.62rem; font-weight: 800; color: #a7f3d0; display: flex; align-items: center; gap: 4px;">
+          <i class="fa-solid fa-star" style="color: #fbbf24; font-size: 0.58rem;"></i> HIFZ &amp; KHATM
+        </span>
+        <span style="font-size: 0.55rem; color: #a7f3d0; font-weight: 800;">0 / 604 S.</span>
+      </div>
+
+      <!-- Center with Circular Ring Gauge -->
+      <div style="display: flex; align-items: center; gap: 8px; margin: 3px 0;">
+        <div style="position: relative; width: 36px; height: 36px; flex-shrink: 0;">
+          <svg class="circle-chart" viewBox="0 0 36 36">
+            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <path class="circle-progress" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" style="stroke-dashoffset: 95;"/>
+          </svg>
+          <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; font-weight: 900; color: #fff;">0.0%</div>
+        </div>
+        <div>
+          <div style="font-size: 0.76rem; font-weight: 800; color: #f8fafc; line-height: 1.1;">Fortschritt</div>
+          <div style="font-size: 0.58rem; color: #94a3b8; font-weight: 500;">Gelernt &amp; Gelesen</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 5px; margin-top: 2px;">
+        <span style="font-size: 0.58rem; color: #a7f3d0; font-weight: 800;">Hifz Studio ➔</span>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.55rem; color: #34d399;"></i>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- OPTION 2: SLIM HORIZONTAL CAPSULE DUO      -->
+  <!-- ========================================== -->
+  <div class="section-title">
+    <span>Modell 2: دو کپسول افقی فوق‌باریک (Slim Horizontal Capsules)</span>
+  </div>
+
+  <div class="m2-container">
+    <!-- Capsule 1: Continue Reading -->
+    <div class="m2-capsule">
+      <div style="display: flex; align-items: center; gap: 9px; min-width: 0;">
+        <div style="width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(217, 119, 6, 0.35)); border: 1px solid rgba(251, 191, 36, 0.5); display: flex; align-items: center; justify-content: center; color: #fef08a; font-size: 0.85rem; flex-shrink: 0;">
+          <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div style="min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 5px;">
+            <span style="font-family: 'Amiri Quran', serif; font-size: 0.98rem; color: #fff; line-height: 1;">سورة الفاتحة</span>
+            <span style="font-size: 0.6rem; color: #94a3b8; font-weight: 600;">(Al-Fatiha)</span>
+          </div>
+          <div style="font-size: 0.62rem; color: #cbd5e1; font-weight: 600; margin-top: 2px;">Seite 1 · Vers 1 · Juz 1</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 5px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.4)); border: 1px solid rgba(52, 211, 153, 0.5); padding: 4px 9px; border-radius: 8px; color: #a7f3d0; font-size: 0.68rem; font-weight: 800; flex-shrink: 0;">
+        <span>Weiter</span>
+        <i class="fa-solid fa-arrow-right" style="font-size: 0.55rem;"></i>
+      </div>
+    </div>
+
+    <!-- Capsule 2: Hifz Progress Bar -->
+    <div class="m2-capsule" style="border-color: rgba(52, 211, 153, 0.28); background: linear-gradient(145deg, rgba(8, 26, 28, 0.9) 0%, rgba(4, 14, 18, 0.95) 100%);">
+      <div style="display: flex; align-items: center; gap: 9px; min-width: 0; width: 100%;">
+        <div style="width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 78, 59, 0.4)); border: 1px solid rgba(52, 211, 153, 0.5); display: flex; align-items: center; justify-content: center; color: #a7f3d0; font-size: 0.85rem; flex-shrink: 0;">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px;">
+            <span style="font-size: 0.68rem; font-weight: 800; color: #a7f3d0;">Hifz &amp; Khatm Fortschritt</span>
+            <span style="font-size: 0.72rem; font-weight: 900; color: #fbbf24;">0.0%</span>
+          </div>
+          <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+            <div style="width: 5%; height: 100%; background: linear-gradient(90deg, #10b981, #fbbf24); border-radius: 3px;"></div>
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #64748b; margin-left: 6px;"></i>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- OPTION 3: ASYMMETRIC HERO & RADIAL SATELLITE -->
+  <!-- ========================================== -->
+  <div class="section-title">
+    <span>Modell 3: کارت اصلی همراه با نشان دایره‌ای (Asymmetric Hero & Dial)</span>
+  </div>
+
+  <div class="m3-wrapper">
+    <!-- Hero Sticker: Continue Mushaf -->
+    <div class="m3-hero-sticker">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 0.62rem; font-weight: 800; color: #fbbf24; background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.3); padding: 2px 7px; border-radius: 6px;">
+          📖 Muṣḥaf Lesezeichen
+        </span>
+      </div>
+      <div>
+        <div style="font-family: 'Amiri Quran', serif; font-size: 1.22rem; color: #fff; line-height: 1.2;">سورة الفاتحة</div>
+        <div style="font-size: 0.64rem; color: #94a3b8; font-weight: 600;">Juz 1 · Seite 1 von 604</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 4px; color: #34d399; font-weight: 800; font-size: 0.66rem;">
+        <span>Weiterlesen</span>
+        <i class="fa-solid fa-arrow-right" style="font-size: 0.58rem;"></i>
+      </div>
+    </div>
+
+    <!-- Stat Sticker: Hifz Badge -->
+    <div class="m3-stat-sticker">
+      <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.4); display: flex; align-items: center; justify-content: center; color: #fbbf24; font-size: 0.75rem; margin-bottom: 4px;">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <div style="font-size: 1.15rem; font-weight: 900; color: #a7f3d0; line-height: 1;">0.0%</div>
+      <div style="font-size: 0.58rem; font-weight: 700; color: #94a3b8; margin-top: 2px;">Hifz &amp; Khatm</div>
+      <span style="font-size: 0.52rem; color: #6ee7b7; font-weight: 800; margin-top: 4px; background: rgba(16, 185, 129, 0.18); padding: 1px 6px; border-radius: 4px;">Öffnen ➔</span>
+    </div>
+  </div>
+
+</body>
+</html>
