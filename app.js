@@ -269,6 +269,7 @@ function getPageVerses(pageNum) {
   }
   return [];
 }
+window.getPageVerses = getPageVerses;
 
 function getJuzForPage(pageNum) {
   if (pageNum <= 1) return 1;
@@ -529,6 +530,7 @@ function loadPage(pageNum) {
   updateDockDisplay();
   saveLastBookmark();
 }
+window.loadPage = loadPage;
 
 function turnPage(delta) {
   loadPage(state.currentPage + delta);

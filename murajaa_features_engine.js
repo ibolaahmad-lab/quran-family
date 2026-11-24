@@ -458,9 +458,6 @@
     updateMurajaaStatusPill(didBacktrack);
   }
 
-    updateMurajaaStatusPill(didBacktrack);
-  }
-
   function highlightWord(wordIndex, isBacktrack) {
     const el = document.getElementById('mword_' + wordIndex);
     if (!el) return;
@@ -587,11 +584,21 @@
     if (!verses || verses.length === 0) {
       if (typeof window.getPageVerses === 'function') {
         verses = window.getPageVerses(pageNum);
+      } else if (typeof getPageVerses === 'function') {
+        verses = getPageVerses(pageNum);
       }
+    }
+    if ((!verses || verses.length === 0) && typeof QURAN_ALL_PAGES !== 'undefined' && QURAN_ALL_PAGES[pageNum]) {
+      verses = QURAN_ALL_PAGES[pageNum];
+    }
+    if (window.state) {
+      window.state.currentPage = pageNum;
+      window.state.currentVersesData = verses;
     }
 
     if (!verses || verses.length === 0) {
       stage.innerHTML = '<div style="text-align: center; padding: 40px; color: #fbbf24;">' + t('page_label') + ' ' + pageNum + '...</div>';
+      if (typeof window.loadPage === 'function') window.loadPage(pageNum);
       return;
     }
 
@@ -653,20 +660,13 @@
         </div>
       </div>
 
-      <!-- Authentic Medina Mushaf External Header (RTL) -->
-      <div class="mushaf-external-header" dir="rtl" style="margin-bottom: 6px;">
-        <div class="mushaf-header-surah-tag">سُورَةُ ${sMeta ? sMeta.arabic : ''}</div>
-        <div class="mushaf-header-center-stepper" dir="rtl">
-          <button onclick="jumpToPage(state.currentPage - 1)" title="${t('page_label')}">►</button>
-          <span style="font-weight: 800; min-width: 60px; text-align: center;">${t('page_label')} ${pageNum}</span>
-          <button onclick="jumpToPage(state.currentPage + 1)" title="${t('page_label')}">◄</button>
+      <!-- Authentic Pure Page Layout matching user reference photo -->
+      <div id="murajaaMushafCard" class="murajaa-pure-page-card murajaa-font-${murajaaState.fontFamily}" style="font-size: ${murajaaState.fontSize}px;">
+        <!-- Top Header Row: Surah Name on Left, Juz Number on Right -->
+        <div class="murajaa-page-top-header" dir="ltr">
+          <span class="murajaa-top-surah-title">Sure ${sMeta ? (sMeta.transliteration || sMeta.name || sMeta.arabic) : 'Al-Baqarah'}</span>
+          <span class="murajaa-top-juz-title">Juz' ${juzNum}</span>
         </div>
-        <div class="mushaf-header-juz-tag">${juzName}</div>
-      </div>
-
-      <!-- Authentic Medina Mushaf Page Card Framed by King Fahd Geometric Border -->
-      <div id="murajaaMushafCard" class="mushaf-page-card mushaf-theme-cream murajaa-font-${murajaaState.fontFamily}" style="font-size: ${murajaaState.fontSize}px;">
-        <div class="mushaf-inner-frame">
     `;
 
     let globalWordIdx = 0;
@@ -733,13 +733,25 @@
         globalWordIdx++;
       });
 
-      html += `<span class="mushaf-ayah-end-glyph" title="${t('ayah_label')} ${v.num}"> ۝${toArabicDigits(v.num)} </span> `;
+      html += `<span class="murajaa-ayah-rosette" title="${t('ayah_label')} ${v.num}"><span>${toArabicDigits(v.num)}</span></span> `;
     });
 
     html += `
         </div>
+        <!-- Centered Page Number at the bottom -->
+        <div class="murajaa-card-bottom-page">${toArabicDigits(pageNum)}</div>
       </div>
-    </div>
+
+      <!-- Compact Stepper Bar below the card -->
+      <div class="murajaa-bottom-stepper-bar" dir="ltr" style="display: flex; justify-content: space-between; align-items: center; margin: 10px auto 20px; max-width: 440px; padding: 4px 6px;">
+        <button class="murajaa-action-btn" onclick="jumpToPage(state.currentPage - 1)" title="${t('page_label')}">
+          ◄ ${t('page_label')} ${pageNum > 1 ? pageNum - 1 : 1}
+        </button>
+        <span style="font-size: 0.82rem; font-weight: 700; color: #fbbf24;">${pageNum} / 604</span>
+        <button class="murajaa-action-btn" onclick="jumpToPage(state.currentPage + 1)" title="${t('page_label')}">
+          ${t('page_label')} ${pageNum < 604 ? pageNum + 1 : 604} ►
+        </button>
+      </div>
     `;
 
     stage.innerHTML = html;
@@ -1321,13 +1333,70 @@
       .murajaa-font-amiri, .murajaa-font-amiri *, .murajaa-font-amiri .mushaf-flowing-text, .murajaa-font-amiri .mushaf-flowing-text * { font-family: 'Amiri Quran', serif !important; }
       .murajaa-font-scheherazade, .murajaa-font-scheherazade *, .murajaa-font-scheherazade .mushaf-flowing-text, .murajaa-font-scheherazade .mushaf-flowing-text * { font-family: 'Scheherazade New', serif !important; }
       .murajaa-font-indopak, .murajaa-font-indopak *, .murajaa-font-indopak .mushaf-flowing-text, .murajaa-font-indopak .mushaf-flowing-text * { font-family: 'IndoPak', 'IndoPak_PDMS', 'Noto Nastaliq Urdu', serif !important; }
+      .murajaa-pure-page-card {
+        background: #fbf8f2 !important;
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35) !important;
+        padding: 18px 20px 24px !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+      }
+      .murajaa-page-top-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+        margin-bottom: 14px !important;
+        padding-bottom: 6px !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+        color: #78716c !important;
+        font-family: system-ui, -apple-system, sans-serif !important;
+        font-size: 0.84rem !important;
+        font-weight: 600 !important;
+      }
+      .murajaa-top-surah-title, .murajaa-top-juz-title {
+        color: #78716c !important;
+        font-size: 0.84rem !important;
+        font-weight: 600 !important;
+      }
       #murajaaMushafCard .mushaf-flowing-text {
-        font-size: var(--murajaa-font-size, inherit) !important;
+        color: #1c1917 !important;
+        font-size: var(--murajaa-font-size, 24px) !important;
         text-align: justify !important;
         text-justify: inter-word !important;
         text-align-last: center !important;
-        line-height: 2.15 !important;
-        word-spacing: 1px !important;
+        line-height: 2.25 !important;
+        word-spacing: 0.5px !important;
+        direction: rtl !important;
+      }
+      .murajaa-ayah-rosette {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 25px !important;
+        height: 25px !important;
+        border-radius: 50% !important;
+        border: 1.5px solid #0d9488 !important;
+        background: rgba(13, 148, 136, 0.1) !important;
+        color: #0f766e !important;
+        font-size: 0.72rem !important;
+        font-weight: 800 !important;
+        margin: 0 4px !important;
+        vertical-align: middle !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+        font-family: 'KFGQPC Uthman Taha Naskh', 'Amiri Quran', Arial, sans-serif !important;
+      }
+      .murajaa-card-bottom-page {
+        text-align: center !important;
+        margin-top: 18px !important;
+        font-size: 0.88rem !important;
+        font-weight: 700 !important;
+        color: #78716c !important;
+        font-family: system-ui, -apple-system, sans-serif !important;
       }
     `;
     document.head.appendChild(style);
