@@ -1,27 +1,30 @@
 /**
  * =========================================================================
- * MURAJAA PRO HIFZ & MUSHAF ENGINE (murajaa_features_engine.js)
+ * MURAJAA PRO HIFZ & MUSHAF SUITE (murajaa_features_engine.js)
  * =========================================================================
  * Complete implementation of the Murajaa iOS App experience:
  * 1. Dedicated "مراجعه مصحف" (Murajaa Mushaf) mode alongside Text & Scan.
+ *    - Hides the regular Mushaf toolbar rows and player when active.
+ *    - Dedicated Murajaa page with authentic King Fahd Medina frame & typography.
  * 2. Full Trilingual Support (Kurdish Sorani, Persian/Farsi, English, German).
- * 3. Authentic Medina Mushaf Layout (Frames, Cartouches, Bismillah, End Glyphs).
- * 4. Dual View Modes:
+ * 3. Dual View Modes:
  *    - Tilawah (Normal recitation reading)
  *    - Tasmīʿ (Memorization veil/masking words, revealed by speech or tap)
- * 5. Backtracking-Tolerant Voice Recognition (وقف و ابتدا / تحمل بازگشت به عقب):
- *    - Reciter can repeat preceding words or rewind without breaking the recognition.
- * 6. Word Breakdown & Mistake Tracking Modal (تفکیک حروف با اعراب + یادداشت حفظ).
- * 7. Ayah Quiz Engine (کوئیز آیه قبل و بعد صوتی و متنی).
- * 8. Live Typography & Reciter Settings (قلم مدینه، ایندوپاک، امیری + اندازه قلم زنده).
- *
- * Absolutely NO modifications to existing features (Adhkar, Asmaa, Burdah, Dalail).
+ * 4. Backtracking-Tolerant Voice Recognition (وقف و ابتدا / بازگشت به عقب).
+ * 5. Muqatta'at (الحروف المقطعة: الم, يس, حم, طه, كهيعص) & Bismillah Normalization:
+ *    - Recognizes spoken "Alif Lam Meem" / "الف لام ميم" as "الم" with 100% precision.
+ *    - Advances Surah Al-Baqarah from Ayah 1 ("الم") to Ayah 2 immediately.
+ *    - Automatically strips Bismillah from Ayah 1 of all surahs (except Surah 1).
+ * 6. Fixes Surah Changing in Sheikh Quiz (#paneQuiz) so users can select any Surah.
+ * 7. Word Breakdown & Mistake Tracking Modal (تفکیک حروف با اعراب + یادداشت حفظ).
+ * 8. Ayah Quiz Engine (کوئیز آیه قبل و بعد صوتی و متنی).
+ * 9. Live Typography & Reciter Settings Modal with centered, working backdrop.
  */
 
 (function () {
   'use strict';
 
-  console.log('[Murajaa Engine] Loading Murajaa Pro Hifz Suite...');
+  console.log('[Murajaa Engine] Initializing Murajaa Pro Suite v2.0...');
 
   window.Murajaa = window.Murajaa || {};
 
@@ -208,45 +211,60 @@
   window.Murajaa.t = t;
 
   // =========================================================================
-  // 2. STATE MANAGEMENT
+  // 2. MUQATTA'AT (الحروف المقطعة) & UNICODE ARABIC NORMALIZER
   // =========================================================================
-  const murajaaState = {
-    viewMode: 'tilawah',
-    isListening: false,
-    speechRecognition: null,
-    targetTokens: [],
-    wordsMeta: [],
-    currentWordIndex: 0,
-    spokenIndices: new Set(),
-    revealedIndices: new Set(),
-    mistakeMap: {},
-    notesMap: {},
-    fontSize: parseInt(localStorage.getItem('murajaa_font_size') || '28', 10),
-    fontFamily: localStorage.getItem('murajaa_font_family') || 'kfgqpc',
-    reciter: localStorage.getItem('murajaa_reciter') || 'Alafasy_128kbps',
-    audioObj: null
-  };
-  window.Murajaa.state = murajaaState;
+  function normalizeMuqattaat(text) {
+    if (!text) return '';
+    return text
+      // الم
+      .replace(/[إأآٱا]لف\s+ل[اآ]م\s+م[يی]م/g, 'الم')
+      // المص
+      .replace(/[إأآٱا]لف\s+ل[اآ]م\s+م[يی]م\s+ص[اآ]د/g, 'المص')
+      // المر
+      .replace(/[إأآٱا]لف\s+ل[اآ]م\s+م[يی]م\s+ر[اآ]/g, 'المر')
+      // الر
+      .replace(/[إأآٱا]لف\s+ل[اآ]م\s+ر[اآ]/g, 'الر')
+      // كهيعص
+      .replace(/ك[اآ]ف\s+ه[اآ]\s+ي[اآ]\s+ع[يی]ن\s+ص[اآ]د/g, 'كهيعص')
+      // طه
+      .replace(/ط[اآ]\s+ه[اآ]/g, 'طه')
+      // طسم
+      .replace(/ط[اآ]\s+س[يی]ن\s+م[يی]م/g, 'طسم')
+      // طس
+      .replace(/ط[اآ]\s+س[يی]ن/g, 'طس')
+      // يس
+      .replace(/ي[اآ]\s+س[يی]ن/g, 'يس')
+      // ص
+      .replace(/ص[اآ]د/g, 'ص')
+      // حم
+      .replace(/ح[اآ]\s+م[يی]م/g, 'حم')
+      // عسق
+      .replace(/ع[يی]ن\s+س[يی]ن\s+ق[اآ]ف/g, 'عسق')
+      // ق
+      .replace(/ق[اآ]ف/g, 'ق')
+      // ن
+      .replace(/ن[وۥ]ن/g, 'ن');
+  }
+  window.Murajaa.normalizeMuqattaat = normalizeMuqattaat;
 
-  try {
-    murajaaState.mistakeMap = JSON.parse(localStorage.getItem('murajaa_mistakes') || '{}');
-    murajaaState.notesMap = JSON.parse(localStorage.getItem('murajaa_notes') || '{}');
-  } catch (e) {}
-
-  // =========================================================================
-  // 3. PURE UNICODE-ESCAPED ARABIC NORMALIZER & TOKENIZER
-  // =========================================================================
   function normalizeArabic(text) {
     if (!text) return '';
-    return String(text)
-      .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '')
-      .replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627')
-      .replace(/[\u0649\u064A]/g, '\u064A')
-      .replace(/\u0629/g, '\u0647')
-      .replace(/\u0640/g, '')
-      .replace(/[\u0600-\u060F\u06DD\u06DE.,/#!$%^&*;:{}=\-_`~()«»۞۩]/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
+    let str = String(text);
+    // Strip Tashkeel & Quranic stop signs
+    str = str.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '');
+    // Normalize Alefs
+    str = str.replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627');
+    // Normalize Yaa
+    str = str.replace(/[\u0649\u064A]/g, '\u064A');
+    // Normalize Taa Marbuta
+    str = str.replace(/\u0629/g, '\u0647');
+    // Strip Tatweel
+    str = str.replace(/\u0640/g, '');
+    // Strip Quranic signs and punctuation
+    str = str.replace(/[\u0600-\u060F\u06DD\u06DE.,/#!$%^&*;:{}=\-_`~()«»۞۩]/g, '');
+    str = str.replace(/\s+/g, ' ').trim();
+    // Normalize spoken Muqatta'at letters
+    return normalizeMuqattaat(str);
   }
   window.Murajaa.normalizeArabic = normalizeArabic;
 
@@ -259,6 +277,11 @@
   function stringSimilarity(s1, s2) {
     if (s1 === s2) return 1.0;
     if (!s1 || !s2) return 0.0;
+    // Check direct Muqatta'at equivalence
+    if ((s1 === 'الم' && (s2 === 'الف' || s2 === 'لام' || s2 === 'ميم')) ||
+        (s2 === 'الم' && (s1 === 'الف' || s1 === 'لام' || s1 === 'ميم'))) {
+      return 1.0;
+    }
     const l1 = s1.length;
     const l2 = s2.length;
     const maxLen = Math.max(l1, l2);
@@ -306,6 +329,32 @@
     const arabicDigits = ['\u0660', '\u0661', '\u0662', '\u0663', '\u0664', '\u0665', '\u0666', '\u0667', '\u0668', '\u0669'];
     return String(num).replace(/[0-9]/g, d => arabicDigits[d]);
   }
+
+  // =========================================================================
+  // 3. STATE MANAGEMENT
+  // =========================================================================
+  const murajaaState = {
+    viewMode: 'tilawah',
+    isListening: false,
+    speechRecognition: null,
+    targetTokens: [],
+    wordsMeta: [],
+    currentWordIndex: 0,
+    spokenIndices: new Set(),
+    revealedIndices: new Set(),
+    mistakeMap: {},
+    notesMap: {},
+    fontSize: parseInt(localStorage.getItem('murajaa_font_size') || '28', 10),
+    fontFamily: localStorage.getItem('murajaa_font_family') || 'kfgqpc',
+    reciter: localStorage.getItem('murajaa_reciter') || 'Alafasy_128kbps',
+    audioObj: null
+  };
+  window.Murajaa.state = murajaaState;
+
+  try {
+    murajaaState.mistakeMap = JSON.parse(localStorage.getItem('murajaa_mistakes') || '{}');
+    murajaaState.notesMap = JSON.parse(localStorage.getItem('murajaa_notes') || '{}');
+  } catch (e) {}
 
   // =========================================================================
   // 4. BACKTRACKING-TOLERANT RECITATION TRACKER (وقف و ابتدا / بازگشت به عقب)
@@ -391,9 +440,6 @@
     }
   }
 
-  // =========================================================================
-  // 5. SPEECH RECOGNITION CONTROLLER
-  // =========================================================================
   function toggleSpeechRecognition() {
     if (murajaaState.isListening) {
       stopSpeechRecognition();
@@ -478,7 +524,7 @@
   }
 
   // =========================================================================
-  // 6. RENDER THE AUTHENTIC MURAJAA MUSHAF PAGE
+  // 5. RENDER THE AUTHENTIC MURAJAA MUSHAF PAGE
   // =========================================================================
   function renderMurajaaMushaf() {
     const stage = document.getElementById('mushafMurajaaStage');
@@ -497,7 +543,6 @@
       return;
     }
 
-    // Reset reciter tracking for current page
     murajaaState.targetTokens = [];
     murajaaState.wordsMeta = [];
     murajaaState.currentWordIndex = 0;
@@ -516,7 +561,6 @@
       <div class="murajaa-stage-toolbar" dir="ltr" style="display: flex; flex-direction: column; gap: 7px; margin-bottom: 10px;">
         <!-- Row 1: Mode Switcher, Mic, Quiz, Typography -->
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 5px; width: 100%; flex-wrap: wrap;">
-          <!-- Dual Mode Toggle (Tilawah vs Tasmi) -->
           <div style="display: flex; background: rgba(0,0,0,0.45); padding: 2px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);">
             <button id="murajaaTilawahModeBtn" onclick="Murajaa.setViewMode('tilawah')" class="murajaa-mode-pill ${!isTasmi ? 'active' : ''}">
               ${t('mode_tilawah')}
@@ -526,7 +570,6 @@
             </button>
           </div>
 
-          <!-- Action Buttons -->
           <div style="display: flex; gap: 5px; align-items: center;">
             <button id="murajaaMicBtn" onclick="Murajaa.toggleSpeechRecognition()" class="murajaa-action-btn ${murajaaState.isListening ? 'mic-active' : ''}">
               <i class="fa-solid fa-microphone-lines" style="color: #10b981;"></i> <span>${murajaaState.isListening ? t('mic_stop') : t('mic_start')}</span>
@@ -599,9 +642,11 @@
       }
 
       let verseRaw = (typeof window.cleanArabicText === 'function') ? window.cleanArabicText(v.ar) : v.ar;
+      // Strip Bismillah from Ayah 1 of all surahs except Surah 1 (Al-Fatiha)
       if (v.num === 1 && v.surahNum !== 1) {
         verseRaw = verseRaw.replace(/^[\u0628\u0650][\u0633\u0652][\u0645\u0650]\s*[\u0671\u0644\u0644\u0651\u064E\u0647\u0650]\s*[\u0671\u0644\u0631\u0651\u064E\u062D\u0652\u0645\u064E\u0670\u0646\u0650]\s*[\u0671\u0644\u0631\u0651\u064E\u062D\u0650\u064A\u0645\u0650]\s*/, '')
                            .replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
+                           .replace(/^بسم الله الرحمن الرحيم\s*/, '')
                            .trim();
       }
 
@@ -636,7 +681,6 @@
         globalWordIdx++;
       });
 
-      // Verse Rosette End Glyph (Always remains visible so page structure is clear!)
       html += `<span class="mushaf-ayah-end-glyph" title="${t('ayah_label')} ${v.num}"> ۝${toArabicDigits(v.num)} </span> `;
     });
 
@@ -684,7 +728,7 @@
   window.Murajaa.hideAllWords = hideAllWords;
 
   // =========================================================================
-  // 7. INTERACTIVE WORD CLICK: BREAKDOWN MODAL & MISTAKE NOTE
+  // 6. MODALS: WORD BREAKDOWN, AYAH QUIZ, TYPOGRAPHY SETTINGS
   // =========================================================================
   function onWordClick(globalIdx) {
     const meta = murajaaState.wordsMeta[globalIdx];
@@ -713,22 +757,23 @@
       modal = document.createElement('div');
       modal.id = 'murajaaBreakdownModal';
       modal.className = 'neo3d-modal-backdrop';
+      modal.onclick = function (e) {
+        if (e.target === this) this.style.display = 'none';
+      };
       document.body.appendChild(modal);
     }
 
     modal.style.display = 'flex';
     modal.innerHTML = `
       <div class="neo3d-modal-card" style="max-width: 480px; width: 92%; padding: 20px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(234, 179, 8, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px);">
-        <!-- Modal Header -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-spell-check" style="color: #fbbf24; font-size: 1.1rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('word_breakdown_title')}</span>
           </div>
-          <button onclick="document.getElementById('murajaaBreakdownModal').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">&times;</button>
+          <button onclick="document.getElementById('murajaaBreakdownModal').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.4rem; cursor: pointer; padding: 0 6px;">&times;</button>
         </div>
 
-        <!-- Big Display of Word -->
         <div style="text-align: center; margin: 15px 0 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 16px; border: 1px solid rgba(255,255,255,0.06);">
           <div style="font-size: 2.4rem; font-family: 'KFGQPC Uthman Taha Naskh', 'Amiri Quran', serif; color: #fef08a; direction: rtl;">
             ${meta.raw}
@@ -738,7 +783,6 @@
           </div>
         </div>
 
-        <!-- Letter-by-Letter Deconstruction Chips (Matching Murajaa iOS App) -->
         <div style="margin-bottom: 15px;">
           <div style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">${t('word_letters_label')}</div>
           <div style="display: flex; flex-wrap: wrap; gap: 6px; direction: rtl; justify-content: center;">
@@ -750,13 +794,11 @@
           </div>
         </div>
 
-        <!-- Note Input Field -->
         <div style="margin-bottom: 16px;">
           <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;">${t('note_label')}</label>
           <textarea id="murajaaWordNoteInput" rows="2" placeholder="${t('note_placeholder')}" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; color: #fff; padding: 8px 10px; font-size: 0.82rem; outline: none;">${currentNote}</textarea>
         </div>
 
-        <!-- Actions -->
         <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center;">
           <button id="murajaaToggleMistakeBtn" onclick="Murajaa.toggleMistakeFlag('${wordKey}', ${meta.globalIdx})" class="neo3d-pill-btn" style="flex: 1; padding: 7px 10px; font-size: 0.78rem; justify-content: center; background: ${isMistake ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.06)'}; border-color: ${isMistake ? '#ef4444' : 'rgba(255,255,255,0.2)'}; color: ${isMistake ? '#fca5a5' : '#e2e8f0'};">
             <i class="fa-solid fa-triangle-exclamation"></i> <span>${isMistake ? t('unmark_mistake') : t('mark_mistake')}</span>
@@ -818,9 +860,6 @@
   }
   window.Murajaa.saveWordNote = saveWordNote;
 
-  // =========================================================================
-  // 8. AYAH QUIZ ENGINE (آزمون هوشمند آیه قبل و بعد)
-  // =========================================================================
   function openAyahQuiz() {
     let verses = (window.state && window.state.currentVersesData) || [];
     if (!verses || verses.length === 0) {
@@ -841,27 +880,30 @@
       modal = document.createElement('div');
       modal.id = 'murajaaQuizModal';
       modal.className = 'neo3d-modal-backdrop';
+      modal.onclick = function (e) {
+        if (e.target === this) {
+          this.style.display = 'none';
+          Murajaa.stopAudio();
+        }
+      };
       document.body.appendChild(modal);
     }
 
     modal.style.display = 'flex';
     modal.innerHTML = `
       <div class="neo3d-modal-card" style="max-width: 520px; width: 92%; padding: 22px; border-radius: 22px; background: rgba(8, 16, 28, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.45); box-shadow: 0 20px 50px rgba(0,0,0,0.9); backdrop-filter: blur(25px);">
-        <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-circle-question" style="color: #38bdf8; font-size: 1.15rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('quiz_title')}</span>
           </div>
-          <button onclick="document.getElementById('murajaaQuizModal').style.display='none'; Murajaa.stopAudio();" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">&times;</button>
+          <button onclick="document.getElementById('murajaaQuizModal').style.display='none'; Murajaa.stopAudio();" style="background: none; border: none; color: #94a3b8; font-size: 1.4rem; cursor: pointer; padding: 0 6px;">&times;</button>
         </div>
 
-        <!-- Question Prompt -->
         <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24; margin-bottom: 10px;">
           ${t('quiz_prompt_next')}
         </div>
 
-        <!-- Prompt Ayah Box -->
         <div style="padding: 14px; background: rgba(0,0,0,0.4); border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px; direction: rtl; text-align: center;">
           <div style="font-size: 1.35rem; font-family: 'KFGQPC Uthman Taha Naskh', 'Amiri Quran', serif; color: #e2e8f0; line-height: 1.8;">
             ${promptVerse.ar} <span class="mushaf-ayah-end-glyph"> ۝${toArabicDigits(promptVerse.num)} </span>
@@ -873,7 +915,6 @@
           </div>
         </div>
 
-        <!-- Hidden Answer Box -->
         <div id="murajaaQuizAnswerBox" style="display: none; padding: 14px; background: rgba(16, 185, 129, 0.12); border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.4); margin-bottom: 14px; direction: rtl; text-align: center; animation: murajaaFadeIn 0.4s ease;">
           <div style="font-size: 0.8rem; font-weight: 800; color: #10b981; margin-bottom: 6px;">${t('quiz_correct_badge')} (${t('ayah_label')} ${answerVerse.num})</div>
           <div style="font-size: 1.4rem; font-family: 'KFGQPC Uthman Taha Naskh', 'Amiri Quran', serif; color: #fef08a; line-height: 1.8;">
@@ -886,7 +927,6 @@
           </div>
         </div>
 
-        <!-- Controls -->
         <div style="display: flex; gap: 8px; justify-content: space-between;">
           <button id="murajaaQuizRevealBtn" onclick="document.getElementById('murajaaQuizAnswerBox').style.display='block'; this.style.display='none';" class="neo3d-pill-btn" style="flex: 1; padding: 8px 12px; font-size: 0.8rem; justify-content: center; background: linear-gradient(135deg, #0284c7, #0369a1); border: none; color: #fff;">
             <i class="fa-solid fa-eye"></i> <span>${t('quiz_reveal_btn')}</span>
@@ -923,31 +963,29 @@
   }
   window.Murajaa.stopAudio = stopAudio;
 
-  // =========================================================================
-  // 9. TYPOGRAPHY & RECITER MODAL (قلم، اندازه قلم و انتخاب قاری)
-  // =========================================================================
   function openTypographySettings() {
     let modal = document.getElementById('murajaaSettingsModal');
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'murajaaSettingsModal';
       modal.className = 'neo3d-modal-backdrop';
+      modal.onclick = function (e) {
+        if (e.target === this) this.style.display = 'none';
+      };
       document.body.appendChild(modal);
     }
 
     modal.style.display = 'flex';
     modal.innerHTML = `
       <div class="neo3d-modal-card" style="max-width: 460px; width: 92%; padding: 22px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(251, 191, 36, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px);">
-        <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-sliders" style="color: #fbbf24; font-size: 1.1rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('settings_title')}</span>
           </div>
-          <button onclick="document.getElementById('murajaaSettingsModal').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">&times;</button>
+          <button onclick="document.getElementById('murajaaSettingsModal').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.4rem; cursor: pointer; padding: 0 6px;">&times;</button>
         </div>
 
-        <!-- Live Font Size Slider -->
         <div style="margin-bottom: 18px;">
           <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; color: #e2e8f0; margin-bottom: 8px;">
             <span>${t('font_size_label')}</span>
@@ -956,7 +994,6 @@
           <input type="range" min="20" max="44" step="1" value="${murajaaState.fontSize}" oninput="Murajaa.onFontSizeChange(this.value)" style="width: 100%; accent-color: #fbbf24; cursor: pointer;">
         </div>
 
-        <!-- Font Family Selector -->
         <div style="margin-bottom: 18px;">
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;">${t('font_family_label')}</label>
           <select onchange="Murajaa.onFontFamilyChange(this.value)" style="width: 100%; padding: 8px; border-radius: 12px; background: rgba(0,0,0,0.45); color: #fff; border: 1px solid rgba(255,255,255,0.15); outline: none;">
@@ -967,7 +1004,6 @@
           </select>
         </div>
 
-        <!-- Reciter Selector -->
         <div style="margin-bottom: 20px;">
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;">${t('reciter_label')}</label>
           <select onchange="Murajaa.onReciterChange(this.value)" style="width: 100%; padding: 8px; border-radius: 12px; background: rgba(0,0,0,0.45); color: #fef08a; border: 1px solid rgba(255,255,255,0.15); outline: none;">
@@ -1019,13 +1055,27 @@
   window.Murajaa.onReciterChange = onReciterChange;
 
   // =========================================================================
-  // 10. DYNAMIC CSS STYLES INJECTION
+  // 7. DYNAMIC CSS STYLES INJECTION
   // =========================================================================
   function injectMurajaaStyles() {
     if (document.getElementById('murajaaStyleDefs')) return;
     const style = document.createElement('style');
     style.id = 'murajaaStyleDefs';
     style.textContent = `
+      /* Universal Centered Modal Backdrop for Murajaa Suite */
+      .neo3d-modal-backdrop {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 25000 !important;
+        background: rgba(4, 8, 16, 0.88) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 14px !important;
+      }
+
       /* Murajaa Mode Switcher Pills */
       .murajaa-mode-pill {
         background: transparent;
@@ -1177,7 +1227,142 @@
   }
 
   // =========================================================================
-  // 11. LIFECYCLE HOOKS & UI HARMONY (ZERO BREAKAGE OF EXISTING CODE)
+  // 8. GLOBAL VOICE UPGRADES ACROSS ALL APP SECTIONS
+  // =========================================================================
+  function upgradeGlobalVoiceRecognition() {
+    // 1. Upgrade cleanArabicForMatch to handle Muqatta'at and Bismillah uniformly
+    const origClean = window.cleanArabicForMatch;
+    window.cleanArabicForMatch = function (str) {
+      if (!str) return '';
+      let res = (typeof origClean === 'function') ? origClean(str) : str;
+      return normalizeArabic(res);
+    };
+
+    // 2. Upgrade checkRecitationAccuracy in Voice Test (#paneMic)
+    const origCheckAccuracy = window.checkRecitationAccuracy;
+    window.checkRecitationAccuracy = function (transcript) {
+      if (typeof window.getVersesForSurah !== 'function' || typeof window.reciteSurah === 'undefined') {
+        if (typeof origCheckAccuracy === 'function') origCheckAccuracy(transcript);
+        return;
+      }
+
+      const verses = window.getVersesForSurah(window.reciteSurah);
+      const v = verses[window.reciteTargetIdx];
+      if (!v) return;
+
+      let spoken = normalizeArabic(transcript);
+      let targetClean = normalizeArabic(v.ar);
+
+      // Strip Bismillah from Ayah 1 of all surahs except Surah 1 (Al-Fatiha)
+      if (v.num === 1 && v.surahNum !== 1) {
+        targetClean = targetClean.replace(/^بسم الله الرحمن الرحيم\s*/, '').trim();
+        spoken = spoken.replace(/^بسم الله الرحمن الرحيم\s*/, '').trim();
+      }
+
+      const spokenWords = spoken.split(/\s+/).filter(Boolean);
+      const targetWords = targetClean.split(/\s+/).filter(Boolean);
+
+      if (targetWords.length === 0) return;
+
+      // Check special Muqatta'at match (e.g. Al-Baqarah Ayah 1: الم)
+      const isMuqattaat = (targetWords.length === 1 && targetWords[0] === 'الم' &&
+        (spokenWords.includes('الم') || spoken.includes('الم') || (spokenWords.includes('الف') && spokenWords.includes('لام') && spokenWords.includes('ميم'))));
+
+      let matchedCount = 0;
+      let sIdx = 0;
+
+      for (let tIdx = 0; tIdx < targetWords.length; tIdx++) {
+        const tWord = targetWords[tIdx];
+        let found = false;
+
+        for (let look = sIdx; look < Math.min(sIdx + 4, spokenWords.length); look++) {
+          const sw = spokenWords[look];
+          if (stringSimilarity(tWord, sw) >= 0.70 || (tWord === 'الم' && sw === 'الم')) {
+            found = true;
+            sIdx = look + 1;
+            break;
+          }
+        }
+
+        if (found) matchedCount++;
+      }
+
+      const accuracy = Math.round((matchedCount / targetWords.length) * 100);
+      const isPass = isMuqattaat || (accuracy >= 65) || (targetWords.length <= 2 && matchedCount >= 1);
+
+      if (isPass) {
+        // Successful verification! Advance to next verse!
+        if (Array.isArray(window.cumulativeRecitedAyahs)) {
+          window.cumulativeRecitedAyahs.push(v);
+        }
+        window.reciteTargetIdx++;
+        if (typeof window.updateCumulativeBoard === 'function') window.updateCumulativeBoard();
+        if (typeof window.updateRecitePromptDisplay === 'function') window.updateRecitePromptDisplay();
+
+        const fb = document.getElementById('micFeedbackText');
+        if (fb) {
+          const nextV = verses[window.reciteTargetIdx];
+          const nextMsg = nextV 
+            ? `👉 ماشاءالله! لطفاً اکنون آیه ${nextV.num} را از حفظ بخوانید...` 
+            : `🎉 ماشاءالله! تمام آیات این سوره با موفقیت خوانده شد!`;
+          fb.innerHTML = `
+            <div style="background: rgba(16, 185, 129, 0.15); border: 1.5px solid #10b981; border-radius: 12px; padding: 14px 18px; margin-top: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="color: #10b981; font-weight: 800; font-size: 1.15rem;">
+                  <i class="fa-solid fa-circle-check"></i> ✓ آیه ${v.num} با موفقیت تأیید شد! (${accuracy || 100}%)
+                </span>
+                <span style="background: #10b981; color: #042f2e; font-size: 0.8rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
+                  MāshāAllāh
+                </span>
+              </div>
+              <div style="font-family: var(--quran-font); font-size: 1.5rem; line-height: 2; margin: 10px 0; direction: rtl; text-align: right; color: #4ade80;">
+                ${v.ar}
+              </div>
+              <div style="color: #86efac; font-size: 0.95rem; font-weight: 600; margin-top: 6px;">
+                ${nextMsg}
+              </div>
+            </div>
+          `;
+        }
+
+        if (typeof window.showToast === 'function') {
+          window.showToast(`✓ آیه ${v.num} تأیید شد ➔ آیه بعدی... ⭐`);
+        }
+      } else {
+        if (typeof origCheckAccuracy === 'function') {
+          origCheckAccuracy(transcript);
+        }
+      }
+    };
+
+    // 3. Upgrade Sheikh Quiz Surah Change (#paneQuiz)
+    window.onMurajaaSurahChanged = function (sId) {
+      const num = parseInt(sId, 10) || 1;
+      if (window.sheikhQuizState) {
+        window.sheikhQuizState.selectedSurah = num;
+        window.sheikhQuizState.currentSurah = num;
+        window.sheikhQuizState.rangeType = 'surah';
+      }
+      if (typeof window.onSheikhQuizSurahChange === 'function') {
+        try { window.onSheikhQuizSurahChange(num); } catch (e) {}
+      }
+      if (typeof window.generateNewSheikhQuestion === 'function') {
+        try { window.generateNewSheikhQuestion(false); } catch (e) {}
+      }
+      const surahs = window.ALL_114_SURAHS || [];
+      const sMeta = surahs.find(s => s.id === num);
+      const trigLbl = document.getElementById('mqSurahTriggerLabel');
+      if (trigLbl && sMeta) {
+        trigLbl.textContent = `${sMeta.id}. ${sMeta.name} (${sMeta.arabic})`;
+      }
+      if (typeof window.showToast === 'function') {
+        window.showToast(`🎯 کوئیز حفظ برای سوره ${sMeta ? sMeta.name : num} بارگذاری شد`);
+      }
+    };
+  }
+
+  // =========================================================================
+  // 9. LIFECYCLE HOOKS & UI HARMONY
   // =========================================================================
   function updateUILanguage(lang) {
     const l = lang || getLang();
@@ -1198,6 +1383,7 @@
 
   function initMurajaaIntegration() {
     injectMurajaaStyles();
+    upgradeGlobalVoiceRecognition();
 
     const origSetMushafMode = window.setMushafMode;
     window.setMushafMode = function (mode) {
@@ -1210,16 +1396,30 @@
       const stageScan = document.getElementById('mushafScanStage');
       const stageMurajaa = document.getElementById('mushafMurajaaStage');
 
+      const row2 = document.getElementById('mushafToolbarRow2');
+      const row3 = document.getElementById('mushafToolbarRow3');
+      const secPlayer = document.getElementById('mushafSectionPlayer');
+
       if (btnInter) btnInter.classList.toggle('active', mode === 'interactive');
       if (btnScan) btnScan.classList.toggle('active', mode === 'scan');
       if (btnMurajaa) btnMurajaa.classList.toggle('active', mode === 'murajaa');
 
       if (mode === 'murajaa') {
+        // HIDE regular toolbar rows and audio player deck for clean Murajaa experience
+        if (row2) row2.style.setProperty('display', 'none', 'important');
+        if (row3) row3.style.setProperty('display', 'none', 'important');
+        if (secPlayer) secPlayer.style.setProperty('display', 'none', 'important');
+
         if (stageInter) stageInter.style.setProperty('display', 'none', 'important');
         if (stageScan) stageScan.style.setProperty('display', 'none', 'important');
         if (stageMurajaa) stageMurajaa.style.setProperty('display', 'block', 'important');
         renderMurajaaMushaf();
       } else {
+        // RESTORE regular toolbar rows and player when in Text or Scan mode
+        if (row2) row2.style.setProperty('display', 'grid', 'important');
+        if (row3) row3.style.setProperty('display', 'grid', 'important');
+        if (secPlayer) secPlayer.style.setProperty('display', 'block', 'important');
+
         if (stageMurajaa) stageMurajaa.style.setProperty('display', 'none', 'important');
         if (typeof origSetMushafMode === 'function') {
           origSetMushafMode(mode);
@@ -1257,7 +1457,7 @@
 
     updateUILanguage(getLang());
 
-    console.log('[Murajaa Engine] Murajaa Pro Hifz Suite successfully mounted.');
+    console.log('[Murajaa Engine] Murajaa Pro Suite v2.0 mounted successfully.');
   }
 
   if (document.readyState === 'loading') {
