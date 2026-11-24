@@ -1180,15 +1180,25 @@
     /* Flowing 15-Line Quranic Text matching King Fahd Mushaf */
     .mushaf-flowing-text {
       direction: rtl;
-      text-align: center;
-      text-align-last: center;
-      line-height: 2.26;
+      text-align: justify !important;
+      text-justify: inter-word !important;
+      text-align-last: center !important;
+      line-height: 2.15 !important;
       font-family: var(--quran-font);
-      font-size: var(--mushaf-font-size, 1.58rem) !important;
+      font-size: var(--mushaf-font-size, 1.55rem) !important;
       color: #111111;
-      word-spacing: normal !important;
+      word-spacing: 1px !important;
       letter-spacing: normal !important;
       -webkit-font-smoothing: antialiased;
+    }
+
+    /* Murajaa Calligraphy Font Families & Dynamic Size */
+    .murajaa-font-kfgqpc, .murajaa-font-kfgqpc *, .murajaa-font-kfgqpc .mushaf-flowing-text, .murajaa-font-kfgqpc .mushaf-flowing-text * { font-family: 'KFGQPC Uthman Taha Naskh', 'Amiri Quran', serif !important; }
+    .murajaa-font-amiri, .murajaa-font-amiri *, .murajaa-font-amiri .mushaf-flowing-text, .murajaa-font-amiri .mushaf-flowing-text * { font-family: 'Amiri Quran', serif !important; }
+    .murajaa-font-scheherazade, .murajaa-font-scheherazade *, .murajaa-font-scheherazade .mushaf-flowing-text, .murajaa-font-scheherazade .mushaf-flowing-text * { font-family: 'Scheherazade New', serif !important; }
+    .murajaa-font-indopak, .murajaa-font-indopak *, .murajaa-font-indopak .mushaf-flowing-text, .murajaa-font-indopak .mushaf-flowing-text * { font-family: 'IndoPak', 'IndoPak_PDMS', 'Noto Nastaliq Urdu', serif !important; }
+    #murajaaMushafCard .mushaf-flowing-text {
+      font-size: var(--murajaa-font-size, inherit) !important;
     }
 
     /* Active Ayah Box matching media_1794774769027_3c5e93ea.jpg & Image 1 */
@@ -2714,10 +2724,11 @@
         margin: 4px 0 10px !important;
       }
       .mushaf-flowing-text {
-        font-size: 1.32rem !important;
-        line-height: 2.2 !important;
-        word-spacing: normal !important;
-        text-align: center !important;
+        font-size: 1.28rem !important;
+        line-height: 2.12 !important;
+        word-spacing: 1px !important;
+        text-align: justify !important;
+        text-justify: inter-word !important;
         text-align-last: center !important;
         letter-spacing: normal !important;
         width: 100% !important;
@@ -6561,6 +6572,11 @@
           <i class="fa-solid fa-magnifying-glass" style="color: #38bdf8;"></i> <span data-i18n="quick_search">Koran-Suche</span>
         </button>
       </div>
+
+      <!-- Quick Prayer Times & Adhan Button in Drawer -->
+      <button type="button" onclick="openPrayerSettingsModal(); closeAndroidDrawer();" class="neo3d-pill-btn" style="padding: 10px 14px; justify-content: center; background: linear-gradient(135deg, rgba(14, 165, 233, 0.22), rgba(2, 132, 199, 0.32)); border-color: rgba(56, 189, 248, 0.45); color: #7dd3fc; font-weight: 800; font-size: 0.82rem;">
+        <i class="fa-solid fa-mosque" style="color: #38bdf8; margin-left: 6px;"></i> <span>اوقات نماز و اذان / کاتەکانی نوێژ</span>
+      </button>
 
 
 

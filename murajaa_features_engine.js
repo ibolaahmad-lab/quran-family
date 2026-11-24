@@ -970,23 +970,37 @@
       modal.id = 'murajaaSettingsModal';
       modal.className = 'neo3d-modal-backdrop';
       modal.onclick = function (e) {
-        if (e.target === this) this.style.display = 'none';
+        if (e.target === this) Murajaa.closeTypographySettings();
+      };
+      modal.ontouchend = function (e) {
+        if (e.target === this) {
+          e.preventDefault();
+          Murajaa.closeTypographySettings();
+        }
       };
       document.body.appendChild(modal);
     }
 
     modal.style.display = 'flex';
     modal.innerHTML = `
-      <div class="neo3d-modal-card" style="max-width: 460px; width: 92%; padding: 22px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(251, 191, 36, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+      <div class="neo3d-modal-card" onclick="event.stopPropagation();" style="max-width: 440px; width: 92%; padding: 20px 22px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(251, 191, 36, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px); box-sizing: border-box;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-sliders" style="color: #fbbf24; font-size: 1.1rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('settings_title')}</span>
           </div>
-          <button onclick="document.getElementById('murajaaSettingsModal').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.4rem; cursor: pointer; padding: 0 6px;">&times;</button>
+          <!-- Sleek compact circular glass close button with golden accent -->
+          <button type="button" onclick="Murajaa.closeTypographySettings()" ontouchend="Murajaa.closeTypographySettings()" style="width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1.2px solid rgba(251,191,36,0.45); color: #fbbf24; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3); -webkit-tap-highlight-color: transparent;">
+            <i class="fa-solid fa-xmark" style="font-size: 0.95rem;"></i>
+          </button>
         </div>
 
-        <div style="margin-bottom: 18px;">
+        <!-- Live Font Preview Box -->
+        <div id="murajaaPreviewBox" class="murajaa-font-${murajaaState.fontFamily}" dir="rtl" style="margin: 4px 0 16px; padding: 10px 14px; border-radius: 12px; background: rgba(0,0,0,0.45); border: 1px solid rgba(251,191,36,0.3); text-align: center; color: #f8fafc; font-size: ${murajaaState.fontSize}px; line-height: 2; transition: all 0.2s ease;">
+          بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ۝١
+        </div>
+
+        <div style="margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; color: #e2e8f0; margin-bottom: 8px;">
             <span>${t('font_size_label')}</span>
             <span id="murajaaFontSizeVal" style="color: #fbbf24; font-weight: 800;">${murajaaState.fontSize}px</span>
@@ -994,7 +1008,7 @@
           <input type="range" min="20" max="44" step="1" value="${murajaaState.fontSize}" oninput="Murajaa.onFontSizeChange(this.value)" style="width: 100%; accent-color: #fbbf24; cursor: pointer;">
         </div>
 
-        <div style="margin-bottom: 18px;">
+        <div style="margin-bottom: 16px;">
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;">${t('font_family_label')}</label>
           <select onchange="Murajaa.onFontFamilyChange(this.value)" style="width: 100%; padding: 8px; border-radius: 12px; background: rgba(0,0,0,0.45); color: #fff; border: 1px solid rgba(255,255,255,0.15); outline: none;">
             <option value="kfgqpc" ${murajaaState.fontFamily === 'kfgqpc' ? 'selected' : ''}>مصحف مدینه منوره (KFGQPC Uthman Taha)</option>
@@ -1004,7 +1018,7 @@
           </select>
         </div>
 
-        <div style="margin-bottom: 20px;">
+        <div style="margin-bottom: 18px;">
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;">${t('reciter_label')}</label>
           <select onchange="Murajaa.onReciterChange(this.value)" style="width: 100%; padding: 8px; border-radius: 12px; background: rgba(0,0,0,0.45); color: #fef08a; border: 1px solid rgba(255,255,255,0.15); outline: none;">
             <option value="Alafasy_128kbps" ${murajaaState.reciter === 'Alafasy_128kbps' ? 'selected' : ''}>🎙️ مشاری بن راشد العفاسی (Alafasy)</option>
@@ -1015,13 +1029,22 @@
           </select>
         </div>
 
-        <button onclick="document.getElementById('murajaaSettingsModal').style.display='none'" class="neo3d-pill-btn" style="width: 100%; padding: 8px; font-size: 0.8rem; justify-content: center; background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff;">
-          ${t('close')}
+        <button type="button" onclick="Murajaa.closeTypographySettings()" ontouchend="Murajaa.closeTypographySettings()" class="neo3d-pill-btn" style="width: 100%; padding: 10px; font-size: 0.85rem; font-weight: 800; justify-content: center; background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 14px rgba(16,185,129,0.35); -webkit-tap-highlight-color: transparent;">
+          <i class="fa-solid fa-check" style="margin-left: 6px;"></i> ${t('close')}
         </button>
       </div>
     `;
   }
   window.Murajaa.openTypographySettings = openTypographySettings;
+
+  function closeTypographySettings() {
+    const modal = document.getElementById('murajaaSettingsModal');
+    if (modal) modal.style.display = 'none';
+    if (typeof renderMurajaaMushafCard === 'function') {
+      renderMurajaaMushafCard();
+    }
+  }
+  window.Murajaa.closeTypographySettings = closeTypographySettings;
 
   function onFontSizeChange(sz) {
     const val = parseInt(sz, 10);
@@ -1031,8 +1054,17 @@
     const lbl = document.getElementById('murajaaFontSizeVal');
     if (lbl) lbl.textContent = val + 'px';
 
+    const prev = document.getElementById('murajaaPreviewBox');
+    if (prev) prev.style.fontSize = val + 'px';
+
+    document.documentElement.style.setProperty('--murajaa-font-size', val + 'px');
+
     const card = document.getElementById('murajaaMushafCard');
-    if (card) card.style.fontSize = val + 'px';
+    if (card) {
+      card.style.fontSize = val + 'px';
+      const flow = card.querySelector('.mushaf-flowing-text');
+      if (flow) flow.style.fontSize = val + 'px';
+    }
   }
   window.Murajaa.onFontSizeChange = onFontSizeChange;
 
@@ -1040,9 +1072,15 @@
     murajaaState.fontFamily = fFam;
     try { localStorage.setItem('murajaa_font_family', fFam); } catch (e) {}
 
+    const prev = document.getElementById('murajaaPreviewBox');
+    if (prev) {
+      prev.className = prev.className.replace(/murajaa-font-\w+/g, '').trim();
+      prev.classList.add('murajaa-font-' + fFam);
+    }
+
     const card = document.getElementById('murajaaMushafCard');
     if (card) {
-      card.className = card.className.replace(/murajaa-font-\w+/g, '');
+      card.className = card.className.replace(/murajaa-font-\w+/g, '').trim();
       card.classList.add('murajaa-font-' + fFam);
     }
   }
@@ -1217,11 +1255,19 @@
         color: #fef08a;
       }
 
-      /* Calligraphy Font Classes */
-      .murajaa-font-kfgqpc { font-family: 'KFGQPC Uthman Taha Naskh', serif !important; }
-      .murajaa-font-amiri { font-family: 'Amiri Quran', serif !important; }
-      .murajaa-font-scheherazade { font-family: 'Scheherazade New', serif !important; }
-      .murajaa-font-indopak { font-family: 'Al Qalam Quran', 'Nafees Riqa', 'Jameel Noori Nastaleeq', serif !important; }
+      /* Calligraphy Font Classes & Dynamic Sizing */
+      .murajaa-font-kfgqpc, .murajaa-font-kfgqpc *, .murajaa-font-kfgqpc .mushaf-flowing-text, .murajaa-font-kfgqpc .mushaf-flowing-text * { font-family: 'KFGQPC Uthman Taha Naskh', 'Amiri Quran', serif !important; }
+      .murajaa-font-amiri, .murajaa-font-amiri *, .murajaa-font-amiri .mushaf-flowing-text, .murajaa-font-amiri .mushaf-flowing-text * { font-family: 'Amiri Quran', serif !important; }
+      .murajaa-font-scheherazade, .murajaa-font-scheherazade *, .murajaa-font-scheherazade .mushaf-flowing-text, .murajaa-font-scheherazade .mushaf-flowing-text * { font-family: 'Scheherazade New', serif !important; }
+      .murajaa-font-indopak, .murajaa-font-indopak *, .murajaa-font-indopak .mushaf-flowing-text, .murajaa-font-indopak .mushaf-flowing-text * { font-family: 'IndoPak', 'IndoPak_PDMS', 'Noto Nastaliq Urdu', serif !important; }
+      #murajaaMushafCard .mushaf-flowing-text {
+        font-size: var(--murajaa-font-size, inherit) !important;
+        text-align: justify !important;
+        text-justify: inter-word !important;
+        text-align-last: center !important;
+        line-height: 2.15 !important;
+        word-spacing: 1px !important;
+      }
     `;
     document.head.appendChild(style);
   }

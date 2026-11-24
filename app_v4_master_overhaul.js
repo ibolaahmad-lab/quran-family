@@ -4586,15 +4586,11 @@
     loadCachedAyahKeysFromDB();
     updateSectionStarButtons();
 
-    // Auto-restore last active tab upon page reload / refresh
+    // Always open cleanly on Home Menu upon page load / refresh as requested by user
     try {
-      const savedTab = localStorage.getItem('quran_active_tab');
-      if (savedTab && savedTab !== 'home') {
-        setTimeout(() => {
-          if (typeof window.switchMainTab === 'function') {
-            window.switchMainTab(savedTab, true);
-          }
-        }, 120);
+      localStorage.setItem('quran_active_tab', 'home');
+      if (typeof window.switchMainTab === 'function') {
+        window.switchMainTab('home', true);
       }
     } catch (e) {}
   }
@@ -4916,19 +4912,21 @@
     const city = getSelectedPrayerCity();
     const curLang = localStorage.getItem('quran_app_language') || (typeof state !== 'undefined' && state.lang) || 'de';
     const isKu = (curLang === 'ku');
+    const isFa = (curLang === 'fa');
+    const isRtl = (isKu || isFa);
 
     const silentBypass = localStorage.getItem('quran_adhan_silent_override') === 'true';
     const autoAdhan = prayerSettings.autoPlayAdhan !== false;
     const selectedVoiceId = prayerSettings.adhanVoice || 'qods';
 
-    modal.dir = isKu ? 'rtl' : 'ltr';
-    modal.style.direction = isKu ? 'rtl' : 'ltr';
+    modal.dir = isRtl ? 'rtl' : 'ltr';
+    modal.style.direction = isRtl ? 'rtl' : 'ltr';
 
     modal.innerHTML = `
       <div class="neo3d-modal-content" onclick="event.stopPropagation();" style="
         position: relative;
         width: 100%;
-        max-width: 310px;
+        max-width: 320px;
         max-height: 86vh;
         overflow-y: auto;
         overflow-x: hidden;
@@ -4938,8 +4936,8 @@
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 30px rgba(56, 189, 248, 0.15);
         padding: 12px 12px 11px;
         box-sizing: border-box;
-        text-align: ${isKu ? 'right' : 'left'};
-        direction: ${isKu ? 'rtl' : 'ltr'};
+        text-align: ${isRtl ? 'right' : 'left'};
+        direction: ${isRtl ? 'rtl' : 'ltr'};
       ">
         <!-- Compact Header -->
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; padding-bottom: 7px; border-bottom: 1px solid rgba(251, 191, 36, 0.2);">
@@ -4948,16 +4946,16 @@
               <i class="fa-solid fa-mosque"></i>
             </div>
             <div>
-              <h3 style="margin: 0; font-size: 0.84rem; font-weight: 800; color: #f8fafc;${isKu ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">${isKu ? 'کاتەکانی نوێژ و بانگ' : 'Gebetszeiten & Adhān'}</h3>
+              <h3 style="margin: 0; font-size: 0.84rem; font-weight: 800; color: #f8fafc;${isRtl ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">${isFa ? 'اوقات شرعی نماز و اذان' : (isKu ? 'کاتەکانی نوێژ و بانگ' : 'Gebetszeiten & Adhān')}</h3>
             </div>
           </div>
-          <button type="button" onclick="closePrayerSettingsModal()" style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.74rem; flex-shrink: 0; padding: 0;">✕</button>
+          <button type="button" onclick="closePrayerSettingsModal()" ontouchend="closePrayerSettingsModal()" style="width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(251,191,36,0.3); color: #fbbf24; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; flex-shrink: 0; padding: 0; -webkit-tap-highlight-color: transparent;">✕</button>
         </div>
 
         <!-- 1. City / Location Selection -->
         <div style="margin-bottom: 9px;">
-          <label style="font-size: 0.68rem; font-weight: 700; color: #fde68a; display: flex; align-items: center; gap: 4px; margin-bottom: 4px;${isKu ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">
-            <i class="fa-solid fa-location-dot" style="color: #38bdf8; font-size: 0.65rem;"></i> ${isKu ? 'شار / شوێن:' : 'Standort / Stadt:'}
+          <label style="font-size: 0.68rem; font-weight: 700; color: #fde68a; display: flex; align-items: center; gap: 4px; margin-bottom: 4px;${isRtl ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">
+            <i class="fa-solid fa-location-dot" style="color: #38bdf8; font-size: 0.65rem;"></i> ${isFa ? 'شهر / موقعیت مکانی:' : (isKu ? 'شار / شوێن:' : 'Standort / Stadt:')}
           </label>
           <div style="position: relative;">
             <select id="prayerCitySelect" onchange="onPrayerCityChanged(this.value)" style="
@@ -4973,15 +4971,15 @@
               font-size: 0.73rem;
               outline: none;
               cursor: pointer;
-              ${isKu ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}
+              ${isRtl ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}
             ">
-              <optgroup label="${isKu ? '🇩🇪 ئەڵمانیا' : '🇩🇪 Deutschland'}">
+              <optgroup label="${isFa ? '🇩🇪 آلمان' : (isKu ? '🇩🇪 ئەڵمانیا' : '🇩🇪 Deutschland')}">
                 ${PRAYER_CITIES.filter(c => c.country === 'de').map(c => `<option value="${c.id}" ${c.id === prayerSettings.cityId ? 'selected' : ''}>${c.flag} ${c.name}</option>`).join('')}
               </optgroup>
-              <optgroup label="${isKu ? '☀️ باشووری کوردستان' : '☀️ باشووری کوردستان (Iraqi Kurdistan)'}">
+              <optgroup label="${isFa ? '☀️ کردستان عراق (باشور)' : (isKu ? '☀️ باشووری کوردستان' : '☀️ باشووری کوردستان (Iraqi Kurdistan)')}">
                 ${PRAYER_CITIES.filter(c => c.country === 'iq_krd').map(c => `<option value="${c.id}" ${c.id === prayerSettings.cityId ? 'selected' : ''}>${c.flag} ${c.name}</option>`).join('')}
               </optgroup>
-              <optgroup label="${isKu ? '☀️ ڕۆژهەڵاتی کوردستان' : '☀️ ڕۆژهەڵاتی کوردستان (Iranian Kurdistan)'}">
+              <optgroup label="${isFa ? '☀️ کردستان ایران (روژهلات)' : (isKu ? '☀️ ڕۆژهەڵاتی کوردستان' : '☀️ ڕۆژهەڵاتی کوردستان (Iranian Kurdistan)')}">
                 ${PRAYER_CITIES.filter(c => c.country === 'ir_krd').map(c => `<option value="${c.id}" ${c.id === prayerSettings.cityId ? 'selected' : ''}>${c.flag} ${c.name}</option>`).join('')}
               </optgroup>
             </select>
@@ -4991,10 +4989,10 @@
         <!-- 2. Mawaqit-Style Adhan Voices List -->
         <div style="margin-bottom: 9px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <label style="font-size: 0.68rem; font-weight: 700; color: #fde68a; display: flex; align-items: center; gap: 4px;${isKu ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">
-              <i class="fa-solid fa-microphone-lines" style="color: #fbbf24; font-size: 0.66rem;"></i> ${isKu ? 'دەنگی بانگ (بانگبێژ):' : 'Adhān-Stimme (Muezzin):'}
+            <label style="font-size: 0.68rem; font-weight: 700; color: #fde68a; display: flex; align-items: center; gap: 4px;${isRtl ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">
+              <i class="fa-solid fa-microphone-lines" style="color: #fbbf24; font-size: 0.66rem;"></i> ${isFa ? 'صدای اذان (مؤذن):' : (isKu ? 'دەنگی بانگ (بانگبێژ):' : 'Adhān-Stimme (Muezzin):')}
             </label>
-            <span style="font-size: 0.58rem; color: #94a3b8; font-weight: 600;">${isKu ? 'ستایلی مواقیت' : 'Mawaqit Studio'}</span>
+            <span style="font-size: 0.58rem; color: #94a3b8; font-weight: 600;">${isRtl ? 'استودیو مواقیت' : 'Mawaqit Studio'}</span>
           </div>
 
           <!-- Scrollable Mawaqit List Cards -->
@@ -5106,50 +5104,51 @@
 
         <!-- 3. Toggle: Automatischen Adhan abspielen -->
         <div style="margin-bottom: 6px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 6px 9px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; width: 100%;">
-          <div style="min-width: 0; padding-${isKu ? 'left' : 'right'}: 4px;">
-            <div style="font-weight: 700; font-size: 0.71rem; color: #fff;${isKu ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">${isKu ? 'بانگدان لە کاتی نوێژدا' : 'Adhān zur Gebetszeit'}</div>
-            <div style="font-size: 0.55rem; color: #94a3b8;${isKu ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">${isKu ? 'لێدانی بانگ لە کاتی خۆیدا' : 'Pünktlich zum Gebet abspielen'}</div>
+          <div style="min-width: 0; padding-${isRtl ? 'left' : 'right'}: 4px;">
+            <div style="font-weight: 700; font-size: 0.71rem; color: #fff;${isRtl ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">${isFa ? 'پخش خودکار اذان در وقت نماز' : (isKu ? 'بانگدان لە کاتی نوێژدا' : 'Adhān zur Gebetszeit')}</div>
+            <div style="font-size: 0.55rem; color: #94a3b8;${isRtl ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">${isFa ? 'پخش دقیق و سروقت بانگ اذان' : (isKu ? 'لێدانی بانگ لە کاتی خۆیدا' : 'Pünktlich zum Gebet abspielen')}</div>
           </div>
           <div onclick="toggleAutoAdhanSetting()" style="width: 29px; height: 17px; background: ${autoAdhan ? '#10b981' : '#475569'}; border-radius: 9px; position: relative; cursor: pointer; box-shadow: ${autoAdhan ? '0 0 6px rgba(16, 185, 129, 0.45)' : 'none'}; flex-shrink: 0; transition: all 0.2s ease;">
-            <div style="width: 11px; height: 11px; background: #fff; border-radius: 50%; position: absolute; ${isKu ? (autoAdhan ? 'left: 3px;' : 'right: 3px;') : (autoAdhan ? 'right: 3px;' : 'left: 3px;')} top: 3px; transition: all 0.2s ease;"></div>
+            <div style="width: 11px; height: 11px; background: #fff; border-radius: 50%; position: absolute; ${isRtl ? (autoAdhan ? 'left: 3px;' : 'right: 3px;') : (autoAdhan ? 'right: 3px;' : 'left: 3px;')} top: 3px; transition: all 0.2s ease;"></div>
           </div>
         </div>
 
         <!-- 4. Silent Mode Override (Auch im Lautlos-Modus abspielen) -->
         <div style="margin-bottom: 10px; background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 10px; padding: 6px 9px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; width: 100%;">
-          <div style="min-width: 0; padding-${isKu ? 'left' : 'right'}: 4px;">
-            <div style="font-weight: 800; font-size: 0.71rem; color: #fef08a; display: flex; align-items: center; gap: 4px;${isKu ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">
-              <i class="fa-solid fa-bell" style="color: #fbbf24; font-size: 0.62rem;"></i> ${isKu ? 'لە دۆخی بێ‌دەنگیشدا' : 'Im Lautlos-Modus abspielen'}
+          <div style="min-width: 0; padding-${isRtl ? 'left' : 'right'}: 4px;">
+            <div style="font-weight: 800; font-size: 0.71rem; color: #fef08a; display: flex; align-items: center; gap: 4px;${isRtl ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">
+              <i class="fa-solid fa-bell" style="color: #fbbf24; font-size: 0.62rem;"></i> ${isFa ? 'پخش در حالت سکوت (سایلنت)' : (isKu ? 'لە دۆخی بێ‌دەنگیشدا' : 'Im Lautlos-Modus abspielen')}
             </div>
-            <div style="font-size: 0.55rem; color: #cbd5e1; margin-top: 1px;${isKu ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">
-              ${isKu ? 'دەنگی بانگ تەنانەت لەسەر بێ‌دەنگیش لێبدات' : 'Erzwingt Ton auch bei stummgeschaltetem Handy'}
+            <div style="font-size: 0.55rem; color: #cbd5e1; margin-top: 1px;${isRtl ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}">
+              ${isFa ? 'پخش زنگ اذان حتی هنگام بی‌صدا بودن گوشی' : (isKu ? 'دەنگی بانگ تەنانەت لەسەر بێ‌دەنگیش لێبدات' : 'Erzwingt Ton auch bei stummgeschaltetem Handy')}
             </div>
           </div>
           <div id="ptSilentBypassSwitch" onclick="toggleSilentBypassSetting()" style="width: 29px; height: 17px; background: ${silentBypass ? '#10b981' : '#475569'}; border-radius: 9px; position: relative; cursor: pointer; box-shadow: ${silentBypass ? '0 0 6px rgba(16, 185, 129, 0.45)' : 'none'}; flex-shrink: 0; transition: all 0.2s ease;">
-            <div style="width: 11px; height: 11px; background: #fff; border-radius: 50%; position: absolute; ${isKu ? (silentBypass ? 'left: 3px;' : 'right: 3px;') : (silentBypass ? 'right: 3px;' : 'left: 3px;')} top: 3px; transition: all 0.2s ease;"></div>
+            <div style="width: 11px; height: 11px; background: #fff; border-radius: 50%; position: absolute; ${isRtl ? (silentBypass ? 'left: 3px;' : 'right: 3px;') : (silentBypass ? 'right: 3px;' : 'left: 3px;')} top: 3px; transition: all 0.2s ease;"></div>
           </div>
         </div>
 
         <!-- Save Button: Closes modal and saves settings -->
-        <button type="button" onclick="closePrayerSettingsModal()" style="
+        <button type="button" onclick="closePrayerSettingsModal()" ontouchend="closePrayerSettingsModal()" style="
           width: 100%;
-          height: 32px;
+          height: 34px;
           border-radius: 10px;
           background: linear-gradient(135deg, #10b981 0%, #059669 100%);
           border: none;
           color: #fff;
           font-weight: 800;
-          font-size: 0.76rem;
+          font-size: 0.78rem;
           cursor: pointer;
           box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 5px;
+          gap: 6px;
           box-sizing: border-box;
-          ${isKu ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}
+          -webkit-tap-highlight-color: transparent;
+          ${isRtl ? ' font-family: \'Noto Kufi Arabic\', sans-serif;' : ''}
         ">
-          <i class="fa-solid fa-check"></i> ${isKu ? 'پاشەکەوتکردن و داخستن' : 'Speichern & Schließen'}
+          <i class="fa-solid fa-check"></i> ${isFa ? 'ذخیره تنظیمات و بستن' : (isKu ? 'پاشەکەوتکردن و داخستن' : 'Speichern & Schließen')}
         </button>
       </div>
     `;
