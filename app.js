@@ -762,17 +762,51 @@ function stopTarteelVoiceListening() {
 
 function matchTarteelVoiceToPage(spoken) {
   if (!spoken || !state.currentVersesData) return;
-  const spokenClean = spoken.replace(/[\u064B-\u065F\u0670]/g, '').trim();
+  const normFunc = window.normalizeArabicForQuranVoice || function(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/\u0670/g, 'ا')
+      .replace(/صلو[ةه]/g, 'صلاه')
+      .replace(/زكو[ةه]/g, 'زكاه')
+      .replace(/حيو[ةه]/g, 'حياه')
+      .replace(/[\u064B-\u065F\u06D6-\u06ED\u06DF\u06E0\u06E2\u06E3\u06E5\u06E6\u06E8\u06EA-\u06ED]/g, '')
+      .replace(/[\u0622\u0623\u0625\u0671]/g, 'ا')
+      .replace(/[\u0649\u064A]/g, 'ي')
+      .replace(/\u0629/g, 'ه')
+      .replace(/\u0640/g, '')
+      .replace(/[\u0600-\u060F\u06DD\u06DE.,/#!$%^&*;:{}=\-_`~()«»۞۩۝]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  const spokenClean = normFunc(spoken);
   const spokenWords = spokenClean.split(/\s+/).filter(w => w.length > 1);
   if (spokenWords.length === 0) return;
 
   state.currentVersesData.forEach((v, idx) => {
-    const vClean = v.ar.replace(/[\u064B-\u065F\u0670]/g, '').trim();
+    let vText = v.ar;
+    if (v.num === 1 && v.surahNum !== 1) {
+      vText = vText.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '');
+    }
+    const vClean = normFunc(vText);
+    const vWords = vClean.split(/\s+/).filter(w => w.length > 1);
+
     let matches = 0;
-    spokenWords.forEach(w => {
-      if (vClean.includes(w)) matches++;
+    spokenWords.forEach(sw => {
+      if (vClean.includes(sw)) {
+        matches++;
+      } else {
+        const swStem = sw.replace(/^(وال|فال|بال|كال|لل|ال|و|ف|ب|ل)/, '');
+        if (swStem.length >= 2 && vWords.some(vw => {
+          const vwStem = vw.replace(/^(وال|فال|بال|كال|لل|ال|و|ف|ب|ل)/, '');
+          return vw === swStem || vw.includes(swStem) || sw.includes(vwStem);
+        })) {
+          matches++;
+        }
+      }
     });
-    if (matches >= 2 || (spokenWords.length === 1 && vClean.includes(spokenWords[0]))) {
+
+    if (matches >= 2 || (spokenWords.length === 1 && matches >= 1) || (vWords.length <= 3 && matches >= 1)) {
       if (!state.revealedAyahs) state.revealedAyahs = {};
       state.revealedAyahs[idx] = true;
       const el = document.getElementById(`mushaf-span-${idx}`);

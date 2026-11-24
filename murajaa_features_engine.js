@@ -250,23 +250,44 @@
   function normalizeArabic(text) {
     if (!text) return '';
     let str = String(text);
-    // Strip Tashkeel & Quranic stop signs
-    str = str.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '');
-    // Normalize Alefs
+
+    // 1. Convert Uthmanic dagger alef (\u0670) to standard Alef (\u0627) so "ٱلْكِتَٰبُ" becomes "الكتاب"
+    str = str.replace(/\u0670/g, '\u0627');
+
+    // 2. Convert Uthmanic spellings with Waw to standard modern Alef
+    // صلوة -> صلاة, زكوة -> زكاة, حيوة -> حياة, ربوا -> ربا, مشكوة -> مشكاة, غدوة -> غداة
+    str = str.replace(/صلو[ةه]/g, 'صلاه')
+             .replace(/زكو[ةه]/g, 'زكاه')
+             .replace(/حيو[ةه]/g, 'حياه')
+             .replace(/ربو[ا]?/g, 'ربا')
+             .replace(/مشكو[ةه]/g, 'مشكاه')
+             .replace(/غدو[ةه]/g, 'غداه')
+             .replace(/نجو[ةه]/g, 'نجاه');
+
+    // 3. Strip Tashkeel, Sukun, Wasla, Maddah & Quranic stop signs
+    str = str.replace(/[\u064B-\u065F\u06D6-\u06ED\u06DF\u06E0\u06E2\u06E3\u06E5\u06E6\u06E8\u06EA-\u06ED]/g, '');
+
+    // 4. Normalize all forms of Alef (أ, إ, آ, ٱ) -> ا
     str = str.replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627');
-    // Normalize Yaa
+
+    // 5. Normalize Yaa / Alef Maqsura (ى -> ي)
     str = str.replace(/[\u0649\u064A]/g, '\u064A');
-    // Normalize Taa Marbuta
+
+    // 6. Normalize Taa Marbuta (ة -> ه)
     str = str.replace(/\u0629/g, '\u0647');
-    // Strip Tatweel
+
+    // 7. Strip Tatweel
     str = str.replace(/\u0640/g, '');
-    // Strip Quranic signs and punctuation
-    str = str.replace(/[\u0600-\u060F\u06DD\u06DE.,/#!$%^&*;:{}=\-_`~()«»۞۩]/g, '');
+
+    // 8. Strip Quranic signs and punctuation
+    str = str.replace(/[\u0600-\u060F\u06DD\u06DE.,/#!$%^&*;:{}=\-_`~()«»۞۩۝]/g, '');
     str = str.replace(/\s+/g, ' ').trim();
-    // Normalize spoken Muqatta'at letters
+
+    // 9. Normalize spoken Muqatta'at letters
     return normalizeMuqattaat(str);
   }
   window.Murajaa.normalizeArabic = normalizeArabic;
+  window.normalizeArabicForQuranVoice = normalizeArabic;
 
   function tokenizeArabic(text) {
     const norm = normalizeArabic(text);
@@ -274,14 +295,29 @@
   }
   window.Murajaa.tokenizeArabic = tokenizeArabic;
 
+  function stripProclitics(w) {
+    if (!w || w.length <= 3) return w;
+    // Strip leading و, ف, ب, ل, ال
+    return w.replace(/^(وال|فال|بال|كال|لل|ال|و|ف|ب|ل)/, '');
+  }
+
   function stringSimilarity(s1, s2) {
-    if (s1 === s2) return 1.0;
     if (!s1 || !s2) return 0.0;
+    if (s1 === s2) return 1.0;
+
     // Check direct Muqatta'at equivalence
     if ((s1 === 'الم' && (s2 === 'الف' || s2 === 'لام' || s2 === 'ميم')) ||
         (s2 === 'الم' && (s1 === 'الف' || s1 === 'لام' || s1 === 'ميم'))) {
       return 1.0;
     }
+
+    // Proclitic stem match: e.g. "وبالآخرة" vs "بالآخرة" or "الذين" vs "والذين"
+    const stem1 = stripProclitics(s1);
+    const stem2 = stripProclitics(s2);
+    if (stem1 && stem2 && stem1 === stem2 && stem1.length >= 2) {
+      return 0.95;
+    }
+
     const l1 = s1.length;
     const l2 = s2.length;
     const maxLen = Math.max(l1, l2);
@@ -301,8 +337,11 @@
         );
       }
     }
-    return 1.0 - (dp[l1][l2] / maxLen);
+    const dist = dp[l1][l2];
+    if (dist <= 1 && maxLen >= 3) return 0.88;
+    return 1.0 - (dist / maxLen);
   }
+  window.Murajaa.stringSimilarity = stringSimilarity;
 
   function deconstructLetters(word) {
     if (!word) return [];
@@ -367,35 +406,45 @@
     const targets = murajaaState.targetTokens;
     if (!targets || targets.length === 0) return;
 
-    const backtrackWindow = 4;
-    const forwardWindow = 3;
+    // Generous windows: up to 14 words backward for breath-pause & repeat, 8 words forward
+    const backtrackWindow = 14;
+    const forwardWindow = 8;
     let didBacktrack = false;
 
     spokenTokens.forEach(spToken => {
       let matchedIndex = -1;
 
-      // 1. Check Backtrack Window (did reciter repeat a preceding word? وقف و ابتدا)
-      const lookbackStart = Math.max(0, murajaaState.currentWordIndex - backtrackWindow);
-      for (let i = murajaaState.currentWordIndex - 1; i >= lookbackStart; i--) {
-        if (stringSimilarity(spToken, targets[i]) >= 0.72) {
-          matchedIndex = i;
-          didBacktrack = true;
-          break;
+      // 1. First check the immediate current target word (highest priority)
+      if (murajaaState.currentWordIndex < targets.length) {
+        if (stringSimilarity(spToken, targets[murajaaState.currentWordIndex]) >= 0.68) {
+          matchedIndex = murajaaState.currentWordIndex;
         }
       }
 
-      // 2. If not backtracking, check forward window
+      // 2. Check Backtrack Window (reciter repeated a preceding word / وقف و ابتدا / نفس‌گیری)
+      if (matchedIndex === -1) {
+        const lookbackStart = Math.max(0, murajaaState.currentWordIndex - backtrackWindow);
+        for (let i = murajaaState.currentWordIndex - 1; i >= lookbackStart; i--) {
+          if (stringSimilarity(spToken, targets[i]) >= 0.70) {
+            matchedIndex = i;
+            didBacktrack = true;
+            break;
+          }
+        }
+      }
+
+      // 3. If not backtracking, check forward window (skipped short words or continuing ahead)
       if (matchedIndex === -1) {
         const lookaheadEnd = Math.min(targets.length - 1, murajaaState.currentWordIndex + forwardWindow);
-        for (let j = murajaaState.currentWordIndex; j <= lookaheadEnd; j++) {
-          if (stringSimilarity(spToken, targets[j]) >= 0.70) {
+        for (let j = murajaaState.currentWordIndex + 1; j <= lookaheadEnd; j++) {
+          if (stringSimilarity(spToken, targets[j]) >= 0.68) {
             matchedIndex = j;
             break;
           }
         }
       }
 
-      // 3. Apply match
+      // 4. Apply match
       if (matchedIndex !== -1) {
         murajaaState.currentWordIndex = matchedIndex + 1;
         murajaaState.spokenIndices.add(matchedIndex);
@@ -405,6 +454,9 @@
         highlightWord(matchedIndex, didBacktrack);
       }
     });
+
+    updateMurajaaStatusPill(didBacktrack);
+  }
 
     updateMurajaaStatusPill(didBacktrack);
   }
@@ -763,7 +815,8 @@
       document.body.appendChild(modal);
     }
 
-    modal.style.display = 'flex';
+    modal.classList.add('open');
+    modal.style.setProperty('display', 'flex', 'important');
     modal.innerHTML = `
       <div class="neo3d-modal-card" style="max-width: 480px; width: 92%; padding: 20px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(234, 179, 8, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
@@ -889,7 +942,8 @@
       document.body.appendChild(modal);
     }
 
-    modal.style.display = 'flex';
+    modal.classList.add('open');
+    modal.style.setProperty('display', 'flex', 'important');
     modal.innerHTML = `
       <div class="neo3d-modal-card" style="max-width: 520px; width: 92%; padding: 22px; border-radius: 22px; background: rgba(8, 16, 28, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.45); box-shadow: 0 20px 50px rgba(0,0,0,0.9); backdrop-filter: blur(25px);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
@@ -981,7 +1035,8 @@
       document.body.appendChild(modal);
     }
 
-    modal.style.display = 'flex';
+    modal.classList.add('open');
+    modal.style.setProperty('display', 'flex', 'important');
     modal.innerHTML = `
       <div class="neo3d-modal-card" onclick="event.stopPropagation();" style="max-width: 440px; width: 92%; padding: 20px 22px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(251, 191, 36, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px); box-sizing: border-box;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
@@ -1039,9 +1094,12 @@
 
   function closeTypographySettings() {
     const modal = document.getElementById('murajaaSettingsModal');
-    if (modal) modal.style.display = 'none';
-    if (typeof renderMurajaaMushafCard === 'function') {
-      renderMurajaaMushafCard();
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.setProperty('display', 'none', 'important');
+    }
+    if (typeof renderMurajaaMushaf === 'function') {
+      renderMurajaaMushaf();
     }
   }
   window.Murajaa.closeTypographySettings = closeTypographySettings;
@@ -1108,10 +1166,13 @@
         background: rgba(4, 8, 16, 0.88) !important;
         backdrop-filter: blur(16px) !important;
         -webkit-backdrop-filter: blur(16px) !important;
-        display: flex !important;
+        display: none;
         align-items: center !important;
         justify-content: center !important;
         padding: 14px !important;
+      }
+      .neo3d-modal-backdrop.open {
+        display: flex !important;
       }
 
       /* Murajaa Mode Switcher Pills */

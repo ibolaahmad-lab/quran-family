@@ -4006,17 +4006,40 @@
   /* ======================================================== */
   /* ANDROID MOBILE DEVICE SIMULATION & FRAME FOR DESKTOP      */
   /* ======================================================== */
+  :root {
+    --app-max-width: 480px;
+  }
+  @media (min-width: 600px) {
+    :root {
+      --app-max-width: 840px;
+    }
+  }
+  @media (min-width: 900px) {
+    :root {
+      --app-max-width: 880px;
+    }
+  }
+  body.screen-fit-full {
+    --app-max-width: 100vw !important;
+  }
+  body.screen-fit-compact {
+    --app-max-width: 460px !important;
+  }
+
   html {
     background: #05080c !important;
   }
   body {
-    max-width: 440px !important;
+    width: 100% !important;
+    max-width: var(--app-max-width) !important;
     margin: 0 auto !important;
     min-height: 100vh !important;
     box-shadow: 0 0 60px rgba(0, 0, 0, 0.95), 0 0 1px rgba(255,255,255,0.1) !important;
     position: relative !important;
     overflow-x: hidden !important;
     padding: 10px 10px 80px 10px !important;
+    transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box !important;
   }
   .sidebar, .main-tabs {
     display: none !important;
@@ -4032,17 +4055,49 @@
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
-    max-width: 440px !important;
+    max-width: var(--app-max-width) !important;
     box-sizing: border-box !important;
+    transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
   #androidDrawerBackdrop {
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 100% !important;
-    max-width: 440px !important;
+    max-width: var(--app-max-width) !important;
   }
   #androidSideDrawer {
     max-width: 330px !important;
+  }
+
+  /* Floating iPad / Mobile Screen Fit Mode Toggle (Matching User Attachment 1) */
+  #screenFitToggleBtn {
+    position: fixed;
+    bottom: 82px;
+    left: 14px;
+    z-index: 12500;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(22, 28, 38, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.2px solid rgba(251, 191, 36, 0.45);
+    color: #fbbf24;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65), 0 0 10px rgba(251, 191, 36, 0.2);
+    transition: all 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #screenFitToggleBtn:hover {
+    transform: scale(1.08);
+    background: rgba(30, 41, 59, 0.95);
+    border-color: #fbbf24;
+  }
+  #screenFitToggleBtn:active {
+    transform: scale(0.95);
   }
 
     @keyframes ayahPulse {
@@ -6689,7 +6744,7 @@
   <!-- ======================================================= -->
   <!-- ANDROID MOBILE BOTTOM NAVIGATION BAR                     -->
   <!-- ======================================================= -->
-  <nav class="android-bottom-nav" style="display: flex; justify-content: space-around; align-items: center; background: rgba(8, 13, 20, 0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 5px 4px 6px; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 440px; z-index: 12000; box-shadow: 0 -8px 28px rgba(0,0,0,0.85); box-sizing: border-box;">
+  <nav class="android-bottom-nav" style="display: flex; justify-content: space-around; align-items: center; background: rgba(8, 13, 20, 0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 5px 4px 6px; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: var(--app-max-width, 480px); z-index: 12000; box-shadow: 0 -8px 28px rgba(0,0,0,0.85); box-sizing: border-box; transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1);">
     <!-- 1. Start (Home) -->
     <button class="abn-btn active" id="abnHome" onclick="switchMainTab('home')" title="Startseite">
       <div class="abn-orb" style="background: linear-gradient(135deg, #38bdf8, #0284c7); box-shadow: 0 4px 10px rgba(14,165,233,0.35), inset 0 1px 2px rgba(255,255,255,0.4);">
@@ -6738,6 +6793,11 @@
       <span class="abn-label" data-i18n="menu">Menü</span>
     </button>
   </nav>
+
+  <!-- Floating iPad & Screen Fit Mode Toggle Button (Matching User Upload 1) -->
+  <button type="button" id="screenFitToggleBtn" onclick="toggleScreenFitMode()" ontouchend="toggleScreenFitMode()" title="تغییر عرض صفحه / تناسب با آیپد و موبایل">
+    <i id="screenFitIcon" class="fa-solid fa-up-right-and-down-left-from-center"></i>
+  </button>
 
 
   <!-- ======================================================= -->
@@ -7341,5 +7401,42 @@
   <script src="app_v4_master_overhaul.js?v=20_pdf_offline"></script>
   <script src="murajaa_features_engine.js?v=20261124_v1"></script>
   <script src="pwa_installer.js?v=20261124_v1"></script>
+  <script>
+    window.toggleScreenFitMode = function() {
+      const isFull = document.body.classList.contains('screen-fit-full');
+      const isCompact = document.body.classList.contains('screen-fit-compact');
+      const icon = document.getElementById('screenFitIcon');
+
+      if (isFull) {
+        document.body.classList.remove('screen-fit-full');
+        document.body.classList.add('screen-fit-compact');
+        localStorage.setItem('quran_screen_fit_mode', 'compact');
+        if (icon) icon.className = 'fa-solid fa-mobile-screen';
+        if (typeof showToast === 'function') showToast('📱 حالت ستونی موبایل (Compact)');
+      } else if (isCompact) {
+        document.body.classList.remove('screen-fit-compact');
+        localStorage.setItem('quran_screen_fit_mode', 'auto');
+        if (icon) icon.className = 'fa-solid fa-up-right-and-down-left-from-center';
+        if (typeof showToast === 'function') showToast('📐 حالت تطبیق خودکار با صفحه (Auto Fit)');
+      } else {
+        document.body.classList.add('screen-fit-full');
+        localStorage.setItem('quran_screen_fit_mode', 'full');
+        if (icon) icon.className = 'fa-solid fa-down-left-and-up-right-to-center';
+        if (typeof showToast === 'function') showToast('🖥️ حالت تمام‌صفحه تبلت و آیپد (Full Screen)');
+      }
+    };
+
+    (function initScreenFitPreference() {
+      const saved = localStorage.getItem('quran_screen_fit_mode');
+      const icon = document.getElementById('screenFitIcon');
+      if (saved === 'full') {
+        document.body.classList.add('screen-fit-full');
+        if (icon) icon.className = 'fa-solid fa-down-left-and-up-right-to-center';
+      } else if (saved === 'compact') {
+        document.body.classList.add('screen-fit-compact');
+        if (icon) icon.className = 'fa-solid fa-mobile-screen';
+      }
+    })();
+  </script>
 </body>
 </html>
