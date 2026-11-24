@@ -5333,13 +5333,16 @@
 
         <!-- Section 1 Neo-3D Unified Toolbar (Reorganized: Row 1: Text & Scan (50/50), Row 2: Surah & Qari (50/50), Row 3: Tajweed, Design, Markieren (1/3 each)) -->
         <div class="neo3d-unified-toolbar" style="padding: 7px 9px; gap: 6px; border-radius: 16px;">
-          <!-- Row 1 (Top): Pure 50/50 Text & Scan Mode Switchers (Tapping active mode toggles Mobile Fullscreen) -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%;">
-            <button id="mushafModeInterBtn" class="neo3d-pill-btn active" onclick="onMushafTextModeClick()" style="justify-content: center; padding: 6px 10px; font-size: 0.8rem; border-radius: 10px; height: 32px;" title="Text-Modus (Uthmānī) – Erneut tippen für Vollbild">
-              <i class="fa-solid fa-font" style="font-size: 0.8rem;"></i> <span>Text (Uthmānī)</span>
+          <!-- Row 1 (Top): 3 Mode Switchers: Text, Scan, and Murajaa Mushaf -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1.15fr; gap: 5px; width: 100%;">
+            <button id="mushafModeInterBtn" class="neo3d-pill-btn active" onclick="onMushafTextModeClick()" style="justify-content: center; padding: 6px 4px; font-size: 0.74rem; border-radius: 10px; height: 32px;" title="Text-Modus (Uthmānī)">
+              <i class="fa-solid fa-font" style="font-size: 0.76rem;"></i> <span id="mushafModeTextLabel">Text</span>
             </button>
-            <button id="mushafModeScanBtn" class="neo3d-pill-btn" onclick="onMushafScanModeClick()" style="justify-content: center; padding: 6px 10px; font-size: 0.8rem; border-radius: 10px; height: 32px;" title="Scan-Modus (Medina HD) – Erneut tippen für Vollbild">
-              <i class="fa-solid fa-image" style="font-size: 0.8rem;"></i> <span>Scan (Medina HD)</span>
+            <button id="mushafModeScanBtn" class="neo3d-pill-btn" onclick="onMushafScanModeClick()" style="justify-content: center; padding: 6px 4px; font-size: 0.74rem; border-radius: 10px; height: 32px;" title="Scan-Modus (Medina HD)">
+              <i class="fa-solid fa-image" style="font-size: 0.76rem;"></i> <span id="mushafModeScanLabel">Scan</span>
+            </button>
+            <button id="mushafModeMurajaaBtn" class="neo3d-pill-btn" onclick="onMushafMurajaaModeClick()" style="justify-content: center; padding: 6px 4px; font-size: 0.74rem; border-radius: 10px; height: 32px; border-color: rgba(234, 179, 8, 0.45); background: rgba(234, 179, 8, 0.08);" title="مراجعه مصحف / Murajaa Mushaf">
+              <i class="fa-solid fa-brain" style="font-size: 0.76rem; color: #fbbf24;"></i> <span id="mushafModeMurajaaLabel">مراجعه مصحف</span>
             </button>
           </div>
 
@@ -5420,6 +5423,9 @@
             </div>
           </div>
         </div>
+
+        <!-- Dedicated Murajaa Mushaf Stage (Authentic Murajaa App Experience) -->
+        <div id="mushafMurajaaStage" style="display: none; position: relative; width: 100%;"></div>
       
         <!-- Section 1 Unified Studio Scrubber & Timecode Audio Player (Model 3 Approved) -->
         <div class="neo-unified-audio-player model3-deck" id="mushafSectionPlayer" style="
