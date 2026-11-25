@@ -361,12 +361,25 @@
 
   // =========================================================================
   // 3. ENGINE: NATIVE BROWSER SPEECH RECOGNITION (Google / Safari)
+  // Continuous Immortal Engine: Auto-reconnects on breath pauses without stalling
   // =========================================================================
+  let nativeRestartTimer = null;
+
   function startNativeGoogleListening(callbacks) {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) {
       if (callbacks.onError) callbacks.onError('مرورگر از این قابلیت پشتیبانی نمی‌کند');
       return;
+    }
+
+    if (nativeSpeechRec) {
+      try {
+        nativeSpeechRec.onend = null;
+        nativeSpeechRec.onerror = null;
+        nativeSpeechRec.onresult = null;
+        nativeSpeechRec.abort();
+      } catch (e) {}
+      nativeSpeechRec = null;
     }
 
     nativeSpeechRec = new SpeechRec();
@@ -392,18 +405,34 @@
     };
 
     nativeSpeechRec.onerror = (e) => {
-      if (e.error !== 'no-speech' && callbacks.onError) {
-        callbacks.onError(e.error);
+      console.warn('Native speech error notice:', e.error);
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        isCurrentlyListening = false;
+        if (callbacks.onError) callbacks.onError(e.error);
       }
     };
 
     nativeSpeechRec.onend = () => {
-      isCurrentlyListening = false;
-      if (callbacks.onEnd) callbacks.onEnd();
+      if (isCurrentlyListening) {
+        // Continuous Immortal Auto-Reconnect on breath pause (under 60ms)
+        if (nativeRestartTimer) clearTimeout(nativeRestartTimer);
+        nativeRestartTimer = setTimeout(() => {
+          if (isCurrentlyListening) {
+            try {
+              nativeSpeechRec.start();
+            } catch (err) {
+              // If already active, ignore
+            }
+          }
+        }, 60);
+      } else {
+        if (callbacks.onEnd) callbacks.onEnd();
+      }
     };
 
     try {
       nativeSpeechRec.start();
+      isCurrentlyListening = true;
     } catch (e) {
       console.warn('Native speech start note:', e);
     }

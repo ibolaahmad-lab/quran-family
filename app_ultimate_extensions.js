@@ -1930,13 +1930,13 @@ function doArabicWordsMatch(w1, w2) {
   const sk2 = toQuranPhoneticConsonants(stripArabicPrefix(n2));
   if (sk1.length >= 2 && sk1 === sk2) return true;
 
-  if (calculateLevenshteinSimilarity(n1, n2) >= 0.65) return true;
-  if (calculateLevenshteinSimilarity(stripArabicPrefix(n1), stripArabicPrefix(n2)) >= 0.65) return true;
+  if (calculateLevenshteinSimilarity(n1, n2) >= 0.58) return true;
+  if (calculateLevenshteinSimilarity(stripArabicPrefix(n1), stripArabicPrefix(n2)) >= 0.58) return true;
   return false;
 }
 window.doArabicWordsMatch = doArabicWordsMatch;
 
-// Precision Word-by-Word Streaming Evaluator
+// Precision Word-by-Word Streaming Evaluator (Smart Window Alignment - Never Stalls in Mid-Ayah)
 function evaluateAyahWordStream(fullSessionSpoken, latestChunk, rawTargetWords, currentRevealed) {
   const normSFull = normalizeArabicForMatch(fullSessionSpoken).split(' ').filter(w => w.length > 0);
   const normSLatest = normalizeArabicForMatch(latestChunk).split(' ').filter(w => w.length > 0);
@@ -1958,7 +1958,6 @@ function evaluateAyahWordStream(fullSessionSpoken, latestChunk, rawTargetWords, 
       return { matchedWords: 1, totalWords: 1, isComplete: true };
     }
     
-    // If the user only said Bismillah at the start of Surah 2, acknowledge it in UI without completing Ayah 1
     if (fullSpokenNorm.includes('بسم الله') || latestNorm.includes('بسم الله')) {
       const liveEl = document.getElementById('tarteelSpeechLiveText');
       if (liveEl) liveEl.textContent = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ 🌸 (خوێندنەوەی دەستپێک - ئێستا بڵێ: الم)';
@@ -1966,48 +1965,66 @@ function evaluateAyahWordStream(fullSessionSpoken, latestChunk, rawTargetWords, 
     }
   }
 
-  // 1. Sequential match from beginning of ayah across full session
+  // 1. SMART WINDOW ALIGNMENT: Never gets stuck on a single misheard or skipped word!
+  let bestTargetProgress = currentRevealed;
+  const candidateLists = [normSFull, normSLatest];
+
+  for (const sTokens of candidateLists) {
+    if (!sTokens || sTokens.length === 0) continue;
+    let curT = currentRevealed;
+
+    for (let s = 0; s < sTokens.length; s++) {
+      const sw = sTokens[s];
+      let bestMatchIdx = -1;
+      
+      // Look window: check curT - 1 (backtrack), curT (expected), up to curT + 4 (lookahead)
+      const lookStart = Math.max(0, curT - 1);
+      const lookEnd = Math.min(T - 1, curT + 4);
+
+      for (let t = lookStart; t <= lookEnd; t++) {
+        if (doArabicWordsMatch(sw, normTarget[t])) {
+          bestMatchIdx = t;
+          break;
+        }
+      }
+
+      if (bestMatchIdx !== -1) {
+        if (bestMatchIdx >= curT) {
+          curT = bestMatchIdx + 1;
+        }
+      }
+    }
+
+    if (curT > bestTargetProgress) {
+      bestTargetProgress = curT;
+    }
+  }
+
+  // 2. Sequential fallback check from beginning (0 to T) with particle tolerance
   let matchedFromStart = 0;
   let sIdx = 0;
   for (let tIdx = 0; tIdx < T; tIdx++) {
     let found = false;
-    for (let look = sIdx; look < Math.min(normSFull.length, sIdx + 3); look++) {
+    for (let look = sIdx; look < Math.min(normSFull.length, sIdx + 4); look++) {
       if (doArabicWordsMatch(normSFull[look], normTarget[tIdx])) {
-        matchedFromStart++;
+        matchedFromStart = tIdx + 1;
         sIdx = look + 1;
         found = true;
         break;
       }
     }
-    if (!found) break;
-  }
-
-  // 2. Incremental match forward from currentRevealed (handles pauses and isolated latest words)
-  let incrementalMatched = currentRevealed;
-  const candidateLists = [normSLatest, normSFull];
-  for (const sList of candidateLists) {
-    let curTest = currentRevealed;
-    let startSearch = 0;
-    while (curTest < T) {
-      const expected = normTarget[curTest];
-      let foundWord = false;
-      for (let i = startSearch; i < sList.length; i++) {
-        if (doArabicWordsMatch(sList[i], expected)) {
-          curTest++;
-          startSearch = i + 1;
-          foundWord = true;
-          break;
-        }
+    if (!found) {
+      // Tolerate short skipped particles (و، ف، فی، من)
+      if (tIdx < T - 1 && normTarget[tIdx].length <= 2) {
+        continue;
       }
-      if (!foundWord) break;
-    }
-    if (curTest > incrementalMatched) {
-      incrementalMatched = curTest;
+      break;
     }
   }
 
-  const newRevealed = Math.min(T, Math.max(currentRevealed, matchedFromStart, incrementalMatched));
-  const isComplete = (newRevealed === T) || (newRevealed >= T - 1 && T >= 6);
+  const newRevealed = Math.min(T, Math.max(currentRevealed, matchedFromStart, bestTargetProgress));
+  // Ayah is complete when all words match, or T-1 for long ayahs
+  const isComplete = (newRevealed >= T) || (newRevealed >= T - 1 && T >= 5) || (T >= 10 && newRevealed >= Math.floor(T * 0.9));
 
   return {
     matchedWords: newRevealed,
@@ -2735,12 +2752,11 @@ function renderTarteelMushafPage() {
     const revealedCount = tarteelState.revealedWords[key] || 0;
 
     if (isFullyRevealed) {
-      // Complete verse revealed in full authentic Tajweed
+      // Clean, pure Uthmani script without intra-word Tajweed spans that break Arabic letter connectivity
       const cleanAr = (typeof cleanArabicText === 'function') ? cleanArabicText(rawVerseAr) : rawVerseAr;
-      const tajweedHtml = (typeof applyTajweedMarkup === 'function') ? applyTajweedMarkup(cleanAr) : cleanAr;
       html += `
         <span class="tarteel-verse-inline ${isTarget ? 'active-target' : ''}" onclick="selectTarteelTargetAyah(${v.surahNum}, ${v.num})" title="Vers ${v.num}" style="${isTarget ? 'color: #059669; font-weight: 900;' : ''}">
-          ${tajweedHtml}
+          ${cleanAr}
           <span class="tarteel-rosette-icon" style="color: #059669; font-weight: 800;">۝${rosetteAr}</span>
         </span>
       `;
@@ -2750,13 +2766,12 @@ function renderTarteelMushafPage() {
       rawWords.forEach((w, wIdx) => {
         const isWordRevealed = (wIdx < revealedCount);
         const cleanW = (typeof cleanArabicText === 'function') ? cleanArabicText(w) : w;
-        const tajweedW = (typeof applyTajweedMarkup === 'function') ? applyTajweedMarkup(cleanW) : cleanW;
         const dashWidth = Math.max(22, Math.min(65, w.length * 9));
         const isNextExpected = (isTarget && wIdx === revealedCount);
 
         wordsHtml += `
           <span id="tarteelWord_${v.surahNum}_${v.num}_${wIdx}" class="tarteel-word-unit ${isWordRevealed ? 'revealed' : 'hidden'}" style="display: inline-block; margin: 0 2px; vertical-align: middle;">
-            <span class="tarteel-word-text" style="display: ${isWordRevealed ? 'inline' : 'none'}; color: #059669; font-weight: 900; font-size: 1.35rem; line-height: 2;">${tajweedW}</span>
+            <span class="tarteel-word-text" style="display: ${isWordRevealed ? 'inline' : 'none'}; color: #059669; font-weight: 900; font-size: 1.35rem; line-height: 2;">${cleanW}</span>
             <span class="tarteel-word-dash" style="display: ${isWordRevealed ? 'none' : 'inline-block'}; width: ${dashWidth}px; height: 16px; border-bottom: ${isNextExpected ? '2.5px solid #10b981' : '1.8px dashed #94a3b8'};"></span>
           </span>
         `;

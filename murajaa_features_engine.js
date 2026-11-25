@@ -768,22 +768,6 @@
     }
 
     launchSpeechSession();
-
-    // Sentinel Watchdog: Keeps recognition alive even across long breath pauses
-    if (watchdogInterval) clearInterval(watchdogInterval);
-    watchdogInterval = setInterval(() => {
-      if (!murajaaState.isListening) {
-        clearInterval(watchdogInterval);
-        watchdogInterval = null;
-        return;
-      }
-      const now = Date.now();
-      // If no speech/heartbeat in 6 seconds, refresh the session
-      if (now - lastSpeechTimestamp > 6000) {
-        lastSpeechTimestamp = now;
-        launchSpeechSession();
-      }
-    }, 4000);
   }
 
   function stopSpeechRecognition() {
