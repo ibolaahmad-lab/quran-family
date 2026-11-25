@@ -1,15 +1,15 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Updated with authentic scholar profile & 74 Golestan lessons
+ * Authentic Scholar Data & 74 Golestan Lessons
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
     "id": "mamosta_hadi_ahmadi",
     "name": "مامۆستا هادی ئەحمەدی",
-    "titleKu": "وتارخوێن و وانەبێژی حوجرەی شەمسولعاریفین",
-    "avatar": "https://cdn4.telesco.pe/file/QtUL0ox2m6JGZ4iOXuE9Cb04vN-TDLmTfN93-tgvyRoGUuLvnHky5VCAcAe8z9Bfqan8ecw_c4-t8tDvr9XKUJM2msXTkELhaqrrrpraOvXVuiLYMobocaLMk96iL5AMzR35njNYDH6hBS494yOlrKkAO0bZTVfDAsxqPX211cBaArD31Vw5Y1CajWLd-lIhrjKb8_M8ZYXuTq97OnN6KB7dvV7pthSUf5b6uSLhQ7WnBP_J4xsKOGjpjT-kX_sm3JiXWe77LfMSvhq7WKQ7Oo0dhCv-Hduin4bPYChMD-o1M9XBH2Ie-MBWvI_jHmicTVi4s9id03pJrMnbrYB4kw.jpg",
-    "hujraCity": "سنە (Sanandaj)",
-    "bioKu": "مامۆستا هادی ئەحمەدی وتارخوێن و وانەبێژی حوجرەی (شمس العارفین) لە گوندی نجار سەر بە شاری پاوەیە. ساڵانێکی زۆرە خزمەتی زانستە شەرعییەکان، تەفسیر، عەقیدە، ئەدەب و عیرفانی ئیسلامی دەکات و دەیان فەقێ و مامۆستای پێگەیاندووە.",
+    "titleKu": "وتارخوێن و وانەبێژی حوجرەی (شمس العارفین)؛ گوندی نجار لە شاری پاوه",
+    "avatar": "images/mamosta_hadi.jpg",
+    "hujraCity": "گوندی نجار - شاری پاوە",
+    "bioKu": "مامۆستا هادی ئەحمەدی وتارخوێن و وانەبێژی فەرمی حوجرەی (شمس العارفین) لە گوندی نجار لە شاری پاوەیە. خزمەتکاری زانستە شەرعییەکان، تەفسیر، فەرموودە و ئەدەبیاتی کوردی و فارسی.",
     "telegramChannel": "https://t.me/mamosa_hadi",
     "youtubeChannel": "https://www.youtube.com/@mamosta.hadi.ahmadi",
     "categories": [
@@ -838,6 +838,7 @@ window.HUJRA_SCHOLARS_DATA = [
         ]
       }
     ],
-    "telegramLessons": "https://t.me/droosemamostahadi"
+    "telegramLessons": "https://t.me/droosemamostahadi",
+    "instagram": "https://instagram.com/mamosta.hadi.ahmadi"
   }
 ];
