@@ -1669,7 +1669,7 @@ var tarteelState = window.tarteelState = {
   page: 1,
   surah: 1,
   targetAyah: 1,
-  reciteMode: 'single',  // 'single' (Einzelvers) vs 'continuous' (Fortlaufend)
+  reciteMode: localStorage.getItem('tarteel_recite_mode') || 'continuous',  // 'continuous' (خوکار / اتوماتیک) vs 'single'
   hideMode: true,        // Hifz Blank Mode by default
   revealed: {},          // key: "surah:ayah" -> true (fully revealed)
   revealedWords: {},     // key: "surah:ayah" -> number of words sequentially revealed (Progressive Reveal)
@@ -1890,13 +1890,24 @@ function evaluateAyahWordStream(fullSessionSpoken, latestChunk, rawTargetWords, 
 
   if (T === 0) return { matchedWords: 0, totalWords: 0, isComplete: false };
 
-  // Special instant pass for Ayah 1 (الم or single-word Muqatta'at)
+  // Special pass for Ayah 1 (الم or single-word Muqatta'at)
   if (T === 1 && (normTarget[0] === 'الم' || rawTargetWords[0] === 'الم')) {
     const fullSpokenNorm = normalizeArabicForMatch(fullSessionSpoken);
     const latestNorm = normalizeArabicForMatch(latestChunk);
-    if (fullSpokenNorm.includes('الم') || fullSpokenNorm.includes('الف') || fullSpokenNorm.includes('بسم الله') ||
-        latestNorm.includes('الم') || latestNorm.includes('الف') || latestNorm.includes('بسم الله')) {
+    
+    // Check if user specifically recited Alif-Lam-Mim (or Arabic 1000/Alf/AlifLam)
+    const isAlifLamMimSpoken = fullSpokenNorm.includes('الم') || fullSpokenNorm.includes('الف') || 
+                               latestNorm.includes('الم') || latestNorm.includes('الف');
+                               
+    if (isAlifLamMimSpoken) {
       return { matchedWords: 1, totalWords: 1, isComplete: true };
+    }
+    
+    // If the user only said Bismillah at the start of Surah 2, acknowledge it in UI without completing Ayah 1
+    if (fullSpokenNorm.includes('بسم الله') || latestNorm.includes('بسم الله')) {
+      const liveEl = document.getElementById('tarteelSpeechLiveText');
+      if (liveEl) liveEl.textContent = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ 🌸 (خوێندنەوەی دەستپێک - ئێستا بڵێ: الم)';
+      return { matchedWords: 0, totalWords: 1, isComplete: false };
     }
   }
 
@@ -2251,6 +2262,59 @@ function toggleTarteelRecitation() {
 
 window.toggleTarteelRecitation = toggleTarteelRecitation;
 
+// Unified Progressive Speech Stream Handler (Used by Google Speech, Groq Whisper & Offline WASM)
+function handleTarteelSpokenStream(fullSessionSpoken, latestChunk, latestResultCount) {
+  if (!tarteelState.isRecording || tarteelState.isPacingPause) return;
+  if (Date.now() < tarteelState.ignoreSpeechBeforeTime) return;
+
+  if (latestResultCount) {
+    tarteelState.speechRecognizerLatestResultIndex = latestResultCount;
+  }
+
+  const liveText = document.getElementById('tarteelSpeechLiveText');
+  const scoreBadge = document.getElementById('tarteelMatchScoreBadge');
+
+  if (liveText) liveText.textContent = latestChunk || fullSessionSpoken;
+
+  // Target Ayah
+  const verses = getTarteelVersesForPage(tarteelState.page);
+  const targetV = verses.find(v => v.num === tarteelState.targetAyah && v.surahNum === tarteelState.surah) || verses[0];
+  if (!targetV) return;
+
+  const targetKey = `${targetV.surahNum}:${targetV.num}`;
+  const rawWords = (targetV.ar || '').split(/\s+/).filter(w => w.length > 0);
+  const totalWords = rawWords.length;
+  const currentRevealed = tarteelState.revealedWords[targetKey] || 0;
+
+  const progress = evaluateAyahWordStream(fullSessionSpoken, latestChunk, rawWords, currentRevealed);
+
+  // Progressive Live Word-by-Word Fill:
+  if (progress.matchedWords > currentRevealed) {
+    const prevCount = currentRevealed;
+    tarteelState.revealedWords[targetKey] = progress.matchedWords;
+    playTarteelTone('wordSuccess');
+    updateProgressiveWordDOM(targetV.surahNum, targetV.num, prevCount, progress.matchedWords);
+  }
+
+  if (scoreBadge) {
+    scoreBadge.textContent = getTarteelText('wordProgressBadge', progress.matchedWords, progress.totalWords);
+    scoreBadge.style.background = progress.isComplete ? 'rgba(16,185,129,0.35)' : 'rgba(56,189,248,0.25)';
+    scoreBadge.style.color = progress.isComplete ? '#34d399' : '#38bdf8';
+  }
+
+  if (progress.isComplete) {
+    // ALL WORDS IN AYAH SUCCESSFULLY COMPLETED!
+    if (latestResultCount) {
+      tarteelState.sessionResultIndex = latestResultCount;
+    }
+    onAyahSuccessfullyRecognized(targetV, fullSessionSpoken || latestChunk);
+  }
+}
+window.handleTarteelSpokenStream = handleTarteelSpokenStream;
+window.processTarteelSpokenText = function(text) {
+  handleTarteelSpokenStream(text, text, (tarteelState.speechRecognizerLatestResultIndex || 0) + 1);
+};
+
 function startTarteelRecitation() {
   tarteelState.isRecording = true;
   tarteelState.timerSeconds = 0;
@@ -2290,9 +2354,7 @@ function startTarteelRecitation() {
     window.QuranVoiceAI.startListening({
       onStart: () => {},
       onTranscript: (cleanText) => {
-        if (!tarteelState.isRecording || tarteelState.isPacingPause) return;
-        if (liveText) liveText.textContent = cleanText;
-        processTarteelSpokenText(cleanText);
+        handleTarteelSpokenStream(cleanText, cleanText, (tarteelState.speechRecognizerLatestResultIndex || 0) + 1);
       },
       onError: (err) => {
         console.warn('Tarteel Voice AI error:', err);
@@ -2322,7 +2384,6 @@ function startTarteelRecitation() {
         if (!tarteelState.isRecording || tarteelState.isPacingPause) return;
         if (Date.now() < tarteelState.ignoreSpeechBeforeTime) return;
 
-        tarteelState.speechRecognizerLatestResultIndex = event.results.length;
         const sessionStart = tarteelState.sessionResultIndex || 0;
         let fullSessionSpoken = '';
         for (let i = sessionStart; i < event.results.length; i++) {
@@ -2333,39 +2394,7 @@ function startTarteelRecitation() {
         const lastResult = event.results[event.results.length - 1];
         const latestChunk = (lastResult && lastResult[0]) ? lastResult[0].transcript.trim() : '';
 
-        if (liveText) liveText.textContent = latestChunk || fullSessionSpoken;
-
-        // Target Ayah
-        const verses = getTarteelVersesForPage(tarteelState.page);
-        const targetV = verses.find(v => v.num === tarteelState.targetAyah && v.surahNum === tarteelState.surah) || verses[0];
-        if (!targetV) return;
-
-        const targetKey = `${targetV.surahNum}:${targetV.num}`;
-        const rawWords = (targetV.ar || '').split(/\s+/).filter(w => w.length > 0);
-        const totalWords = rawWords.length;
-        const currentRevealed = tarteelState.revealedWords[targetKey] || 0;
-
-        const progress = evaluateAyahWordStream(fullSessionSpoken, latestChunk, rawWords, currentRevealed);
-
-        // Progressive Live Word-by-Word Fill:
-        if (progress.matchedWords > currentRevealed) {
-          const prevCount = currentRevealed;
-          tarteelState.revealedWords[targetKey] = progress.matchedWords;
-          playTarteelTone('wordSuccess');
-          updateProgressiveWordDOM(targetV.surahNum, targetV.num, prevCount, progress.matchedWords);
-        }
-
-        if (scoreBadge) {
-          scoreBadge.textContent = getTarteelText('wordProgressBadge', progress.matchedWords, progress.totalWords);
-          scoreBadge.style.background = progress.isComplete ? 'rgba(16,185,129,0.35)' : 'rgba(56,189,248,0.25)';
-          scoreBadge.style.color = progress.isComplete ? '#34d399' : '#38bdf8';
-        }
-
-        if (progress.isComplete) {
-          // ALL WORDS IN AYAH SUCCESSFULLY COMPLETED!
-          tarteelState.sessionResultIndex = event.results.length;
-          onAyahSuccessfullyRecognized(targetV, fullSessionSpoken || latestChunk);
-        }
+        handleTarteelSpokenStream(fullSessionSpoken, latestChunk, event.results.length);
       };
 
       tarteelState.speechRecognizer.onerror = function(err) {
@@ -2452,9 +2481,16 @@ function onAyahSuccessfullyRecognized(targetV, spoken) {
   renderTarteelMushafPage();
 
   if (tarteelState.reciteMode === 'single') {
-    // Mode 1: Single Ayah (Einzelvers)
+    // Mode 1: Single Ayah (Einzelvers) - Auto-advance targetAyah to next verse
     stopTarteelRecitation();
-    updateTarteelStatusText(getTarteelText('matchSuccess', targetV.num) + ' Â· ' + getTarteelText('singleModeDesc', targetV.num + 1), true);
+    if (curIdx >= 0 && curIdx < verses.length - 1) {
+      tarteelState.targetAyah = verses[curIdx + 1].num;
+      tarteelState.surah = verses[curIdx + 1].surahNum;
+    } else if (tarteelState.page < 604) {
+      changeTarteelPage(tarteelState.page + 1);
+    }
+    renderTarteelMushafPage();
+    updateTarteelStatusText(getTarteelText('matchSuccess', targetV.num) + ' · ' + getTarteelText('singleModeDesc', tarteelState.targetAyah), true);
     if (typeof showToast === 'function') {
       showToast(getTarteelText('matchSuccess', targetV.num));
     }

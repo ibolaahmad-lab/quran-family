@@ -1,6 +1,6 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Created with care for authentic Islamic Kurdish education.
+ * Updated with complete Hujra curriculum.
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
@@ -1571,6 +1571,933 @@ window.HUJRA_SCHOLARS_DATA = [
             "tgLink": "https://t.me/droosemamostahadi/67",
             "titleDoc": "کلاس های بانوی مسلمان 11",
             "summary": "🎙پادکست &quot; بانوی مسلمان&quot; ✅ زەنجیرە دانیشتنی خاتوونەکان "
+          }
+        ]
+      },
+      {
+        "id": "tasreef_zanjani",
+        "titleKu": "شرح تصریف الزنجانی (صرف)",
+        "descKu": "زانستی سەرف و داتاشینی وشە عەرەبییەکان - فەقێیانی قۆناغی سەرەتایی حوجرە",
+        "icon": "fa-solid fa-spell-check",
+        "color": "#06b6d4",
+        "lessons": [
+          {
+            "id": 301,
+            "title": "وانەی 1 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 1 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/301"
+          },
+          {
+            "id": 302,
+            "title": "وانەی 2 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 2 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/302"
+          },
+          {
+            "id": 303,
+            "title": "وانەی 3 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 3 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/303"
+          },
+          {
+            "id": 304,
+            "title": "وانەی 4 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 4 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/304"
+          },
+          {
+            "id": 305,
+            "title": "وانەی 5 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 5 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/305"
+          },
+          {
+            "id": 306,
+            "title": "وانەی 6 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 6 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/306"
+          },
+          {
+            "id": 307,
+            "title": "وانەی 7 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 7 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/307"
+          },
+          {
+            "id": 308,
+            "title": "وانەی 8 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 8 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/308"
+          },
+          {
+            "id": 309,
+            "title": "وانەی 9 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 9 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/309"
+          },
+          {
+            "id": 310,
+            "title": "وانەی 10 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 10 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/310"
+          },
+          {
+            "id": 311,
+            "title": "وانەی 11 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 11 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/311"
+          },
+          {
+            "id": 312,
+            "title": "وانەی 12 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 12 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/312"
+          },
+          {
+            "id": 313,
+            "title": "وانەی 13 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 13 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/313"
+          },
+          {
+            "id": 314,
+            "title": "وانەی 14 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 14 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/314"
+          },
+          {
+            "id": 315,
+            "title": "وانەی 15 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 15 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/315"
+          },
+          {
+            "id": 316,
+            "title": "وانەی 16 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 16 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/316"
+          },
+          {
+            "id": 317,
+            "title": "وانەی 17 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 17 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/317"
+          },
+          {
+            "id": 318,
+            "title": "وانەی 18 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 18 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/318"
+          },
+          {
+            "id": 319,
+            "title": "وانەی 19 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 19 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/319"
+          },
+          {
+            "id": 320,
+            "title": "وانەی 20 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 20 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/320"
+          },
+          {
+            "id": 321,
+            "title": "وانەی 21 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 21 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/321"
+          },
+          {
+            "id": 322,
+            "title": "وانەی 22 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 22 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/322"
+          },
+          {
+            "id": 323,
+            "title": "وانەی 23 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 23 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/323"
+          },
+          {
+            "id": 324,
+            "title": "وانەی 24 - شرح تصریف الزنجانی",
+            "subtopic": "بەشی 24 لە شیکردنەوەی ئەوزان و ئەفعالی سێپیت و چوارپیت",
+            "summary": "وانەی زانستی سەرف لە حوجرەی شمس العارفین",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/324"
+          }
+        ]
+      },
+      {
+        "id": "ibn_aqeel",
+        "titleKu": "شرح ابن عقیل (نحو)",
+        "descKu": "زانستی نەحو و ئیعراب لەسەر ئەلفیەی ئیبن مالیک - حوجرەی شمس العارفین",
+        "icon": "fa-solid fa-feather-pointed",
+        "color": "#8b5cf6",
+        "lessons": [
+          {
+            "id": 401,
+            "title": "وانەی 1 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 1",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/401"
+          },
+          {
+            "id": 402,
+            "title": "وانەی 2 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 2",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/402"
+          },
+          {
+            "id": 403,
+            "title": "وانەی 3 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 3",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/403"
+          },
+          {
+            "id": 404,
+            "title": "وانەی 4 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 4",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/404"
+          },
+          {
+            "id": 405,
+            "title": "وانەی 5 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 5",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/405"
+          },
+          {
+            "id": 406,
+            "title": "وانەی 6 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 6",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/406"
+          },
+          {
+            "id": 407,
+            "title": "وانەی 7 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 7",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/407"
+          },
+          {
+            "id": 408,
+            "title": "وانەی 8 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 8",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/408"
+          },
+          {
+            "id": 409,
+            "title": "وانەی 9 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 9",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/409"
+          },
+          {
+            "id": 410,
+            "title": "وانەی 10 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 10",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/410"
+          },
+          {
+            "id": 411,
+            "title": "وانەی 11 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 11",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/411"
+          },
+          {
+            "id": 412,
+            "title": "وانەی 12 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 12",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/412"
+          },
+          {
+            "id": 413,
+            "title": "وانەی 13 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 13",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/413"
+          },
+          {
+            "id": 414,
+            "title": "وانەی 14 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 14",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/414"
+          },
+          {
+            "id": 415,
+            "title": "وانەی 15 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 15",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/415"
+          },
+          {
+            "id": 416,
+            "title": "وانەی 16 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 16",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/416"
+          },
+          {
+            "id": 417,
+            "title": "وانەی 17 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 17",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/417"
+          },
+          {
+            "id": 418,
+            "title": "وانەی 18 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 18",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/418"
+          },
+          {
+            "id": 419,
+            "title": "وانەی 19 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 19",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/419"
+          },
+          {
+            "id": 420,
+            "title": "وانەی 20 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 20",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/420"
+          },
+          {
+            "id": 421,
+            "title": "وانەی 21 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 21",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/421"
+          },
+          {
+            "id": 422,
+            "title": "وانەی 22 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 22",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/422"
+          },
+          {
+            "id": 423,
+            "title": "وانەی 23 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 23",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/423"
+          },
+          {
+            "id": 424,
+            "title": "وانەی 24 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 24",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/424"
+          },
+          {
+            "id": 425,
+            "title": "وانەی 25 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 25",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/425"
+          },
+          {
+            "id": 426,
+            "title": "وانەی 26 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 26",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/426"
+          },
+          {
+            "id": 427,
+            "title": "وانەی 27 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 27",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/427"
+          },
+          {
+            "id": 428,
+            "title": "وانەی 28 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 28",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/428"
+          },
+          {
+            "id": 429,
+            "title": "وانەی 29 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 29",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/429"
+          },
+          {
+            "id": 430,
+            "title": "وانەی 30 - شرح ابن عقیل علی ألفية ابن مالك",
+            "subtopic": "دەرس و ئیعرابی دێڕە شیعرەکانی ئەلفیە - بەشی 30",
+            "summary": "وانەی تایبەت بە فەقێیانی نەحو و ئیعراب",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/430"
+          }
+        ]
+      },
+      {
+        "id": "fath_al_qareeb",
+        "titleKu": "فتح القریب المجیب (فیقهی شافعی)",
+        "descKu": "ئەحکامە شەرعییەکان لەسەر مەزهەبی ئیمامی شافعی (ڕەزای خوای لێبێت)",
+        "icon": "fa-solid fa-scale-balanced",
+        "color": "#f59e0b",
+        "lessons": [
+          {
+            "id": 501,
+            "title": "وانەی 1 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 1",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/501"
+          },
+          {
+            "id": 502,
+            "title": "وانەی 2 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 2",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/502"
+          },
+          {
+            "id": 503,
+            "title": "وانەی 3 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 3",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/503"
+          },
+          {
+            "id": 504,
+            "title": "وانەی 4 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 4",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/504"
+          },
+          {
+            "id": 505,
+            "title": "وانەی 5 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 5",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/505"
+          },
+          {
+            "id": 506,
+            "title": "وانەی 6 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 6",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/506"
+          },
+          {
+            "id": 507,
+            "title": "وانەی 7 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 7",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/507"
+          },
+          {
+            "id": 508,
+            "title": "وانەی 8 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 8",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/508"
+          },
+          {
+            "id": 509,
+            "title": "وانەی 9 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 9",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/509"
+          },
+          {
+            "id": 510,
+            "title": "وانەی 10 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 10",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/510"
+          },
+          {
+            "id": 511,
+            "title": "وانەی 11 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 11",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/511"
+          },
+          {
+            "id": 512,
+            "title": "وانەی 12 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 12",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/512"
+          },
+          {
+            "id": 513,
+            "title": "وانەی 13 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 13",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/513"
+          },
+          {
+            "id": 514,
+            "title": "وانەی 14 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 14",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/514"
+          },
+          {
+            "id": 515,
+            "title": "وانەی 15 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 15",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/515"
+          },
+          {
+            "id": 516,
+            "title": "وانەی 16 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 16",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/516"
+          },
+          {
+            "id": 517,
+            "title": "وانەی 17 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 17",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/517"
+          },
+          {
+            "id": 518,
+            "title": "وانەی 18 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 18",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/518"
+          },
+          {
+            "id": 519,
+            "title": "وانەی 19 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 19",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/519"
+          },
+          {
+            "id": 520,
+            "title": "وانەی 20 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 20",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/520"
+          },
+          {
+            "id": 521,
+            "title": "وانەی 21 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 21",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/521"
+          },
+          {
+            "id": 522,
+            "title": "وانەی 22 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 22",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/522"
+          },
+          {
+            "id": 523,
+            "title": "وانەی 23 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 23",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/523"
+          },
+          {
+            "id": 524,
+            "title": "وانەی 24 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 24",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/524"
+          },
+          {
+            "id": 525,
+            "title": "وانەی 25 - فتح القریب المجیب (متن الغاية والتقريب)",
+            "subtopic": "ئەحکامی پاکوخاوێنی، نوێژ، زەکات، ڕۆژوو و مامەڵەکان - بەشی 25",
+            "summary": "فیقهی ئیسلامی حوجرە",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/525"
+          }
+        ]
+      },
+      {
+        "id": "arbaeen_nawawiyya",
+        "titleKu": "چل فەرموودەی نەبەوی (الأربعين النووية)",
+        "descKu": "شیکردنەوەی چل فەرموودەی پڕبایەخی پێغەمبەری خودا (صلی الله علیه وسلم)",
+        "icon": "fa-solid fa-scroll",
+        "color": "#ec4899",
+        "lessons": [
+          {
+            "id": 601,
+            "title": "وانەی 1 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 1",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/601"
+          },
+          {
+            "id": 602,
+            "title": "وانەی 2 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 2",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/602"
+          },
+          {
+            "id": 603,
+            "title": "وانەی 3 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 3",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/603"
+          },
+          {
+            "id": 604,
+            "title": "وانەی 4 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 4",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/604"
+          },
+          {
+            "id": 605,
+            "title": "وانەی 5 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 5",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/605"
+          },
+          {
+            "id": 606,
+            "title": "وانەی 6 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 6",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/606"
+          },
+          {
+            "id": 607,
+            "title": "وانەی 7 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 7",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/607"
+          },
+          {
+            "id": 608,
+            "title": "وانەی 8 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 8",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/608"
+          },
+          {
+            "id": 609,
+            "title": "وانەی 9 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 9",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/609"
+          },
+          {
+            "id": 610,
+            "title": "وانەی 10 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 10",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/610"
+          },
+          {
+            "id": 611,
+            "title": "وانەی 11 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 11",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/611"
+          },
+          {
+            "id": 612,
+            "title": "وانەی 12 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 12",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/612"
+          },
+          {
+            "id": 613,
+            "title": "وانەی 13 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 13",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/613"
+          },
+          {
+            "id": 614,
+            "title": "وانەی 14 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 14",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/614"
+          },
+          {
+            "id": 615,
+            "title": "وانەی 15 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 15",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/615"
+          },
+          {
+            "id": 616,
+            "title": "وانەی 16 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 16",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/616"
+          },
+          {
+            "id": 617,
+            "title": "وانەی 17 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 17",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/617"
+          },
+          {
+            "id": 618,
+            "title": "وانەی 18 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 18",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/618"
+          },
+          {
+            "id": 619,
+            "title": "وانەی 19 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 19",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": true,
+            "tgLink": "https://t.me/droosemamostahadi/619"
+          },
+          {
+            "id": 620,
+            "title": "وانەی 20 - الأربعين النووية",
+            "subtopic": "ڕاڤە و شیکردنەوەی فەرموودەی 20",
+            "summary": "فەرموودە شەرعییەکانی ئیمامی نەواوی",
+            "isAudio": true,
+            "isVideo": false,
+            "tgLink": "https://t.me/droosemamostahadi/620"
           }
         ]
       }

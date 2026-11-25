@@ -187,7 +187,17 @@
     // If audio is too short (< 0.4s), skip
     if (blob.size < 3000) return;
 
-    const apiKey = groqApiKey || 'gsk_free_demo_key';
+    if (!groqApiKey) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('ℹ️ برای استفاده از Groq Whisper، کلید API را وارد کنید. بازگشت به موتور مرورگر...');
+      }
+      setEngine('google_speech');
+      stopListening();
+      startNativeGoogleListening(callbacks);
+      return;
+    }
+
+    const apiKey = groqApiKey;
     const formData = new FormData();
     formData.append('file', blob, 'recitation.webm');
     formData.append('model', 'whisper-large-v3-turbo');
@@ -353,7 +363,7 @@
     nativeSpeechRec = new SpeechRec();
     nativeSpeechRec.lang = 'ar-SA';
     nativeSpeechRec.continuous = true;
-    nativeSpeechRec.interimResults = false;
+    nativeSpeechRec.interimResults = true;
     nativeSpeechRec.maxAlternatives = 3;
 
     nativeSpeechRec.onstart = () => {
@@ -363,11 +373,13 @@
 
     nativeSpeechRec.onresult = (event) => {
       let transcript = '';
+      let isFinal = false;
       for (let i = event.resultIndex; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript;
+        if (event.results[i].isFinal) isFinal = true;
       }
       const clean = normalizeText(transcript);
-      if (callbacks.onTranscript) callbacks.onTranscript(clean, true);
+      if (callbacks.onTranscript) callbacks.onTranscript(clean, isFinal);
     };
 
     nativeSpeechRec.onerror = (e) => {
@@ -551,7 +563,12 @@
 
   // Dynamic Multilingual Translations for Engine Modal
   function getModalTranslations() {
-    const lang = window.currentLang || 'ku';
+    let lang = 'fa';
+    try {
+      lang = localStorage.getItem('quran_app_language') || window.currentAppLanguage || window.currentLang || 'fa';
+    } catch (e) {
+      lang = window.currentLang || 'fa';
+    }
     const dict = {
       ku: {
         title: 'ڕێکخستنی دەنگی زیرەک',
