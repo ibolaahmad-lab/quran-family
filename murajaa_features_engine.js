@@ -308,19 +308,63 @@
     return w.replace(/^(وال|فال|بال|كال|لل|ال|و|ف|ب|ل)/, '');
   }
 
+  // =========================================================================
+  // 1.5 NON-NATIVE QURAN PHONETIC ENGINE (PERSIAN, KURDISH, GERMAN ACCENTS)
+  // =========================================================================
+  function toQuranPhoneticKey(word) {
+    if (!word) return '';
+    let w = String(word);
+    w = w.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u06DF\u06E0\u06E2\u06E3\u06E5\u06E6\u06E8\u06EA-\u06ED]/g, '')
+         .replace(/[إأآٱ]/g, 'ا')
+         .replace(/ة/g, 'ه')
+         .replace(/[ىي]/g, 'ي')
+         .replace(/ؤ/g, 'و').replace(/ئ/g, 'ي')
+         .replace(/[\u0600-\u060F\u06DD\u06DE.,/#!$%^&*;:{}=\-_`~()«»۞۩۝]/g, '')
+         .replace(/\s+/g, ' ').trim();
+
+    // Muqatta'at (الحروف المقطعة: الم, الر, طه, يس, حم, ...)
+    if (/^(الم|الف\s*لام\s*ميم|الف\s*لا\s*ميم|الفلام\s*ميم|الف\s*ل\s*ميم|الاميم|ألم|علم)$/.test(w)) return 'ALIF_LAM_MIM';
+    if (/^(الر|الف\s*لام\s*را|الف\s*لام\s*راء)$/.test(w)) return 'ALIF_LAM_RA';
+    if (/^(المر|الف\s*لام\s*ميم\s*را|الف\s*لام\s*ميم\s*راء)$/.test(w)) return 'ALIF_LAM_MIM_RA';
+    if (/^(طه|طا\s*ها|طاه|طاها)$/.test(w)) return 'TA_HA';
+    if (/^(يس|يا\s*سين|ياسين)$/.test(w)) return 'YA_SIN';
+    if (/^(حم|حا\s*ميم|حاميم)$/.test(w)) return 'HA_MIM';
+    if (/^(طسم|طا\s*سين\s*ميم|طاسين\s*ميم)$/.test(w)) return 'TA_SIN_MIM';
+    if (/^(طس|طا\s*سين|طاسين)$/.test(w)) return 'TA_SIN';
+    if (/^(ص|صاد)$/.test(w)) return 'SAD';
+    if (/^(ق|قاف)$/.test(w)) return 'QAF';
+    if (/^(ن|نون)$/.test(w)) return 'NUN';
+
+    // Non-native consonant equivalence classes (Persian, Kurdish, Turkish, German speakers)
+    w = w.replace(/[صث]/g, 'س');   // ص, ث -> س
+    w = w.replace(/[ذضظ]/g, 'ز');   // ذ, ض, ظ -> ز
+    w = w.replace(/ط/g, 'ت');       // ط -> ت
+    w = w.replace(/ح/g, 'ه');       // ح -> ه
+    w = w.replace(/ع/g, 'ا');       // ع -> ا
+    w = w.replace(/[قغ]/g, 'ك');    // ق, غ -> ك
+    w = w.replace(/وا(?:\s|$)/g, 'و '); // plural silent alif
+    w = w.replace(/ء$/g, '');
+    return w.trim();
+  }
+  window.Murajaa.toQuranPhoneticKey = toQuranPhoneticKey;
+
   function stringSimilarity(s1, s2) {
     if (!s1 || !s2) return 0.0;
     if (s1 === s2) return 1.0;
 
-    // Check direct Muqatta'at equivalence
-    if ((s1 === 'الم' && (s2 === 'الف' || s2 === 'لام' || s2 === 'ميم' || s2 === 'الف لام ميم')) ||
-        (s2 === 'الم' && (s1 === 'الف' || s1 === 'لام' || s1 === 'ميم' || s1 === 'الف لام ميم'))) {
+    // Check direct Muqatta'at equivalence (Alif Lam Meem)
+    const k1 = toQuranPhoneticKey(s1);
+    const k2 = toQuranPhoneticKey(s2);
+    if (k1 && k2 && k1 === k2) return 1.0;
+
+    if ((k1 === 'ALIF_LAM_MIM' || s1 === 'الم') && 
+        (k2 === 'ALIF_LAM_MIM' || s2 === 'الم' || s2.includes('الف') || s2.includes('لام') || s2.includes('ميم'))) {
       return 1.0;
     }
 
     // Strip elongated vowels (Madd)
-    const norm1 = s1.replace(/([اوي])+([اوي])/g, '$1');
-    const norm2 = s2.replace(/([اوي])+([اوي])/g, '$1');
+    const norm1 = k1.replace(/([اوي])+([اوي])/g, '$1');
+    const norm2 = k2.replace(/([اوي])+([اوي])/g, '$1');
     if (norm1 === norm2) return 0.98;
 
     // Short particles discrimination (length <= 2: في, ما, من, لا, قد, هو)
@@ -364,8 +408,8 @@
       }
     }
     const dist = dp[l1][l2];
-    if (dist <= 1 && maxLen >= 3) return 0.88;
-    if (dist <= 2 && maxLen >= 6) return 0.78;
+    if (dist <= 1 && maxLen >= 3) return 0.90;
+    if (dist <= 2 && maxLen >= 5) return 0.82;
     return 1.0 - (dist / maxLen);
   }
   window.Murajaa.stringSimilarity = stringSimilarity;
@@ -451,12 +495,18 @@
 
       // 1. Immediate Target: Check expected current word
       if (cur < targets.length) {
-        if (stringSimilarity(spToken, targets[cur]) >= 0.60) {
+        const curTarget = targets[cur];
+        const isMuqattaatMatch = (curTarget === 'الم' || toQuranPhoneticKey(curTarget) === 'ALIF_LAM_MIM') &&
+          (spToken === 'الم' || spToken === 'الف' || spToken === 'لام' || spToken === 'ميم' || 
+           spToken.includes('الف') || spToken.includes('لام') || spToken.includes('ميم') || 
+           toQuranPhoneticKey(spToken) === 'ALIF_LAM_MIM');
+
+        if (isMuqattaatMatch || stringSimilarity(spToken, curTarget) >= 0.52) {
           matchedIndex = cur;
         } else if (cur < targets.length - 1) {
           // Check compound match: spToken matches target[cur] + target[cur+1]
           const combined = targets[cur] + targets[cur + 1];
-          if (stringSimilarity(spToken, combined) >= 0.70) {
+          if (stringSimilarity(spToken, combined) >= 0.65) {
             matchedIndex = cur;
             advanceBy = 2; // Matches two target words!
           }
@@ -465,10 +515,10 @@
 
       // 2. Check alternatives from SpeechRecognitionResult if primary didn't match
       if (matchedIndex === -1 && speechResult && speechResult.length > 1) {
-        for (let alt = 1; alt < Math.min(3, speechResult.length); alt++) {
+        for (let alt = 1; alt < Math.min(4, speechResult.length); alt++) {
           const altTokens = tokenizeArabic(speechResult[alt].transcript);
           const altToken = altTokens[sIdx];
-          if (altToken && cur < targets.length && stringSimilarity(altToken, targets[cur]) >= 0.60) {
+          if (altToken && cur < targets.length && stringSimilarity(altToken, targets[cur]) >= 0.52) {
             matchedIndex = cur;
             break;
           }
@@ -479,7 +529,7 @@
       if (matchedIndex === -1) {
         const lookaheadEnd = Math.min(targets.length - 1, cur + forwardWindow);
         for (let j = cur + 1; j <= lookaheadEnd; j++) {
-          if (stringSimilarity(spToken, targets[j]) >= 0.65) {
+          if (stringSimilarity(spToken, targets[j]) >= 0.58) {
             matchedIndex = j;
             break;
           }
@@ -490,7 +540,7 @@
       if (matchedIndex === -1) {
         const lookbackStart = Math.max(0, cur - backtrackWindow);
         for (let b = cur - 1; b >= lookbackStart; b--) {
-          if (stringSimilarity(spToken, targets[b]) >= 0.68) {
+          if (stringSimilarity(spToken, targets[b]) >= 0.65) {
             matchedIndex = b;
             didBacktrack = true;
             break;
@@ -985,7 +1035,14 @@
   // =========================================================================
   // 6. MODALS: WORD BREAKDOWN, AYAH QUIZ, TYPOGRAPHY SETTINGS
   // =========================================================================
+  let isModalClosing = false;
+  function preventGhostClicks() {
+    isModalClosing = true;
+    setTimeout(() => { isModalClosing = false; }, 450);
+  }
+
   function onWordClick(globalIdx) {
+    if (isModalClosing) return;
     const meta = murajaaState.wordsMeta[globalIdx];
     if (!meta) return;
 
@@ -1002,6 +1059,7 @@
   window.Murajaa.onWordClick = onWordClick;
 
   function openWordBreakdown(meta) {
+    if (isModalClosing) return;
     const wordKey = `${meta.surah}_${meta.ayah}_${meta.normalized}`;
     const letters = deconstructLetters(meta.raw);
     const isMistake = !!murajaaState.mistakeMap[wordKey];
@@ -1012,30 +1070,28 @@
       modal = document.createElement('div');
       modal.id = 'murajaaBreakdownModal';
       modal.className = 'neo3d-modal-backdrop';
-      modal.onclick = function (e) {
-        if (e.target === this) Murajaa.closeWordBreakdown();
-      };
-      modal.ontouchend = function (e) {
-        if (e.target === this) {
-          e.preventDefault();
-          Murajaa.closeWordBreakdown();
-        }
-      };
       document.body.appendChild(modal);
     }
+
+    modal.onclick = function (e) {
+      if (e.target === this) Murajaa.closeWordBreakdown(e);
+    };
+    modal.ontouchend = function (e) {
+      if (e.target === this) Murajaa.closeWordBreakdown(e);
+    };
 
     modal.classList.add('open');
     modal.style.setProperty('display', 'flex', 'important');
     modal.innerHTML = `
-      <div class="neo3d-modal-card" onclick="event.stopPropagation();" style="max-width: 480px; width: 92%; padding: 20px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(234, 179, 8, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px); box-sizing: border-box;">
+      <div class="neo3d-modal-card" onclick="event.stopPropagation();" ontouchend="event.stopPropagation();" onpointerdown="event.stopPropagation();" style="max-width: 480px; width: 92%; padding: 20px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(234, 179, 8, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px); box-sizing: border-box;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-spell-check" style="color: #fbbf24; font-size: 1.1rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('word_breakdown_title')}</span>
           </div>
-          <!-- Circular gold close button -->
-          <button type="button" onclick="Murajaa.closeWordBreakdown()" ontouchend="Murajaa.closeWordBreakdown()" style="width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1.2px solid rgba(251,191,36,0.45); color: #fbbf24; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3); -webkit-tap-highlight-color: transparent;" title="${t('close')}">
-            <i class="fa-solid fa-xmark" style="font-size: 0.95rem;"></i>
+          <!-- Circular gold close button with touch & click protection -->
+          <button type="button" onclick="Murajaa.closeWordBreakdown(event);" ontouchend="Murajaa.closeWordBreakdown(event);" onpointerdown="event.stopPropagation();" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(251,191,36,0.6); color: #fbbf24; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.4); -webkit-tap-highlight-color: transparent; touch-action: manipulation;" title="${t('close')}">
+            <i class="fa-solid fa-xmark" style="font-size: 1.1rem; pointer-events: none;"></i>
           </button>
         </div>
 
@@ -1074,7 +1130,7 @@
         </div>
 
         <!-- Secondary Return / Close Button -->
-        <button type="button" onclick="Murajaa.closeWordBreakdown()" ontouchend="Murajaa.closeWordBreakdown()" class="neo3d-pill-btn" style="width: 100%; padding: 9px; font-size: 0.82rem; font-weight: 700; justify-content: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #e2e8f0; border-radius: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent;">
+        <button type="button" onclick="Murajaa.closeWordBreakdown(event);" ontouchend="Murajaa.closeWordBreakdown(event);" onpointerdown="event.stopPropagation();" class="neo3d-pill-btn" style="width: 100%; padding: 10px; font-size: 0.85rem; font-weight: 800; justify-content: center; background: rgba(255,255,255,0.1); border: 1.2px solid rgba(255,255,255,0.25); color: #fff; border-radius: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
           <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i> ${t('close')}
         </button>
       </div>
@@ -1082,7 +1138,12 @@
   }
   window.Murajaa.openWordBreakdown = openWordBreakdown;
 
-  function closeWordBreakdown() {
+  function closeWordBreakdown(e) {
+    if (e) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
+    preventGhostClicks();
     const modal = document.getElementById('murajaaBreakdownModal');
     if (modal) {
       modal.classList.remove('open');
@@ -1139,6 +1200,7 @@
   window.Murajaa.saveWordNote = saveWordNote;
 
   function openAyahQuiz() {
+    if (isModalClosing) return;
     let verses = (window.state && window.state.currentVersesData) || [];
     if (!verses || verses.length === 0) {
       const p = (window.state && window.state.currentPage) || 1;
@@ -1158,30 +1220,28 @@
       modal = document.createElement('div');
       modal.id = 'murajaaQuizModal';
       modal.className = 'neo3d-modal-backdrop';
-      modal.onclick = function (e) {
-        if (e.target === this) Murajaa.closeAyahQuiz();
-      };
-      modal.ontouchend = function (e) {
-        if (e.target === this) {
-          e.preventDefault();
-          Murajaa.closeAyahQuiz();
-        }
-      };
       document.body.appendChild(modal);
     }
+
+    modal.onclick = function (e) {
+      if (e.target === this) Murajaa.closeAyahQuiz(e);
+    };
+    modal.ontouchend = function (e) {
+      if (e.target === this) Murajaa.closeAyahQuiz(e);
+    };
 
     modal.classList.add('open');
     modal.style.setProperty('display', 'flex', 'important');
     modal.innerHTML = `
-      <div class="neo3d-modal-card" onclick="event.stopPropagation();" style="max-width: 520px; width: 92%; padding: 22px; border-radius: 22px; background: rgba(8, 16, 28, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.45); box-shadow: 0 20px 50px rgba(0,0,0,0.9); backdrop-filter: blur(25px); box-sizing: border-box;">
+      <div class="neo3d-modal-card" onclick="event.stopPropagation();" ontouchend="event.stopPropagation();" onpointerdown="event.stopPropagation();" style="max-width: 520px; width: 92%; padding: 22px; border-radius: 22px; background: rgba(8, 16, 28, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.45); box-shadow: 0 20px 50px rgba(0,0,0,0.9); backdrop-filter: blur(25px); box-sizing: border-box;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-circle-question" style="color: #38bdf8; font-size: 1.15rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('quiz_title')}</span>
           </div>
-          <!-- Circular cyan close button -->
-          <button type="button" onclick="Murajaa.closeAyahQuiz()" ontouchend="Murajaa.closeAyahQuiz()" style="width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1.2px solid rgba(56,189,248,0.45); color: #38bdf8; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3); -webkit-tap-highlight-color: transparent;" title="${t('close')}">
-            <i class="fa-solid fa-xmark" style="font-size: 0.95rem;"></i>
+          <!-- Circular cyan close button with touch & click protection -->
+          <button type="button" onclick="Murajaa.closeAyahQuiz(event);" ontouchend="Murajaa.closeAyahQuiz(event);" onpointerdown="event.stopPropagation();" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(56,189,248,0.6); color: #38bdf8; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.4); -webkit-tap-highlight-color: transparent; touch-action: manipulation;" title="${t('close')}">
+            <i class="fa-solid fa-xmark" style="font-size: 1.1rem; pointer-events: none;"></i>
           </button>
         </div>
 
@@ -1222,7 +1282,7 @@
         </div>
 
         <!-- Secondary Return / Close Button -->
-        <button type="button" onclick="Murajaa.closeAyahQuiz()" ontouchend="Murajaa.closeAyahQuiz()" class="neo3d-pill-btn" style="width: 100%; padding: 9px; font-size: 0.82rem; font-weight: 700; justify-content: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #e2e8f0; border-radius: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent;">
+        <button type="button" onclick="Murajaa.closeAyahQuiz(event);" ontouchend="Murajaa.closeAyahQuiz(event);" onpointerdown="event.stopPropagation();" class="neo3d-pill-btn" style="width: 100%; padding: 10px; font-size: 0.85rem; font-weight: 800; justify-content: center; background: rgba(255,255,255,0.1); border: 1.2px solid rgba(255,255,255,0.25); color: #fff; border-radius: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
           <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i> ${t('close')}
         </button>
       </div>
@@ -1230,7 +1290,12 @@
   }
   window.Murajaa.openAyahQuiz = openAyahQuiz;
 
-  function closeAyahQuiz() {
+  function closeAyahQuiz(e) {
+    if (e) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
+    preventGhostClicks();
     const modal = document.getElementById('murajaaQuizModal');
     if (modal) {
       modal.classList.remove('open');
@@ -1264,35 +1329,34 @@
   window.Murajaa.stopAudio = stopAudio;
 
   function openTypographySettings() {
+    if (isModalClosing) return;
     let modal = document.getElementById('murajaaSettingsModal');
     if (!modal) {
       modal = document.createElement('div');
       modal.id = 'murajaaSettingsModal';
       modal.className = 'neo3d-modal-backdrop';
-      modal.onclick = function (e) {
-        if (e.target === this) Murajaa.closeTypographySettings();
-      };
-      modal.ontouchend = function (e) {
-        if (e.target === this) {
-          e.preventDefault();
-          Murajaa.closeTypographySettings();
-        }
-      };
       document.body.appendChild(modal);
     }
+
+    modal.onclick = function (e) {
+      if (e.target === this) Murajaa.closeTypographySettings(e);
+    };
+    modal.ontouchend = function (e) {
+      if (e.target === this) Murajaa.closeTypographySettings(e);
+    };
 
     modal.classList.add('open');
     modal.style.setProperty('display', 'flex', 'important');
     modal.innerHTML = `
-      <div class="neo3d-modal-card" onclick="event.stopPropagation();" style="max-width: 440px; width: 92%; padding: 20px 22px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(251, 191, 36, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px); box-sizing: border-box;">
+      <div class="neo3d-modal-card" onclick="event.stopPropagation();" ontouchend="event.stopPropagation();" onpointerdown="event.stopPropagation();" style="max-width: 440px; width: 92%; padding: 20px 22px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(251, 191, 36, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px); box-sizing: border-box;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-sliders" style="color: #fbbf24; font-size: 1.1rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('settings_title')}</span>
           </div>
           <!-- Sleek compact circular glass close button with golden accent -->
-          <button type="button" onclick="Murajaa.closeTypographySettings()" ontouchend="Murajaa.closeTypographySettings()" style="width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1.2px solid rgba(251,191,36,0.45); color: #fbbf24; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3); -webkit-tap-highlight-color: transparent;">
-            <i class="fa-solid fa-xmark" style="font-size: 0.95rem;"></i>
+          <button type="button" onclick="Murajaa.closeTypographySettings(event);" ontouchend="Murajaa.closeTypographySettings(event);" onpointerdown="event.stopPropagation();" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(251,191,36,0.6); color: #fbbf24; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.4); -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
+            <i class="fa-solid fa-xmark" style="font-size: 1.05rem; pointer-events: none;"></i>
           </button>
         </div>
 
@@ -1330,7 +1394,7 @@
           </select>
         </div>
 
-        <button type="button" onclick="Murajaa.closeTypographySettings()" ontouchend="Murajaa.closeTypographySettings()" class="neo3d-pill-btn" style="width: 100%; padding: 10px; font-size: 0.85rem; font-weight: 800; justify-content: center; background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 14px rgba(16,185,129,0.35); -webkit-tap-highlight-color: transparent;">
+        <button type="button" onclick="Murajaa.closeTypographySettings(event);" ontouchend="Murajaa.closeTypographySettings(event);" onpointerdown="event.stopPropagation();" class="neo3d-pill-btn" style="width: 100%; padding: 10px; font-size: 0.85rem; font-weight: 800; justify-content: center; background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 14px rgba(16,185,129,0.35); -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
           <i class="fa-solid fa-check" style="margin-left: 6px;"></i> ${t('close')}
         </button>
       </div>
@@ -1338,7 +1402,12 @@
   }
   window.Murajaa.openTypographySettings = openTypographySettings;
 
-  function closeTypographySettings() {
+  function closeTypographySettings(e) {
+    if (e) {
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    }
+    preventGhostClicks();
     const modal = document.getElementById('murajaaSettingsModal');
     if (modal) {
       modal.classList.remove('open');

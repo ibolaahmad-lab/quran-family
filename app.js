@@ -2517,6 +2517,46 @@ function toggleBlindHint() {
 }
 window.toggleBlindHint = toggleBlindHint;
 
+// ============================================================
+// NON-NATIVE QURAN PHONETIC ENGINE (PERSIAN, KURDISH, GERMAN)
+// ============================================================
+function toQuranPhoneticKey(word) {
+  if (!word) return '';
+  let w = String(word);
+  w = w.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u06DF\u06E0\u06E2\u06E3\u06E5\u06E6\u06E8\u06EA-\u06ED]/g, '')
+       .replace(/[إأآٱ]/g, 'ا')
+       .replace(/ة/g, 'ه')
+       .replace(/[ىي]/g, 'ي')
+       .replace(/ؤ/g, 'و').replace(/ئ/g, 'ي')
+       .replace(/[\u0600-\u060F\u06DD\u06DE.,/#!$%^&*;:{}=\-_`~()«»۞۩۝]/g, '')
+       .replace(/\s+/g, ' ').trim();
+
+  // Muqatta'at (الحروف المقطعة)
+  if (/^(الم|الف\s*لام\s*ميم|الف\s*لا\s*ميم|الفلام\s*ميم|الف\s*ل\s*ميم|الاميم|ألم|علم)$/.test(w)) return 'ALIF_LAM_MIM';
+  if (/^(الر|الف\s*لام\s*را|الف\s*لام\s*راء)$/.test(w)) return 'ALIF_LAM_RA';
+  if (/^(المر|الف\s*لام\s*ميم\s*را|الف\s*لام\s*ميم\s*راء)$/.test(w)) return 'ALIF_LAM_MIM_RA';
+  if (/^(طه|طا\s*ها|طاه|طاها)$/.test(w)) return 'TA_HA';
+  if (/^(يس|يا\s*سين|ياسين)$/.test(w)) return 'YA_SIN';
+  if (/^(حم|حا\s*ميم|حاميم)$/.test(w)) return 'HA_MIM';
+  if (/^(طسم|طا\s*سين\s*ميم|طاسين\s*ميم)$/.test(w)) return 'TA_SIN_MIM';
+  if (/^(طس|طا\s*سين|طاسين)$/.test(w)) return 'TA_SIN';
+  if (/^(ص|صاد)$/.test(w)) return 'SAD';
+  if (/^(ق|قاف)$/.test(w)) return 'QAF';
+  if (/^(ن|نون)$/.test(w)) return 'NUN';
+
+  // Non-native consonant equivalence classes (Persian, Kurdish, Turkish, German speakers)
+  w = w.replace(/[صث]/g, 'س');   // ص, ث -> س
+  w = w.replace(/[ذضظ]/g, 'ز');   // ذ, ض, ظ -> ز
+  w = w.replace(/ط/g, 'ت');       // ط -> ت
+  w = w.replace(/ح/g, 'ه');       // ح -> ه
+  w = w.replace(/ع/g, 'ا');       // ع -> ا
+  w = w.replace(/[قغ]/g, 'ك');    // ق, غ -> ك
+  w = w.replace(/وا(?:\s|$)/g, 'و '); // plural silent alif
+  w = w.replace(/ء$/g, '');
+  return w.trim();
+}
+window.toQuranPhoneticKey = toQuranPhoneticKey;
+
 // Levenshtein distance for word-level fuzzy matching
 function levenshteinDist(a, b) {
   if (a === b) return 0;
@@ -2542,11 +2582,32 @@ function levenshteinDist(a, b) {
 }
 
 function isArabicWordMatch(w1, w2) {
+  if (!w1 || !w2) return false;
   if (w1 === w2) return true;
-  // If words are at least 3 letters, allow distance of 1 (handles subtle speech-to-text variation)
-  if (w1.length >= 3 && w2.length >= 3) {
-    if (levenshteinDist(w1, w2) <= 1) return true;
+
+  const k1 = toQuranPhoneticKey(w1);
+  const k2 = toQuranPhoneticKey(w2);
+  if (k1 && k2 && k1 === k2) return true;
+
+  // Muqatta'at match (e.g. spoken "الف لام میم" matches "الم")
+  if ((k1 === 'ALIF_LAM_MIM' || w1 === 'الم') && 
+      (k2 === 'ALIF_LAM_MIM' || w2 === 'الم' || w2.includes('الف') || w2.includes('لام') || w2.includes('ميم'))) {
+    return true;
   }
+
+  // Strip proclitics (و, ف, ب, ل, ال)
+  const strip = (w) => (w && w.length > 3) ? w.replace(/^(وال|فال|بال|كال|لل|ال|و|ف|ب|ل)/, '') : w;
+  const s1 = strip(k1);
+  const s2 = strip(k2);
+  if (s1 && s2 && s1 === s2 && s1.length >= 2) return true;
+
+  // Fuzzy Levenshtein on phonetic keys for non-native pronunciation
+  const d = levenshteinDist(k1, k2);
+  const maxL = Math.max(k1.length, k2.length);
+  if (maxL <= 2) return k1 === k2;
+  if (d <= 1 && maxL >= 3) return true;
+  if (d <= 2 && maxL >= 5) return true;
+
   return false;
 }
 window.isArabicWordMatch = isArabicWordMatch;
@@ -2557,19 +2618,26 @@ function checkRecitationAccuracy(transcript) {
   const v = verses[reciteTargetIdx];
   if (!v) return;
 
-  const spoken = cleanArabicForMatch(transcript);
+  let spoken = cleanArabicForMatch(transcript);
   let targetClean = cleanArabicForMatch(v.ar);
-  // If first verse of surah, strip bismillah for matching
+
+  // If first verse of surah, strip bismillah from BOTH target and spoken for matching
   if (v.num === 1 && v.surahNum !== 1) {
     targetClean = targetClean.replace(/^بسم الله الرحمن الرحيم\s*/, '').trim();
+    spoken = spoken.replace(/^بسم الله الرحمن الرحيم\s*/, '').trim();
   }
 
-  const spokenWords = spoken.split(' ').filter(Boolean);
-  const targetWords = targetClean.split(' ').filter(Boolean);
+  const spokenWords = spoken.split(/\s+/).filter(Boolean);
+  const targetWords = targetClean.split(/\s+/).filter(Boolean);
 
   if (targetWords.length === 0) return;
 
-  // Tarteel.ai inspired Word Alignment & Mistake Detection (MMD)
+  // Special Muqatta'at instant pass for Ayah 1 (e.g. Surah Al-Baqarah: الم)
+  const isMuqattaatVerse = (targetWords.length === 1 && (targetWords[0] === 'الم' || toQuranPhoneticKey(targetWords[0]) === 'ALIF_LAM_MIM') &&
+    (spokenWords.some(w => isArabicWordMatch(targetWords[0], w)) || 
+     spoken.includes('الم') || spoken.includes('الف') || spoken.includes('لام') || spoken.includes('ميم')));
+
+  // Word Alignment & Mistake Detection
   const wordStatus = [];
   let matchedCount = 0;
   let sIdx = 0;
@@ -2578,8 +2646,8 @@ function checkRecitationAccuracy(transcript) {
     const tWord = targetWords[tIdx];
     let found = false;
 
-    // Look ahead in spoken words window
-    for (let look = sIdx; look < Math.min(sIdx + 3, spokenWords.length); look++) {
+    // Look ahead in spoken words window (expanded to 6 to handle non-native repetition & breath pauses)
+    for (let look = sIdx; look < Math.min(sIdx + 6, spokenWords.length); look++) {
       if (isArabicWordMatch(tWord, spokenWords[look])) {
         found = true;
         sIdx = look + 1;
@@ -2598,8 +2666,8 @@ function checkRecitationAccuracy(transcript) {
   const accuracy = Math.round((matchedCount / targetWords.length) * 100);
   const fb = document.getElementById('micFeedbackText');
 
-  // Strict threshold: requires at least 70% word accuracy. No loose 2-word fallbacks!
-  const isPass = (accuracy >= 70);
+  // Non-native friendly passing threshold: 45% or Muqatta'at or short verse
+  const isPass = isMuqattaatVerse || (accuracy >= 45) || (targetWords.length <= 2 && matchedCount >= 1);
 
   if (isPass) {
     // SUCCESS! Verse verified
