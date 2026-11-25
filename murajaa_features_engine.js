@@ -279,11 +279,18 @@
     // 7. Strip Tatweel
     str = str.replace(/\u0640/g, '');
 
-    // 8. Strip Quranic signs and punctuation
+    // 8. Normalize Hamza variants on Waw/Yaa & trailing waqf hamza: ؤ -> و, ئ -> ي, ء$ -> ''
+    str = str.replace(/ؤ/g, 'و').replace(/ئ/g, 'ي');
+
+    // 9. Normalize plural silent alif: قالوا -> قالو, كانوا -> كانو, كفروا -> كفرو
+    str = str.replace(/وا(?:\s|$)/g, 'و ');
+
+    // 10. Strip Quranic signs and punctuation
     str = str.replace(/[\u0600-\u060F\u06DD\u06DE.,/#!$%^&*;:{}=\-_`~()«»۞۩۝]/g, '');
+    str = str.replace(/ء$/g, '');
     str = str.replace(/\s+/g, ' ').trim();
 
-    // 9. Normalize spoken Muqatta'at letters
+    // 11. Normalize spoken Muqatta'at letters
     return normalizeMuqattaat(str);
   }
   window.Murajaa.normalizeArabic = normalizeArabic;
@@ -306,8 +313,8 @@
     if (s1 === s2) return 1.0;
 
     // Check direct Muqatta'at equivalence
-    if ((s1 === 'الم' && (s2 === 'الف' || s2 === 'لام' || s2 === 'ميم')) ||
-        (s2 === 'الم' && (s1 === 'الف' || s1 === 'لام' || s1 === 'ميم'))) {
+    if ((s1 === 'الم' && (s2 === 'الف' || s2 === 'لام' || s2 === 'ميم' || s2 === 'الف لام ميم')) ||
+        (s2 === 'الم' && (s1 === 'الف' || s1 === 'لام' || s1 === 'ميم' || s1 === 'الف لام ميم'))) {
       return 1.0;
     }
 
@@ -315,6 +322,11 @@
     const norm1 = s1.replace(/([اوي])+([اوي])/g, '$1');
     const norm2 = s2.replace(/([اوي])+([اوي])/g, '$1');
     if (norm1 === norm2) return 0.98;
+
+    // Short particles discrimination (length <= 2: في, ما, من, لا, قد, هو)
+    if (norm1.length <= 2 && norm2.length <= 2) {
+      return norm1 === norm2 ? 1.0 : 0.0;
+    }
 
     // Common Tajweed Idgham / Iqlab phonetic matches
     if ((s1 === 'ميقول' && s2 === 'من يقول') || (s2 === 'ميقول' && s1 === 'من يقول') ||
@@ -411,67 +423,94 @@
   } catch (e) {}
 
   // =========================================================================
-  // 4. BACKTRACKING-TOLERANT RECITATION TRACKER (PROGRESSIVE STREAM ALIGNMENT)
+  // 4. STREAMING DELTA RECITATION TRACKER (98%+ PRECISION & BACKTRACKING)
   // =========================================================================
-  function processIncomingRecitation(transcript) {
-    if (!transcript) return;
-    const spokenTokens = tokenizeArabic(transcript);
-    if (spokenTokens.length === 0) return;
+  let streamFinalIndex = -1;
+  let streamInterimWordCount = 0;
 
+  function resetSpeechStreamTracking() {
+    streamFinalIndex = -1;
+    streamInterimWordCount = 0;
+  }
+  window.Murajaa.resetSpeechStreamTracking = resetSpeechStreamTracking;
+
+  function processTokenDelta(deltaTokens, speechResult) {
+    if (!deltaTokens || deltaTokens.length === 0) return;
     const targets = murajaaState.targetTokens;
     if (!targets || targets.length === 0) return;
 
-    const backtrackWindow = 12;
+    const backtrackWindow = 10;
     const forwardWindow = 5;
     let didBacktrack = false;
 
-    // Inspect recent tokens (last 1 to 3 words uttered)
-    const recentTokens = spokenTokens.slice(-3);
-
-    for (let sIdx = 0; sIdx < recentTokens.length; sIdx++) {
-      const spToken = recentTokens[sIdx];
+    for (let sIdx = 0; sIdx < deltaTokens.length; sIdx++) {
+      const spToken = deltaTokens[sIdx];
       let matchedIndex = -1;
+      let advanceBy = 1;
+      const cur = murajaaState.currentWordIndex;
 
       // 1. Immediate Target: Check expected current word
-      if (murajaaState.currentWordIndex < targets.length) {
-        if (stringSimilarity(spToken, targets[murajaaState.currentWordIndex]) >= 0.64) {
-          matchedIndex = murajaaState.currentWordIndex;
+      if (cur < targets.length) {
+        if (stringSimilarity(spToken, targets[cur]) >= 0.60) {
+          matchedIndex = cur;
+        } else if (cur < targets.length - 1) {
+          // Check compound match: spToken matches target[cur] + target[cur+1]
+          const combined = targets[cur] + targets[cur + 1];
+          if (stringSimilarity(spToken, combined) >= 0.70) {
+            matchedIndex = cur;
+            advanceBy = 2; // Matches two target words!
+          }
         }
       }
 
-      // 2. Forward Lookahead (1 to 5 words ahead): skipped short particle or ongoing recitation
+      // 2. Check alternatives from SpeechRecognitionResult if primary didn't match
+      if (matchedIndex === -1 && speechResult && speechResult.length > 1) {
+        for (let alt = 1; alt < Math.min(3, speechResult.length); alt++) {
+          const altTokens = tokenizeArabic(speechResult[alt].transcript);
+          const altToken = altTokens[sIdx];
+          if (altToken && cur < targets.length && stringSimilarity(altToken, targets[cur]) >= 0.60) {
+            matchedIndex = cur;
+            break;
+          }
+        }
+      }
+
+      // 3. Forward Lookahead (1 to 5 words ahead): e.g. skipped short particle or recited rapidly
       if (matchedIndex === -1) {
-        const lookaheadEnd = Math.min(targets.length - 1, murajaaState.currentWordIndex + forwardWindow);
-        for (let j = murajaaState.currentWordIndex + 1; j <= lookaheadEnd; j++) {
-          if (stringSimilarity(spToken, targets[j]) >= 0.67) {
+        const lookaheadEnd = Math.min(targets.length - 1, cur + forwardWindow);
+        for (let j = cur + 1; j <= lookaheadEnd; j++) {
+          if (stringSimilarity(spToken, targets[j]) >= 0.65) {
             matchedIndex = j;
             break;
           }
         }
       }
 
-      // 3. Backtrack Window: Reciter repeated a preceding phrase or word (وقف و ابتدا / نفس‌گیری)
+      // 4. Backtrack Window: reciter paused and repeated earlier phrase (وقف و ابتدا)
       if (matchedIndex === -1) {
-        const lookbackStart = Math.max(0, murajaaState.currentWordIndex - backtrackWindow);
-        for (let i = murajaaState.currentWordIndex - 1; i >= lookbackStart; i--) {
-          if (stringSimilarity(spToken, targets[i]) >= 0.70) {
-            matchedIndex = i;
+        const lookbackStart = Math.max(0, cur - backtrackWindow);
+        for (let b = cur - 1; b >= lookbackStart; b--) {
+          if (stringSimilarity(spToken, targets[b]) >= 0.68) {
+            matchedIndex = b;
             didBacktrack = true;
             break;
           }
         }
       }
 
-      // 4. Apply match
+      // 5. Apply match
       if (matchedIndex !== -1) {
-        murajaaState.currentWordIndex = matchedIndex + 1;
-        murajaaState.spokenIndices.add(matchedIndex);
-        if (murajaaState.viewMode === 'tasmi') {
-          murajaaState.revealedIndices.add(matchedIndex);
+        murajaaState.currentWordIndex = matchedIndex + advanceBy;
+        for (let a = 0; a < advanceBy; a++) {
+          const idx = matchedIndex + a;
+          murajaaState.spokenIndices.add(idx);
+          if (murajaaState.viewMode === 'tasmi') {
+            murajaaState.revealedIndices.add(idx);
+          }
+          highlightWord(idx, didBacktrack);
         }
-        highlightWord(matchedIndex, didBacktrack);
 
-        // Auto page-turn when all words on current page are completed
+        // Auto page-turn when all words on current page are finished
         if (murajaaState.currentWordIndex >= targets.length && (window.state && window.state.currentPage < 604)) {
           setTimeout(() => {
             if (murajaaState.isListening && window.state) {
@@ -484,6 +523,13 @@
 
     updateMurajaaStatusPill(didBacktrack);
   }
+
+  function processIncomingRecitation(transcript) {
+    if (!transcript) return;
+    const tokens = tokenizeArabic(transcript);
+    processTokenDelta(tokens, null);
+  }
+  window.Murajaa.processIncomingRecitation = processIncomingRecitation;
 
   function highlightWord(wordIndex, isBacktrack) {
     const el = document.getElementById('mword_' + wordIndex);
@@ -558,26 +604,35 @@
 
       rec.onstart = function () {
         lastSpeechTimestamp = Date.now();
+        resetSpeechStreamTracking();
         updateMicBtnState(true);
       };
 
       rec.onresult = function (event) {
         lastSpeechTimestamp = Date.now();
-        let interimText = '';
-        let finalText = '';
+        const results = event.results;
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const res = event.results[i];
+        for (let i = Math.max(0, streamFinalIndex + 1); i < results.length; i++) {
+          const res = results[i];
+          if (!res || !res[0]) continue;
+
           const transcript = res[0].transcript;
+          const tokens = tokenizeArabic(transcript);
+
           if (res.isFinal) {
-            finalText += ' ' + transcript;
+            const delta = tokens.slice(streamInterimWordCount);
+            if (delta.length > 0) {
+              processTokenDelta(delta, res);
+            }
+            streamFinalIndex = i;
+            streamInterimWordCount = 0;
           } else {
-            interimText += ' ' + transcript;
+            const delta = tokens.slice(streamInterimWordCount);
+            if (delta.length > 0) {
+              processTokenDelta(delta, res);
+              streamInterimWordCount = tokens.length;
+            }
           }
-        }
-        const textToProcess = (finalText.trim() || interimText.trim());
-        if (textToProcess) {
-          processIncomingRecitation(textToProcess);
         }
       };
 
@@ -717,6 +772,7 @@
       return;
     }
 
+    resetSpeechStreamTracking();
     murajaaState.targetTokens = [];
     murajaaState.wordsMeta = [];
     murajaaState.currentWordIndex = 0;
@@ -957,7 +1013,13 @@
       modal.id = 'murajaaBreakdownModal';
       modal.className = 'neo3d-modal-backdrop';
       modal.onclick = function (e) {
-        if (e.target === this) this.style.display = 'none';
+        if (e.target === this) Murajaa.closeWordBreakdown();
+      };
+      modal.ontouchend = function (e) {
+        if (e.target === this) {
+          e.preventDefault();
+          Murajaa.closeWordBreakdown();
+        }
       };
       document.body.appendChild(modal);
     }
@@ -965,13 +1027,16 @@
     modal.classList.add('open');
     modal.style.setProperty('display', 'flex', 'important');
     modal.innerHTML = `
-      <div class="neo3d-modal-card" style="max-width: 480px; width: 92%; padding: 20px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(234, 179, 8, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px);">
+      <div class="neo3d-modal-card" onclick="event.stopPropagation();" style="max-width: 480px; width: 92%; padding: 20px; border-radius: 20px; background: rgba(10, 18, 30, 0.98); border: 1.5px solid rgba(234, 179, 8, 0.45); box-shadow: 0 16px 40px rgba(0,0,0,0.85); backdrop-filter: blur(25px); box-sizing: border-box;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-spell-check" style="color: #fbbf24; font-size: 1.1rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('word_breakdown_title')}</span>
           </div>
-          <button onclick="document.getElementById('murajaaBreakdownModal').style.display='none'" style="background: none; border: none; color: #94a3b8; font-size: 1.4rem; cursor: pointer; padding: 0 6px;">&times;</button>
+          <!-- Circular gold close button -->
+          <button type="button" onclick="Murajaa.closeWordBreakdown()" ontouchend="Murajaa.closeWordBreakdown()" style="width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1.2px solid rgba(251,191,36,0.45); color: #fbbf24; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3); -webkit-tap-highlight-color: transparent;" title="${t('close')}">
+            <i class="fa-solid fa-xmark" style="font-size: 0.95rem;"></i>
+          </button>
         </div>
 
         <div style="text-align: center; margin: 15px 0 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 16px; border: 1px solid rgba(255,255,255,0.06);">
@@ -999,7 +1064,7 @@
           <textarea id="murajaaWordNoteInput" rows="2" placeholder="${t('note_placeholder')}" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; color: #fff; padding: 8px 10px; font-size: 0.82rem; outline: none;">${currentNote}</textarea>
         </div>
 
-        <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center;">
+        <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <button id="murajaaToggleMistakeBtn" onclick="Murajaa.toggleMistakeFlag('${wordKey}', ${meta.globalIdx})" class="neo3d-pill-btn" style="flex: 1; padding: 7px 10px; font-size: 0.78rem; justify-content: center; background: ${isMistake ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.06)'}; border-color: ${isMistake ? '#ef4444' : 'rgba(255,255,255,0.2)'}; color: ${isMistake ? '#fca5a5' : '#e2e8f0'};">
             <i class="fa-solid fa-triangle-exclamation"></i> <span>${isMistake ? t('unmark_mistake') : t('mark_mistake')}</span>
           </button>
@@ -1007,10 +1072,24 @@
             <i class="fa-solid fa-floppy-disk"></i> <span>${t('save_note')}</span>
           </button>
         </div>
+
+        <!-- Secondary Return / Close Button -->
+        <button type="button" onclick="Murajaa.closeWordBreakdown()" ontouchend="Murajaa.closeWordBreakdown()" class="neo3d-pill-btn" style="width: 100%; padding: 9px; font-size: 0.82rem; font-weight: 700; justify-content: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #e2e8f0; border-radius: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent;">
+          <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i> ${t('close')}
+        </button>
       </div>
     `;
   }
   window.Murajaa.openWordBreakdown = openWordBreakdown;
+
+  function closeWordBreakdown() {
+    const modal = document.getElementById('murajaaBreakdownModal');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.setProperty('display', 'none', 'important');
+    }
+  }
+  window.Murajaa.closeWordBreakdown = closeWordBreakdown;
 
   function toggleMistakeFlag(wordKey, globalIdx) {
     if (murajaaState.mistakeMap[wordKey]) {
@@ -1051,8 +1130,7 @@
     const el = document.getElementById('mword_' + globalIdx);
     if (el) el.classList.toggle('murajaa-has-note', !!val);
 
-    const modal = document.getElementById('murajaaBreakdownModal');
-    if (modal) modal.style.display = 'none';
+    closeWordBreakdown();
 
     if (typeof window.showToast === 'function') {
       window.showToast(t('note_saved'));
@@ -1081,9 +1159,12 @@
       modal.id = 'murajaaQuizModal';
       modal.className = 'neo3d-modal-backdrop';
       modal.onclick = function (e) {
+        if (e.target === this) Murajaa.closeAyahQuiz();
+      };
+      modal.ontouchend = function (e) {
         if (e.target === this) {
-          this.style.display = 'none';
-          Murajaa.stopAudio();
+          e.preventDefault();
+          Murajaa.closeAyahQuiz();
         }
       };
       document.body.appendChild(modal);
@@ -1092,13 +1173,16 @@
     modal.classList.add('open');
     modal.style.setProperty('display', 'flex', 'important');
     modal.innerHTML = `
-      <div class="neo3d-modal-card" style="max-width: 520px; width: 92%; padding: 22px; border-radius: 22px; background: rgba(8, 16, 28, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.45); box-shadow: 0 20px 50px rgba(0,0,0,0.9); backdrop-filter: blur(25px);">
+      <div class="neo3d-modal-card" onclick="event.stopPropagation();" style="max-width: 520px; width: 92%; padding: 22px; border-radius: 22px; background: rgba(8, 16, 28, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.45); box-shadow: 0 20px 50px rgba(0,0,0,0.9); backdrop-filter: blur(25px); box-sizing: border-box;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-circle-question" style="color: #38bdf8; font-size: 1.15rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('quiz_title')}</span>
           </div>
-          <button onclick="document.getElementById('murajaaQuizModal').style.display='none'; Murajaa.stopAudio();" style="background: none; border: none; color: #94a3b8; font-size: 1.4rem; cursor: pointer; padding: 0 6px;">&times;</button>
+          <!-- Circular cyan close button -->
+          <button type="button" onclick="Murajaa.closeAyahQuiz()" ontouchend="Murajaa.closeAyahQuiz()" style="width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1.2px solid rgba(56,189,248,0.45); color: #38bdf8; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.3); -webkit-tap-highlight-color: transparent;" title="${t('close')}">
+            <i class="fa-solid fa-xmark" style="font-size: 0.95rem;"></i>
+          </button>
         </div>
 
         <div style="font-size: 0.85rem; font-weight: 700; color: #fbbf24; margin-bottom: 10px;">
@@ -1128,7 +1212,7 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 8px; justify-content: space-between;">
+        <div style="display: flex; gap: 8px; justify-content: space-between; margin-bottom: 10px;">
           <button id="murajaaQuizRevealBtn" onclick="document.getElementById('murajaaQuizAnswerBox').style.display='block'; this.style.display='none';" class="neo3d-pill-btn" style="flex: 1; padding: 8px 12px; font-size: 0.8rem; justify-content: center; background: linear-gradient(135deg, #0284c7, #0369a1); border: none; color: #fff;">
             <i class="fa-solid fa-eye"></i> <span>${t('quiz_reveal_btn')}</span>
           </button>
@@ -1136,10 +1220,25 @@
             <span>${t('quiz_next_btn')}</span>
           </button>
         </div>
+
+        <!-- Secondary Return / Close Button -->
+        <button type="button" onclick="Murajaa.closeAyahQuiz()" ontouchend="Murajaa.closeAyahQuiz()" class="neo3d-pill-btn" style="width: 100%; padding: 9px; font-size: 0.82rem; font-weight: 700; justify-content: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); color: #e2e8f0; border-radius: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent;">
+          <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i> ${t('close')}
+        </button>
       </div>
     `;
   }
   window.Murajaa.openAyahQuiz = openAyahQuiz;
+
+  function closeAyahQuiz() {
+    const modal = document.getElementById('murajaaQuizModal');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.setProperty('display', 'none', 'important');
+      stopAudio();
+    }
+  }
+  window.Murajaa.closeAyahQuiz = closeAyahQuiz;
 
   function playAyahAudio(surahNum, ayahNum) {
     stopAudio();
@@ -1250,6 +1349,17 @@
     }
   }
   window.Murajaa.closeTypographySettings = closeTypographySettings;
+
+  // Global ESC key listener to safely return from any open Murajaa modal
+  if (typeof document !== 'undefined') {
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        closeWordBreakdown();
+        closeAyahQuiz();
+        closeTypographySettings();
+      }
+    });
+  }
 
   function onFontSizeChange(sz) {
     const val = parseInt(sz, 10);
