@@ -2320,11 +2320,16 @@ let cumulativeRecitedAyahs = [];
 
 function cleanArabicForMatch(str) {
   if (!str) return '';
-  return str
+  let s = String(str);
+  // Normalize 1000 / ١٠٠٠ (Arabic word 'Alf' / هزار) to الف
+  s = s.replace(/\b1000\b/g, 'الف')
+       .replace(/١٠٠٠/g, 'الف')
+       .replace(/١۰۰۰/g, 'الف');
+  return s
     .replace(/[\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED]/g, '')
     .replace(/[إأآٱ]/g, 'ا')
     .replace(/ة/g, 'ه')
-    .replace(/ى/g, 'ي')
+    .replace(/[ىي]/g, 'ي')
     .replace(/[^\u0600-\u06FF\s]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
@@ -2618,8 +2623,57 @@ function checkRecitationAccuracy(transcript) {
   const v = verses[reciteTargetIdx];
   if (!v) return;
 
-  let spoken = cleanArabicForMatch(transcript);
+  const rawSpoken = String(transcript || '');
+  let spoken = cleanArabicForMatch(rawSpoken);
   let targetClean = cleanArabicForMatch(v.ar);
+
+  // Instant Pass for Ayah 1 Muqatta'at (e.g. Surah 2: Al-Baqarah Ayah 1: الم)
+  const isAyah1Muqattaat = (v.num === 1 && (targetClean === 'الم' || toQuranPhoneticKey(targetClean) === 'ALIF_LAM_MIM'));
+  const userRecitedBismillahOrAlif = (
+    spoken.includes('بسم الله') || 
+    spoken.includes('باسم الله') ||
+    spoken.includes('الم') || 
+    spoken.includes('الف') || 
+    spoken.includes('لام') || 
+    spoken.includes('ميم') ||
+    rawSpoken.includes('١٠٠٠') ||
+    rawSpoken.includes('1000') ||
+    rawSpoken.includes('١۰۰۰')
+  );
+
+  if (isAyah1Muqattaat && userRecitedBismillahOrAlif) {
+    cumulativeRecitedAyahs.push(v);
+    reciteTargetIdx++;
+    updateCumulativeBoard();
+    updateRecitePromptDisplay();
+    const fb = document.getElementById('micFeedbackText');
+    if (fb) {
+      const nextV = verses[reciteTargetIdx];
+      const nextMsg = nextV 
+        ? `👉 احسنت! لطفاً اکنون آیه ${nextV.num} را از حفظ بخوانید (ذَٰلِكَ الْكِتَابُ)...` 
+        : `🎉 ماشاءالله! تمام آیات این سوره با موفقیت خوانده شد!`;
+      fb.innerHTML = `
+        <div style="background: rgba(16, 185, 129, 0.15); border: 1.5px solid #10b981; border-radius: 12px; padding: 14px 18px; margin-top: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="color: #10b981; font-weight: 800; font-size: 1.15rem;">
+              <i class="fa-solid fa-circle-check"></i> ✓ آیه ۱ (الم) با موفقیت تأیید شد! (۱۰۰٪)
+            </span>
+            <span style="background: #10b981; color: #042f2e; font-size: 0.8rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
+              MāshāAllāh
+            </span>
+          </div>
+          <div style="font-family: var(--quran-font); font-size: 1.5rem; line-height: 2; margin: 10px 0; direction: rtl; text-align: right; color: #4ade80;">
+            الم
+          </div>
+          <div style="color: #86efac; font-size: 0.95rem; font-weight: 600; margin-top: 6px;">
+            ${nextMsg}
+          </div>
+        </div>
+      `;
+    }
+    showToast(`✓ آیه ۱ (الم) تأیید شد ➔ گوش دادن به آیه ۲... ⭐`);
+    return;
+  }
 
   // If first verse of surah, strip bismillah from BOTH target and spoken for matching
   if (v.num === 1 && v.surahNum !== 1) {
@@ -2627,15 +2681,25 @@ function checkRecitationAccuracy(transcript) {
     spoken = spoken.replace(/^بسم الله الرحمن الرحيم\s*/, '').trim();
   }
 
+  // If user only recited Bismillah and paused before verse 1, keep listening without penalty
+  if (!spoken && (rawSpoken.includes('بسم الله') || rawSpoken.includes('باسم الله'))) {
+    const fb = document.getElementById('micFeedbackText');
+    if (fb) {
+      fb.innerHTML = `✨ <em>بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ - احسنت! در حال شنیدن صدای شما... لطفاً آیه ۱ را ادامه دهید 🎙️</em>`;
+    }
+    return;
+  }
+
   const spokenWords = spoken.split(/\s+/).filter(Boolean);
   const targetWords = targetClean.split(/\s+/).filter(Boolean);
 
   if (targetWords.length === 0) return;
 
-  // Special Muqatta'at instant pass for Ayah 1 (e.g. Surah Al-Baqarah: الم)
+  // Special Muqatta'at instant pass for Ayah 1
   const isMuqattaatVerse = (targetWords.length === 1 && (targetWords[0] === 'الم' || toQuranPhoneticKey(targetWords[0]) === 'ALIF_LAM_MIM') &&
     (spokenWords.some(w => isArabicWordMatch(targetWords[0], w)) || 
-     spoken.includes('الم') || spoken.includes('الف') || spoken.includes('لام') || spoken.includes('ميم')));
+     spoken.includes('الم') || spoken.includes('الف') || spoken.includes('لام') || spoken.includes('ميم') ||
+     rawSpoken.includes('١٠٠٠') || rawSpoken.includes('1000')));
 
   // Word Alignment & Mistake Detection
   const wordStatus = [];

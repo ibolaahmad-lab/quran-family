@@ -1,5 +1,5 @@
 // Service Worker for Quran Karim PWA
-const CACHE_NAME = 'quran-karim-cache-v20261125_v6';
+const CACHE_NAME = 'quran-karim-cache-v20261125_v7';
 const PRECACHE_ASSETS = [
   './',
   './index.html',

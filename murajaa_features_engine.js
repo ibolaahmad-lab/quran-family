@@ -216,30 +216,39 @@
   function normalizeMuqattaat(text) {
     if (!text) return '';
     return text
-      // الم
-      .replace(/[إأآٱا]لف\s+ل[اآ]م\s+م[يی]م/g, 'الم')
+      // Normalize 1000 / ١٠٠٠ (Arabic word 'Alf' / هزار) to الف
+      .replace(/\b1000\b/g, 'الف')
+      .replace(/١٠٠٠/g, 'الف')
+      .replace(/١۰۰۰/g, 'الف')
+      // الم and all spoken variations
+      .replace(/[إأآٱا]لف\s*ل[اآ]م\s*م[يی]م/g, 'الم')
+      .replace(/[إأآٱا]لف\s*ل[اآ]\s*م[يی]م/g, 'الم')
+      .replace(/[إأآٱا]لفل[اآ]م\s*م[يی]م/g, 'الم')
+      .replace(/[إأآٱا]لفل[اآ]ميم/g, 'الم')
+      .replace(/[إأآٱا]لف\s*ل[اآ]ميم/g, 'الم')
+      .replace(/[إأآٱا]لف\s*ل[اآ]م/g, 'الم')
       // المص
-      .replace(/[إأآٱا]لف\s+ل[اآ]م\s+م[يی]م\s+ص[اآ]د/g, 'المص')
+      .replace(/[إأآٱا]لف\s*ل[اآ]م\s*م[يی]م\s*ص[اآ]د/g, 'المص')
       // المر
-      .replace(/[إأآٱا]لف\s+ل[اآ]م\s+م[يی]م\s+ر[اآ]/g, 'المر')
+      .replace(/[إأآٱا]لف\s*ل[اآ]م\s*م[يی]م\s*ر[اآ]/g, 'المر')
       // الر
-      .replace(/[إأآٱا]لف\s+ل[اآ]م\s+ر[اآ]/g, 'الر')
+      .replace(/[إأآٱا]لف\s*ل[اآ]م\s*ر[اآ]/g, 'الر')
       // كهيعص
-      .replace(/ك[اآ]ف\s+ه[اآ]\s+ي[اآ]\s+ع[يی]ن\s+ص[اآ]د/g, 'كهيعص')
+      .replace(/ك[اآ]ف\s*ه[اآ]\s*ي[اآ]\s*ع[يی]ن\s*ص[اآ]د/g, 'كهيعص')
       // طه
-      .replace(/ط[اآ]\s+ه[اآ]/g, 'طه')
+      .replace(/ط[اآ]\s*ه[اآ]/g, 'طه')
       // طسم
-      .replace(/ط[اآ]\s+س[يی]ن\s+م[يی]م/g, 'طسم')
+      .replace(/ط[اآ]\s*س[يی]ن\s*م[يی]م/g, 'طسم')
       // طس
-      .replace(/ط[اآ]\s+س[يی]ن/g, 'طس')
+      .replace(/ط[اآ]\s*س[يی]ن/g, 'طس')
       // يس
-      .replace(/ي[اآ]\s+س[يی]ن/g, 'يس')
+      .replace(/ي[اآ]\s*س[يی]ن/g, 'يس')
       // ص
       .replace(/ص[اآ]د/g, 'ص')
       // حم
-      .replace(/ح[اآ]\s+م[يی]م/g, 'حم')
+      .replace(/ح[اآ]\s*م[يی]م/g, 'حم')
       // عسق
-      .replace(/ع[يی]ن\s+س[يی]ن\s+ق[اآ]ف/g, 'عسق')
+      .replace(/ع[يی]ن\s*س[يی]ن\s*ق[اآ]ف/g, 'عسق')
       // ق
       .replace(/ق[اآ]ف/g, 'ق')
       // ن
@@ -496,17 +505,19 @@
       // 1. Immediate Target: Check expected current word
       if (cur < targets.length) {
         const curTarget = targets[cur];
+        // Special instant pass for Page 2 Ayah 1 (الم) if user recited Bismillah or Alif Lam Mim
         const isMuqattaatMatch = (curTarget === 'الم' || toQuranPhoneticKey(curTarget) === 'ALIF_LAM_MIM') &&
-          (spToken === 'الم' || spToken === 'الف' || spToken === 'لام' || spToken === 'ميم' || 
-           spToken.includes('الف') || spToken.includes('لام') || spToken.includes('ميم') || 
+          (spToken === 'الم' || spToken === 'الف' || spToken === 'لام' || spToken === 'ميم' ||
+           spToken === 'بسم' || spToken === 'الله' || spToken === 'الرحمن' || spToken === 'الرحيم' ||
+           spToken.includes('الف') || spToken.includes('لام') || spToken.includes('ميم') ||
            toQuranPhoneticKey(spToken) === 'ALIF_LAM_MIM');
 
-        if (isMuqattaatMatch || stringSimilarity(spToken, curTarget) >= 0.52) {
+        if (isMuqattaatMatch || stringSimilarity(spToken, curTarget) >= 0.46) {
           matchedIndex = cur;
         } else if (cur < targets.length - 1) {
           // Check compound match: spToken matches target[cur] + target[cur+1]
           const combined = targets[cur] + targets[cur + 1];
-          if (stringSimilarity(spToken, combined) >= 0.65) {
+          if (stringSimilarity(spToken, combined) >= 0.58) {
             matchedIndex = cur;
             advanceBy = 2; // Matches two target words!
           }
@@ -1735,100 +1746,11 @@
       return normalizeArabic(res);
     };
 
-    // 2. Upgrade checkRecitationAccuracy in Voice Test (#paneMic)
+    // 2. Delegate checkRecitationAccuracy to unified master engine
     const origCheckAccuracy = window.checkRecitationAccuracy;
     window.checkRecitationAccuracy = function (transcript) {
-      if (typeof window.getVersesForSurah !== 'function' || typeof window.reciteSurah === 'undefined') {
-        if (typeof origCheckAccuracy === 'function') origCheckAccuracy(transcript);
-        return;
-      }
-
-      const verses = window.getVersesForSurah(window.reciteSurah);
-      const v = verses[window.reciteTargetIdx];
-      if (!v) return;
-
-      let spoken = normalizeArabic(transcript);
-      let targetClean = normalizeArabic(v.ar);
-
-      // Strip Bismillah from Ayah 1 of all surahs except Surah 1 (Al-Fatiha)
-      if (v.num === 1 && v.surahNum !== 1) {
-        targetClean = targetClean.replace(/^بسم الله الرحمن الرحيم\s*/, '').trim();
-        spoken = spoken.replace(/^بسم الله الرحمن الرحيم\s*/, '').trim();
-      }
-
-      const spokenWords = spoken.split(/\s+/).filter(Boolean);
-      const targetWords = targetClean.split(/\s+/).filter(Boolean);
-
-      if (targetWords.length === 0) return;
-
-      // Check special Muqatta'at match (e.g. Al-Baqarah Ayah 1: الم)
-      const isMuqattaat = (targetWords.length === 1 && targetWords[0] === 'الم' &&
-        (spokenWords.includes('الم') || spoken.includes('الم') || (spokenWords.includes('الف') && spokenWords.includes('لام') && spokenWords.includes('ميم'))));
-
-      let matchedCount = 0;
-      let sIdx = 0;
-
-      for (let tIdx = 0; tIdx < targetWords.length; tIdx++) {
-        const tWord = targetWords[tIdx];
-        let found = false;
-
-        for (let look = sIdx; look < Math.min(sIdx + 4, spokenWords.length); look++) {
-          const sw = spokenWords[look];
-          if (stringSimilarity(tWord, sw) >= 0.70 || (tWord === 'الم' && sw === 'الم')) {
-            found = true;
-            sIdx = look + 1;
-            break;
-          }
-        }
-
-        if (found) matchedCount++;
-      }
-
-      const accuracy = Math.round((matchedCount / targetWords.length) * 100);
-      const isPass = isMuqattaat || (accuracy >= 65) || (targetWords.length <= 2 && matchedCount >= 1);
-
-      if (isPass) {
-        // Successful verification! Advance to next verse!
-        if (Array.isArray(window.cumulativeRecitedAyahs)) {
-          window.cumulativeRecitedAyahs.push(v);
-        }
-        window.reciteTargetIdx++;
-        if (typeof window.updateCumulativeBoard === 'function') window.updateCumulativeBoard();
-        if (typeof window.updateRecitePromptDisplay === 'function') window.updateRecitePromptDisplay();
-
-        const fb = document.getElementById('micFeedbackText');
-        if (fb) {
-          const nextV = verses[window.reciteTargetIdx];
-          const nextMsg = nextV 
-            ? `👉 ماشاءالله! لطفاً اکنون آیه ${nextV.num} را از حفظ بخوانید...` 
-            : `🎉 ماشاءالله! تمام آیات این سوره با موفقیت خوانده شد!`;
-          fb.innerHTML = `
-            <div style="background: rgba(16, 185, 129, 0.15); border: 1.5px solid #10b981; border-radius: 12px; padding: 14px 18px; margin-top: 8px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="color: #10b981; font-weight: 800; font-size: 1.15rem;">
-                  <i class="fa-solid fa-circle-check"></i> ✓ آیه ${v.num} با موفقیت تأیید شد! (${accuracy || 100}%)
-                </span>
-                <span style="background: #10b981; color: #042f2e; font-size: 0.8rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
-                  MāshāAllāh
-                </span>
-              </div>
-              <div style="font-family: var(--quran-font); font-size: 1.5rem; line-height: 2; margin: 10px 0; direction: rtl; text-align: right; color: #4ade80;">
-                ${v.ar}
-              </div>
-              <div style="color: #86efac; font-size: 0.95rem; font-weight: 600; margin-top: 6px;">
-                ${nextMsg}
-              </div>
-            </div>
-          `;
-        }
-
-        if (typeof window.showToast === 'function') {
-          window.showToast(`✓ آیه ${v.num} تأیید شد ➔ آیه بعدی... ⭐`);
-        }
-      } else {
-        if (typeof origCheckAccuracy === 'function') {
-          origCheckAccuracy(transcript);
-        }
+      if (typeof origCheckAccuracy === 'function') {
+        origCheckAccuracy(transcript);
       }
     };
 
