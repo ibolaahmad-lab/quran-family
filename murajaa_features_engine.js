@@ -1083,6 +1083,17 @@
     setTimeout(() => { isModalClosing = false; }, 450);
   }
 
+  window.closeMurajaaModal = function (modalId) {
+    preventGhostClicks();
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+      modal.style.setProperty('display', 'none', 'important');
+    }
+    if (typeof stopAudio === 'function') stopAudio();
+  };
+
   function onWordClick(globalIdx) {
     if (isModalClosing) return;
     const meta = murajaaState.wordsMeta[globalIdx];
@@ -1131,9 +1142,9 @@
             <i class="fa-solid fa-spell-check" style="color: #fbbf24; font-size: 1.1rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('word_breakdown_title')}</span>
           </div>
-          <!-- Circular gold close button with touch & click protection -->
-          <button type="button" onclick="Murajaa.closeWordBreakdown(event);" ontouchend="Murajaa.closeWordBreakdown(event);" onpointerdown="event.stopPropagation();" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(251,191,36,0.6); color: #fbbf24; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.4); -webkit-tap-highlight-color: transparent; touch-action: manipulation;" title="${t('close')}">
-            <i class="fa-solid fa-xmark" style="font-size: 1.1rem; pointer-events: none;"></i>
+          <!-- Fail-Safe Circular gold close button -->
+          <button type="button" onclick="window.closeMurajaaModal('murajaaBreakdownModal');" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(251,191,36,0.8); color: #fbbf24; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.5); -webkit-tap-highlight-color: transparent;" title="${t('close')}">
+            <i class="fa-solid fa-xmark" style="font-size: 1.2rem; pointer-events: none;"></i>
           </button>
         </div>
 
@@ -1281,9 +1292,9 @@
             <i class="fa-solid fa-circle-question" style="color: #38bdf8; font-size: 1.15rem;"></i>
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('quiz_title')}</span>
           </div>
-          <!-- Circular cyan close button with touch & click protection -->
-          <button type="button" onclick="Murajaa.closeAyahQuiz(event);" ontouchend="Murajaa.closeAyahQuiz(event);" onpointerdown="event.stopPropagation();" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(56,189,248,0.6); color: #38bdf8; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.4); -webkit-tap-highlight-color: transparent; touch-action: manipulation;" title="${t('close')}">
-            <i class="fa-solid fa-xmark" style="font-size: 1.1rem; pointer-events: none;"></i>
+          <!-- Fail-Safe Circular cyan close button -->
+          <button type="button" onclick="window.closeMurajaaModal('murajaaQuizModal');" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(56,189,248,0.8); color: #38bdf8; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.5); -webkit-tap-highlight-color: transparent;" title="${t('close')}">
+            <i class="fa-solid fa-xmark" style="font-size: 1.2rem; pointer-events: none;"></i>
           </button>
         </div>
 
@@ -1324,7 +1335,7 @@
         </div>
 
         <!-- Secondary Return / Close Button -->
-        <button type="button" onclick="Murajaa.closeAyahQuiz(event);" ontouchend="Murajaa.closeAyahQuiz(event);" onpointerdown="event.stopPropagation();" class="neo3d-pill-btn" style="width: 100%; padding: 10px; font-size: 0.85rem; font-weight: 800; justify-content: center; background: rgba(255,255,255,0.1); border: 1.2px solid rgba(255,255,255,0.25); color: #fff; border-radius: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
+        <button type="button" onclick="window.closeMurajaaModal('murajaaQuizModal');" class="neo3d-pill-btn" style="width: 100%; padding: 10px; font-size: 0.85rem; font-weight: 800; justify-content: center; background: rgba(255,255,255,0.1); border: 1.2px solid rgba(255,255,255,0.25); color: #fff; border-radius: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent;">
           <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i> ${t('close')}
         </button>
       </div>
@@ -1397,8 +1408,8 @@
             <span style="font-weight: 800; color: #fff; font-size: 0.95rem;">${t('settings_title')}</span>
           </div>
           <!-- Sleek compact circular glass close button with golden accent -->
-          <button type="button" onclick="Murajaa.closeTypographySettings(event);" ontouchend="Murajaa.closeTypographySettings(event);" onpointerdown="event.stopPropagation();" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(251,191,36,0.6); color: #fbbf24; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.4); -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
-            <i class="fa-solid fa-xmark" style="font-size: 1.05rem; pointer-events: none;"></i>
+          <button type="button" onclick="window.closeMurajaaModal('murajaaSettingsModal');" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(251,191,36,0.8); color: #fbbf24; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.5); -webkit-tap-highlight-color: transparent;" title="${t('close')}">
+            <i class="fa-solid fa-xmark" style="font-size: 1.15rem; pointer-events: none;"></i>
           </button>
         </div>
 

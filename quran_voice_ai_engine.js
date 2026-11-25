@@ -14,7 +14,7 @@
   const STORAGE_GROQ_KEY = 'quran_groq_api_key';
 
   // State
-  let activeEngineId = localStorage.getItem(STORAGE_ENGINE_KEY) || 'groq_whisper';
+  let activeEngineId = localStorage.getItem(STORAGE_ENGINE_KEY) || 'google_speech';
   let groqApiKey = localStorage.getItem(STORAGE_GROQ_KEY) || '';
   let isCurrentlyListening = false;
   let activeCallbacks = null;
@@ -70,12 +70,30 @@
     }
   };
 
-  // Helper: Normalizer
+  // Helper: Normalizer with 1000/١٠٠٠, Muqatta'at and Kurdish/Persian normalization
   function normalizeText(txt) {
-    if (typeof window.cleanArabicForMatch === 'function') {
-      return window.cleanArabicForMatch(txt);
+    if (!txt) return '';
+    let t = String(txt)
+      .replace(/(?:1000|١٠٠٠)/g, ' الف ')
+      .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '')
+      .replace(/[إأآءئؤٱ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/[\u064A\u06CC\u0649]/g, 'ي')
+      .replace(/[\u0643\u06A9\u06AA]/g, 'ك')
+      .replace(/[اإأ]لف\s*ل[اآ]م\s*م[يی]م/g, 'الم')
+      .replace(/[اإأ]لف\s*ل[اآ]\s*م[يی]م/g, 'الم')
+      .replace(/[اإأ]لفل[اآ]م\s*م[يی]م/g, 'الم')
+      .replace(/[اإأ]لفل[اآ]ميم/g, 'الم')
+      .replace(/[اإأ]لف\s*ل[اآ]ميم/g, 'الم')
+      .replace(/[اإأ]لف\s*ل[اآ]م/g, 'الم');
+
+    if (typeof window.normalizeArabicForMatch === 'function') {
+      return window.normalizeArabicForMatch(t);
     }
-    return String(txt || '').trim();
+    if (typeof window.cleanArabicForMatch === 'function') {
+      return window.cleanArabicForMatch(t);
+    }
+    return t.replace(/\s+/g, ' ').trim();
   }
 
   // =========================================================================
@@ -531,6 +549,82 @@
     document.head.appendChild(style);
   }
 
+  // Dynamic Multilingual Translations for Engine Modal
+  function getModalTranslations() {
+    const lang = window.currentLang || 'ku';
+    const dict = {
+      ku: {
+        title: 'ڕێکخستنی دەنگی زیرەک',
+        subtitle: 'هەڵبژاردنی مۆتۆری دەنگی تلاوەت (Triple-Engine)',
+        e1_title: '١. Groq Whisper (سەرهێڵ و خێرا) ⭐',
+        e1_badge: 'پێشنیارکراو',
+        e1_desc: 'خێراترین و وردترین مۆتۆری دەنگی جیهان (ژێر ٠٫٣ چرکە)، تێگەیشتن لە هەموو شێوەزارەکان.',
+        e2_title: '٢. Whisper ناوخۆیی (١٠٠٪ ئۆفلاین)',
+        e2_badge: 'بێ ئینتەرنێت',
+        e2_desc: 'کارپێکردن بە پرۆسێسەری ئامێرەکەت (WebAssembly) بەبێ پێویستی بە ئینتەرنێت.',
+        e3_title: '٣. گووگڵ / وێبگەڕ (خۆڕایی و خێرا)',
+        e3_badge: 'سەرەکی',
+        e3_desc: 'مۆتۆری خۆماڵی ئامێرەکەت لەگەڵ پاڵاوتنی دەنگی و چاککردنی پیتەکان (وەک ١٠٠٠ بۆ ئەلف).',
+        apiKeyTitle: '🔑 کلیلی تایبەتی Groq (ئارەزوومەندانە):',
+        apiKeyPlaceholder: 'gsk_...',
+        apiKeyBtn: 'پاشەکەوت',
+        apiKeyNote: 'لە کاتی بەتاڵ بووندا، مۆتۆری خۆڕایی گووگڵ بە شێوەی خۆکار کار دەکات.'
+      },
+      de: {
+        title: 'Spracherkennungs-Engine',
+        subtitle: 'Auswahl der Koran-Rezitations-KI (Triple-Engine)',
+        e1_title: '1. Groq Whisper (Cloud Ultra-Fast) ⭐',
+        e1_badge: 'Empfohlen',
+        e1_desc: 'Höchste Präzision weltweit; unter 0,3s Latenz, versteht alle Akzente.',
+        e2_title: '2. Whisper Offline (100% Lokal)',
+        e2_badge: 'Kein Internet',
+        e2_desc: 'Vollständige Ausführung im Browser/Gerät via WebAssembly.',
+        e3_title: '3. Google / Browser Standard',
+        e3_badge: 'Standard',
+        e3_desc: 'Kostenlose Standard-Spracherkennung mit phonetischer Koran-Optimierung.',
+        apiKeyTitle: '🔑 Eigener Groq API-Key (optional):',
+        apiKeyPlaceholder: 'gsk_...',
+        apiKeyBtn: 'Speichern',
+        apiKeyNote: 'Falls leer, läuft die Spracherkennung direkt über die Standard-Engine.'
+      },
+      ar: {
+        title: 'إعدادات محرك التعرف الصوتي',
+        subtitle: 'اختيار الذكاء الاصطناعي للتلاوة (Triple-Engine)',
+        e1_title: '١. Groq Whisper (سحابي فائق السرعة) ⭐',
+        e1_badge: 'موصى به',
+        e1_desc: 'أدق وأسرع محرك ذكاء اصطناعي (أقل من ٠٫٣ ثانية)، استيعاب كامل لجميع اللهجات.',
+        e2_title: '٢. Whisper محلي (١٠٠٪ دون إنترنت)',
+        e2_badge: 'أوفلاين',
+        e2_desc: 'معالجة مباشرة على معالج الجهاز عبر WebAssembly دون إرسال للخارج.',
+        e3_title: '٣. متصفح جوجل / سفاري القياسي',
+        e3_badge: 'افتراضي',
+        e3_desc: 'محرك الجهاز الداخلي مع فلترة صوتية ذكية لتلاوة القرآن الكريم.',
+        apiKeyTitle: '🔑 مفتاح Groq API الخاص (اختياري):',
+        apiKeyPlaceholder: 'gsk_...',
+        apiKeyBtn: 'حفظ',
+        apiKeyNote: 'في حال تركه فارغاً، يعمل المحرك الافتراضي تلقائياً.'
+      },
+      fa: {
+        title: 'تنظیمات موتور تشخیص صدا',
+        subtitle: 'انتخاب هوش مصنوعی تلاوت (Triple-Engine)',
+        e1_title: '۱. Groq Whisper (ابری فوق‌سریع) ⭐',
+        e1_badge: 'پیشنهادی',
+        e1_desc: 'دقیق‌ترین و سریع‌ترین موتور هوش مصنوعی جهان (زیر ۰٫۳ ثانیه).',
+        e2_title: '۲. Whisper محلی (۱۰۰٪ آفلاین)',
+        e2_badge: 'بدون اینترنت',
+        e2_desc: 'اجرای کامل درون گوشی/تبلت با WebAssembly بدون ارسال به اینترنت.',
+        e3_title: '۳. مرورگر پیش‌فرض (گوگل / اپل)',
+        e3_badge: 'استاندارد',
+        e3_desc: 'موتور داخلی دستگاه همراه با تصحیح هوشمند حروف و ارقام ۱۰۰۰.',
+        apiKeyTitle: '🔑 کلید اختصاصی Groq (اختیاری):',
+        apiKeyPlaceholder: 'gsk_...',
+        apiKeyBtn: 'ذخیره',
+        apiKeyNote: 'در صورت خالی بودن، موتور رایگان داخلی به صورت خودکار عمل می‌کند.'
+      }
+    };
+    return dict[lang] || dict['ku'] || dict['fa'];
+  }
+
   // Engine Settings Modal
   function openEngineSettingsModal() {
     let modal = document.getElementById('voiceEngineModal');
@@ -543,6 +637,7 @@
       document.body.appendChild(modal);
     }
 
+    const t = getModalTranslations();
     const currentKey = groqApiKey || '';
     modal.innerHTML = `
       <div class="neo3d-hub-sheet" style="width: 100%; max-width: 480px; max-height: 88vh; display: flex; flex-direction: column; padding: 18px 16px; overflow: hidden; border-radius: 26px; background: linear-gradient(165deg, #0d1722 0%, #060b10 100%); border: 1.5px solid rgba(56, 189, 248, 0.35); box-shadow: 0 28px 65px rgba(0,0,0,0.95); direction: rtl; text-align: right;">
@@ -553,8 +648,8 @@
               <i class="fa-solid fa-microphone-lines"></i>
             </div>
             <div>
-              <div style="font-weight: 900; color: #fff; font-size: 1rem;">تنظیمات موتور تشخیص صدا</div>
-              <div style="font-size: 0.72rem; color: #34d399;">انتخاب هوش مصنوعی تلاوت (Triple-Engine)</div>
+              <div style="font-weight: 900; color: #fff; font-size: 1rem;">${t.title}</div>
+              <div style="font-size: 0.72rem; color: #34d399;">${t.subtitle}</div>
             </div>
           </div>
           <button onclick="QuranVoiceAI.closeEngineModal()" class="neo3d-close-btn" style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.08); border: none; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></button>
@@ -562,15 +657,27 @@
 
         <!-- Body / Engine Options -->
         <div style="flex: 1; overflow-y: auto; padding: 14px 4px; display: flex; flex-direction: column; gap: 10px;">
+          <!-- Engine 3: Native Browser (Google / Safari) FIRST -->
+          <div class="engine-card-option ${activeEngineId === 'google_speech' ? 'active-engine' : ''}" onclick="QuranVoiceAI.setEngine('google_speech'); QuranVoiceAI.closeEngineModal();">
+            <div style="font-size: 1.6rem; width: 44px; height: 44px; border-radius: 12px; background: rgba(245, 158, 11, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fbbf24;">🌐</div>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">${t.e3_title}</div>
+                <span style="font-size: 0.65rem; background: #d97706; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 800;">${t.e3_badge}</span>
+              </div>
+              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; line-height: 1.4;">${t.e3_desc}</div>
+            </div>
+          </div>
+
           <!-- Engine 1: Groq Whisper Cloud -->
           <div class="engine-card-option ${activeEngineId === 'groq_whisper' ? 'active-engine' : ''}" onclick="QuranVoiceAI.setEngine('groq_whisper'); QuranVoiceAI.closeEngineModal();">
             <div style="font-size: 1.6rem; width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #34d399;">⚡</div>
             <div style="flex: 1;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">۱. Groq Whisper (ابری فوق‌سریع) ⭐</div>
-                <span style="font-size: 0.65rem; background: #10b981; color: #042f2e; padding: 1px 6px; border-radius: 4px; font-weight: 800;">پیشنهادی</span>
+                <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">${t.e1_title}</div>
+                <span style="font-size: 0.65rem; background: #10b981; color: #042f2e; padding: 1px 6px; border-radius: 4px; font-weight: 800;">${t.e1_badge}</span>
               </div>
-              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; line-height: 1.4;">دقیق‌ترین تشخیص در دنیا؛ پاسخ‌دهی زیر ۰٫۳ ثانیه، فهم عالی لهجه‌های کردی، فارسی و ترتیل.</div>
+              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; line-height: 1.4;">${t.e1_desc}</div>
             </div>
           </div>
 
@@ -579,36 +686,24 @@
             <div style="font-size: 1.6rem; width: 44px; height: 44px; border-radius: 12px; background: rgba(56, 189, 248, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #38bdf8;">🧠</div>
             <div style="flex: 1;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">۲. Whisper محلی (۱۰۰٪ آفلاین)</div>
-                <span style="font-size: 0.65rem; background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 800;">بدون اینترنت</span>
+                <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">${t.e2_title}</div>
+                <span style="font-size: 0.65rem; background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 800;">${t.e2_badge}</span>
               </div>
-              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; line-height: 1.4;">اجرای کامل درون گوشی/تبلت با WebAssembly بدون ارسال به هیچ سرور بیرونی.</div>
-            </div>
-          </div>
-
-          <!-- Engine 3: Native Browser (Google / Safari) -->
-          <div class="engine-card-option ${activeEngineId === 'google_speech' ? 'active-engine' : ''}" onclick="QuranVoiceAI.setEngine('google_speech'); QuranVoiceAI.closeEngineModal();">
-            <div style="font-size: 1.6rem; width: 44px; height: 44px; border-radius: 12px; background: rgba(245, 158, 11, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fbbf24;">🌐</div>
-            <div style="flex: 1;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">۳. مرورگر پیش‌فرض (گوگل / اپل)</div>
-                <span style="font-size: 0.65rem; background: #d97706; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 800;">استاندارد</span>
-              </div>
-              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; line-height: 1.4;">موتور داخلی دستگاه همراه با تصحیح هوشمند حروف و ارقام ۱۰۰۰.</div>
+              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; line-height: 1.4;">${t.e2_desc}</div>
             </div>
           </div>
 
           <!-- Groq Custom API Key Option -->
           <div style="margin-top: 8px; padding: 12px; border-radius: 14px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08);">
             <div style="font-size: 0.76rem; font-weight: 800; color: #e2e8f0; margin-bottom: 6px;">
-              🔑 کلید اختصاصی Groq (اختیاری برای استفاده نامحدود شخصی):
+              ${t.apiKeyTitle}
             </div>
             <div style="display: flex; gap: 6px;">
-              <input type="text" id="groqApiKeyInput" placeholder="gsk_..." value="${currentKey}" style="flex: 1; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #fff; padding: 0 10px; font-size: 0.75rem; direction: ltr; font-family: monospace;">
-              <button onclick="QuranVoiceAI.saveGroqApiKey(document.getElementById('groqApiKeyInput').value)" class="neo3d-pill-btn" style="padding: 0 12px; height: 32px; background: #10b981; color: #fff; border: none; font-size: 0.74rem;">ذخیره</button>
+              <input type="text" id="groqApiKeyInput" placeholder="${t.apiKeyPlaceholder}" value="${currentKey}" style="flex: 1; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #fff; padding: 0 10px; font-size: 0.75rem; direction: ltr; font-family: monospace;">
+              <button onclick="QuranVoiceAI.saveGroqApiKey(document.getElementById('groqApiKeyInput').value)" class="neo3d-pill-btn" style="padding: 0 12px; height: 32px; background: #10b981; color: #fff; border: none; font-size: 0.74rem;">${t.apiKeyBtn}</button>
             </div>
             <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 5px;">
-              در صورت خالی بودن، برنامه به صورت خودکار از سرور رایگان آماده استفاده می‌کند.
+              ${t.apiKeyNote}
             </div>
           </div>
         </div>

@@ -1767,17 +1767,27 @@ function playTarteelTone(type) {
 }
 window.playTarteelTone = playTarteelTone;
 
-// Precision Arabic Quran string normalizer with Dagger-Alef conversion & Madd collapsing
+// Precision Arabic Quran string normalizer with Dagger-Alef conversion, 1000/١٠٠٠ translation & Muqatta'at
 function normalizeArabicForMatch(text) {
   if (!text) return '';
-  return text
-    .replace(/\u0670/g, 'ا')                              // Convert Dagger Alef (\u0670) to standard Alef 'ا' so Quranic orthography matches STT
+  return String(text)
+    // 1000 / ١٠٠٠ -> الف (Arabic thousands spoken as Alif)
+    .replace(/(?:1000|١٠٠٠)/g, ' الف ')
+    .replace(/\u0670/g, 'ا')                              // Convert Dagger Alef (\u0670) to standard Alef 'ا'
     .replace(/[\u064B-\u065F\u06D6-\u06ED]/g, '')        // Remove tashkeel & Quranic pause marks
     .replace(/[إأآءئؤٱ]/g, 'ا')                             // Normalize all forms of hamza / alef
     .replace(/ة/g, 'ه')                                     // Normalize taa marbuta
-    .replace(/ى/g, 'ي')                                     // Normalize alef maqsura
+    .replace(/[\u064A\u06CC\u0649]/g, 'ي')                 // Normalize alef maqsura and Persian/Kurdish yeh
+    .replace(/[\u0643\u06A9\u06AA]/g, 'ك')                 // Normalize Persian/Kurdish kaf to Arabic kaf
     .replace(/ـ/g, '')                                      // Remove tatweel
-    .replace(/[٠-٩0-9]/g, '')                               // Remove numerals
+    // Muqatta'at spoken variants to standardized forms (e.g. Alif Lam Mim -> الم)
+    .replace(/[اإأ]لف\s*ل[اآ]م\s*م[يی]م/g, 'الم')
+    .replace(/[اإأ]لف\s*ل[اآ]\s*م[يی]م/g, 'الم')
+    .replace(/[اإأ]لفل[اآ]م\s*م[يی]م/g, 'الم')
+    .replace(/[اإأ]لفل[اآ]ميم/g, 'الم')
+    .replace(/[اإأ]لف\s*ل[اآ]ميم/g, 'الم')
+    .replace(/[اإأ]لف\s*ل[اآ]م/g, 'الم')
+    .replace(/[٠-٩0-9]/g, '')                               // Remove remaining numerals AFTER 1000 converted
     // Normalize repeated Madd letters (Tajweed elongations: الرحمااان -> الرحمان)
     .replace(/ا+/g, 'ا')
     .replace(/و+/g, 'و')
@@ -1793,6 +1803,18 @@ function normalizeArabicForMatch(text) {
     .trim();
 }
 window.normalizeArabicForMatch = normalizeArabicForMatch;
+
+function toQuranPhoneticConsonants(w) {
+  if (!w) return '';
+  return String(w)
+    .replace(/[صث]/g, 'س')
+    .replace(/[ذضظ]/g, 'ز')
+    .replace(/ط/g, 'ت')
+    .replace(/ح/g, 'ه')
+    .replace(/ع/g, 'ا')
+    .replace(/[قغ]/g, 'ك')
+    .replace(/[اوي]/g, '');
+}
 
 function stripArabicPrefix(w) {
   if (!w) return '';
@@ -1834,14 +1856,27 @@ function doArabicWordsMatch(w1, w2) {
   const n2 = normalizeArabicForMatch(w2);
   if (!n1 || !n2) return false;
   if (n1 === n2) return true;
+
+  // Muqatta'at: Alif Lam Mim equivalence
+  if ((n1 === 'الم' || n1 === 'الف' || n1 === 'الفلام' || n1 === '1000' || n1 === '١٠٠٠') &&
+      (n2 === 'الم' || n2 === 'الف' || n2 === 'الفلام')) return true;
+
   // Specific Quran orthography aliases
   if ((n1 === 'مالك' && n2 === 'ملك') || (n1 === 'ملك' && n2 === 'مالك')) return true;
   if ((n1 === 'الصراط' && n2 === 'السراط') || (n1 === 'السراط' && n2 === 'الصراط')) return true;
   if ((n1 === 'الرحمن' && n2 === 'الرحمان') || (n1 === 'الرحمان' && n2 === 'الرحمن')) return true;
+  if ((n1 === 'ذلك' && (n2 === 'ذالك' || n2 === 'زالك' || n2 === 'زلك')) ||
+      (n2 === 'ذلك' && (n1 === 'ذالك' || n1 === 'زالك' || n1 === 'زلك'))) return true;
 
   if (stripArabicPrefix(n1) === stripArabicPrefix(n2)) return true;
-  if (calculateLevenshteinSimilarity(n1, n2) >= 0.70) return true;
-  if (calculateLevenshteinSimilarity(stripArabicPrefix(n1), stripArabicPrefix(n2)) >= 0.70) return true;
+
+  // Consonant skeleton match for Kurdish / Persian / German non-native reciters
+  const sk1 = toQuranPhoneticConsonants(stripArabicPrefix(n1));
+  const sk2 = toQuranPhoneticConsonants(stripArabicPrefix(n2));
+  if (sk1.length >= 2 && sk1 === sk2) return true;
+
+  if (calculateLevenshteinSimilarity(n1, n2) >= 0.65) return true;
+  if (calculateLevenshteinSimilarity(stripArabicPrefix(n1), stripArabicPrefix(n2)) >= 0.65) return true;
   return false;
 }
 window.doArabicWordsMatch = doArabicWordsMatch;
@@ -1854,6 +1889,16 @@ function evaluateAyahWordStream(fullSessionSpoken, latestChunk, rawTargetWords, 
   const T = normTarget.length;
 
   if (T === 0) return { matchedWords: 0, totalWords: 0, isComplete: false };
+
+  // Special instant pass for Ayah 1 (الم or single-word Muqatta'at)
+  if (T === 1 && (normTarget[0] === 'الم' || rawTargetWords[0] === 'الم')) {
+    const fullSpokenNorm = normalizeArabicForMatch(fullSessionSpoken);
+    const latestNorm = normalizeArabicForMatch(latestChunk);
+    if (fullSpokenNorm.includes('الم') || fullSpokenNorm.includes('الف') || fullSpokenNorm.includes('بسم الله') ||
+        latestNorm.includes('الم') || latestNorm.includes('الف') || latestNorm.includes('بسم الله')) {
+      return { matchedWords: 1, totalWords: 1, isComplete: true };
+    }
+  }
 
   // 1. Sequential match from beginning of ayah across full session
   let matchedFromStart = 0;
