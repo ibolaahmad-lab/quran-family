@@ -2240,6 +2240,29 @@ function startTarteelRecitation() {
     if (timerDigits) timerDigits.textContent = `${m}:${s}`;
   }, 1000);
 
+  // Multi-Engine Quran Voice AI Integration (Groq Whisper / Offline WASM / Native Google)
+  if (window.QuranVoiceAI && window.QuranVoiceAI.getEngine() !== 'google_speech') {
+    window.QuranVoiceAI.startListening({
+      onStart: () => {},
+      onTranscript: (cleanText) => {
+        if (!tarteelState.isRecording || tarteelState.isPacingPause) return;
+        if (liveText) liveText.textContent = cleanText;
+        processTarteelSpokenText(cleanText);
+      },
+      onError: (err) => {
+        console.warn('Tarteel Voice AI error:', err);
+      },
+      onEnd: () => {
+        if (tarteelState.isRecording) {
+          setTimeout(() => {
+            if (tarteelState.isRecording) startTarteelRecitation();
+          }, 100);
+        }
+      }
+    });
+    return;
+  }
+
   // Initialize Speech Recognition Engine (ar-SA with offline Android support)
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (SpeechRecognition) {
@@ -2460,6 +2483,9 @@ function stopTarteelRecitation() {
   if (tarteelState.timerInterval) {
     clearInterval(tarteelState.timerInterval);
     tarteelState.timerInterval = null;
+  }
+  if (window.QuranVoiceAI) {
+    try { window.QuranVoiceAI.stopListening(); } catch(e){}
   }
   if (tarteelState.speechRecognizer) {
     try { tarteelState.speechRecognizer.stop(); } catch(e){}

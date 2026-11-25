@@ -1,5 +1,5 @@
 // Service Worker for Quran Karim PWA
-const CACHE_NAME = 'quran-karim-cache-v20261125_v7';
+const CACHE_NAME = 'quran-karim-cache-v20261125_v8';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
@@ -7,7 +7,8 @@ const PRECACHE_ASSETS = [
   './quran.png',
   './quran_512.png',
   './app_v4_master_overhaul.js',
-  './murajaa_features_engine.js'
+  './murajaa_features_engine.js',
+  './quran_voice_ai_engine.js'
 ];
 
 self.addEventListener('install', event => {

@@ -4139,7 +4139,8 @@
   <script src="pdf.min.js"></script>
   <script src="pdf.worker.min.js"></script>
   <script src="i18n.js"></script>
-  <script src="app.js?v=20261125_v7"></script>
+  <script src="quran_voice_ai_engine.js?v=20261125_v8"></script>
+  <script src="app.js?v=20261125_v8"></script>
 
   <style id="neo3dMasterStyles">
     /* Permanently disable legacy PIN overlay */
@@ -5839,8 +5840,12 @@
               </button>
             </div>
 
-            <!-- Right: Beautiful Nested Microphone Button -->
-            <div style="display: flex; align-items: center; justify-content: flex-end;">
+            <!-- Right: Beautiful Nested Microphone Button with 3D Engine Switcher -->
+            <div style="display: flex; align-items: center; gap: 6px; justify-content: flex-end;">
+              <button type="button" class="voice-engine-switch-pill" onclick="QuranVoiceAI.openEngineModal()" title="تغییر موتور هوش مصنوعی صدا (ویسپر ابری / آفلاین / گوگل)">
+                <span class="engine-badge-icon">⚡</span>
+                <span class="engine-badge-title">Whisper</span>
+              </button>
               <button id="tarteelEmeraldFab" class="tarteel-emerald-fab" onclick="toggleTarteelRecitation()" title="Mikrofon starten/stoppen">
                 <i class="fa-solid fa-microphone" id="tarteelEmeraldFabIcon"></i>
               </button>
@@ -6628,13 +6633,6 @@
         </button>
       </div>
 
-      <!-- Quick Prayer Times & Adhan Button in Drawer -->
-      <button type="button" onclick="openPrayerSettingsModal(); closeAndroidDrawer();" class="neo3d-pill-btn" style="padding: 10px 14px; justify-content: center; background: linear-gradient(135deg, rgba(14, 165, 233, 0.22), rgba(2, 132, 199, 0.32)); border-color: rgba(56, 189, 248, 0.45); color: #7dd3fc; font-weight: 800; font-size: 0.82rem;">
-        <i class="fa-solid fa-mosque" style="color: #38bdf8; margin-left: 6px;"></i> <span>اوقات نماز و اذان / کاتەکانی نوێژ</span>
-      </button>
-
-
-
       <!-- 3D Collapsible Category 1: Koran-Studios -->
       <div class="neo3d-card" style="padding: 12px 14px; border: 1.5px solid rgba(251, 191, 36, 0.28); background: linear-gradient(145deg, rgba(22, 33, 46, 0.94), rgba(11, 18, 26, 0.98));">
         <div onclick="toggleDrawerGroup('studios')" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
@@ -7399,7 +7397,7 @@
   <script src="authentic_duas_azkar_data.js"></script>
   <script src="asmaa_allah_data.js"></script>
   <script src="app_v4_master_overhaul.js?v=20_pdf_offline"></script>
-  <script src="murajaa_features_engine.js?v=20261125_v7"></script>
+  <script src="murajaa_features_engine.js?v=20261125_v8"></script>
   <script src="pwa_installer.js?v=20261124_v1"></script>
   <script>
     window.toggleScreenFitMode = function() {

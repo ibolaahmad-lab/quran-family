@@ -733,15 +733,39 @@
   }
 
   function startSpeechRecognition() {
+    murajaaState.isListening = true;
+    updateMicBtnState(true);
+    updateMurajaaStatusPill(false);
+
+    if (window.QuranVoiceAI && window.QuranVoiceAI.getEngine() !== 'google_speech') {
+      window.QuranVoiceAI.startListening({
+        onStart: () => {
+          updateMicBtnState(true);
+        },
+        onTranscript: (cleanText, isFinal) => {
+          processIncomingRecitation(cleanText);
+        },
+        onError: (err) => {
+          console.warn('[Murajaa Voice AI error]:', err);
+        },
+        onEnd: () => {
+          if (murajaaState.isListening) {
+            setTimeout(() => {
+              if (murajaaState.isListening) startSpeechRecognition();
+            }, 100);
+          } else {
+            updateMicBtnState(false);
+          }
+        }
+      });
+      return;
+    }
+
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) {
       alert(t('mic_not_supported'));
       return;
     }
-
-    murajaaState.isListening = true;
-    updateMicBtnState(true);
-    updateMurajaaStatusPill(false);
 
     launchSpeechSession();
 
@@ -764,6 +788,9 @@
 
   function stopSpeechRecognition() {
     murajaaState.isListening = false;
+    if (window.QuranVoiceAI) {
+      window.QuranVoiceAI.stopListening();
+    }
     if (watchdogInterval) {
       clearInterval(watchdogInterval);
       watchdogInterval = null;
@@ -862,6 +889,10 @@
           </div>
 
           <div style="display: flex; gap: 5px; align-items: center;">
+            <button type="button" class="voice-engine-switch-pill" onclick="QuranVoiceAI.openEngineModal()" title="تغییر موتور هوش مصنوعی صدا (ویسپر ابری / آفلاین / گوگل)">
+              <span class="engine-badge-icon">⚡</span>
+              <span class="engine-badge-title">Whisper</span>
+            </button>
             <button id="murajaaMicBtn" onclick="Murajaa.toggleSpeechRecognition()" class="murajaa-action-btn ${murajaaState.isListening ? 'mic-active' : ''}">
               <i class="fa-solid fa-microphone-lines" style="color: #10b981;"></i> <span>${murajaaState.isListening ? t('mic_stop') : t('mic_start')}</span>
             </button>
