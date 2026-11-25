@@ -1,17 +1,17 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Updated via Hujra Pipeline on 2026-11-25T21:20:17.846Z
+ * Updated with authentic scholar profile & 74 Golestan lessons
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
     "id": "mamosta_hadi_ahmadi",
     "name": "مامۆستا هادی ئەحمەدی",
-    "titleKu": "مامۆستای حوجرەی مزگەوتی شێخ حسامەدین لە سنە",
-    "avatar": "https://ui-avatars.com/api/?name=%D9%85%D8%A7%D9%85%DB%8F%D8%B3%D8%AA%D8%A7+%D9%87%D8%A7%D8%AF%DB%8C&background=10b981&color=fff&size=128&bold=true",
+    "titleKu": "وتارخوێن و وانەبێژی حوجرەی شەمسولعاریفین",
+    "avatar": "https://cdn4.telesco.pe/file/QtUL0ox2m6JGZ4iOXuE9Cb04vN-TDLmTfN93-tgvyRoGUuLvnHky5VCAcAe8z9Bfqan8ecw_c4-t8tDvr9XKUJM2msXTkELhaqrrrpraOvXVuiLYMobocaLMk96iL5AMzR35njNYDH6hBS494yOlrKkAO0bZTVfDAsxqPX211cBaArD31Vw5Y1CajWLd-lIhrjKb8_M8ZYXuTq97OnN6KB7dvV7pthSUf5b6uSLhQ7WnBP_J4xsKOGjpjT-kX_sm3JiXWe77LfMSvhq7WKQ7Oo0dhCv-Hduin4bPYChMD-o1M9XBH2Ie-MBWvI_jHmicTVi4s9id03pJrMnbrYB4kw.jpg",
     "hujraCity": "سنە (Sanandaj)",
-    "bioKu": "مامۆستای ئایینی، مودەریسی حوجرە و شارەزا لە زانستەکانی سەرف، نەحو، مەنتیق، عەقیدە و تەفسیری قورئان.",
-    "telegramChannel": "https://t.me/droosemamostahadi",
-    "youtubeChannel": "https://www.youtube.com/@hadi_ahmadi",
+    "bioKu": "مامۆستا هادی ئەحمەدی وتارخوێن و وانەبێژی حوجرەی (شمس العارفین) لە گوندی نجار سەر بە شاری پاوەیە. ساڵانێکی زۆرە خزمەتی زانستە شەرعییەکان، تەفسیر، عەقیدە، ئەدەب و عیرفانی ئیسلامی دەکات و دەیان فەقێ و مامۆستای پێگەیاندووە.",
+    "telegramChannel": "https://t.me/mamosa_hadi",
+    "youtubeChannel": "https://www.youtube.com/@mamosta.hadi.ahmadi",
     "categories": [
       {
         "id": "cat_golestan_saadi",
@@ -837,6 +837,7 @@ window.HUJRA_SCHOLARS_DATA = [
           }
         ]
       }
-    ]
+    ],
+    "telegramLessons": "https://t.me/droosemamostahadi"
   }
 ];
