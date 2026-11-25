@@ -311,15 +311,29 @@
       return 1.0;
     }
 
+    // Strip elongated vowels (Madd)
+    const norm1 = s1.replace(/([اوي])+([اوي])/g, '$1');
+    const norm2 = s2.replace(/([اوي])+([اوي])/g, '$1');
+    if (norm1 === norm2) return 0.98;
+
+    // Common Tajweed Idgham / Iqlab phonetic matches
+    if ((s1 === 'ميقول' && s2 === 'من يقول') || (s2 === 'ميقول' && s1 === 'من يقول') ||
+        (s1 === 'موال' && s2 === 'من وال') || (s2 === 'موال' && s1 === 'من وال') ||
+        (s1 === 'مربهم' && s2 === 'من ربهم') || (s2 === 'مربهم' && s1 === 'من ربهم') ||
+        (s1 === 'ممبعد' && s2 === 'من بعد') || (s2 === 'ممبعد' && s1 === 'من بعد') ||
+        (s1 === 'عنفس' && s2 === 'عن نفس') || (s2 === 'عنفس' && s1 === 'عن نفس')) {
+      return 0.95;
+    }
+
     // Proclitic stem match: e.g. "وبالآخرة" vs "بالآخرة" or "الذين" vs "والذين"
-    const stem1 = stripProclitics(s1);
-    const stem2 = stripProclitics(s2);
+    const stem1 = stripProclitics(norm1);
+    const stem2 = stripProclitics(norm2);
     if (stem1 && stem2 && stem1 === stem2 && stem1.length >= 2) {
       return 0.95;
     }
 
-    const l1 = s1.length;
-    const l2 = s2.length;
+    const l1 = norm1.length;
+    const l2 = norm2.length;
     const maxLen = Math.max(l1, l2);
     if (maxLen === 0) return 1.0;
 
@@ -329,7 +343,7 @@
 
     for (let i = 1; i <= l1; i++) {
       for (let j = 1; j <= l2; j++) {
-        const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+        const cost = norm1[i - 1] === norm2[j - 1] ? 0 : 1;
         dp[i][j] = Math.min(
           dp[i - 1][j] + 1,
           dp[i][j - 1] + 1,
@@ -339,6 +353,7 @@
     }
     const dist = dp[l1][l2];
     if (dist <= 1 && maxLen >= 3) return 0.88;
+    if (dist <= 2 && maxLen >= 6) return 0.78;
     return 1.0 - (dist / maxLen);
   }
   window.Murajaa.stringSimilarity = stringSimilarity;
@@ -396,7 +411,7 @@
   } catch (e) {}
 
   // =========================================================================
-  // 4. BACKTRACKING-TOLERANT RECITATION TRACKER (وقف و ابتدا / بازگشت به عقب)
+  // 4. BACKTRACKING-TOLERANT RECITATION TRACKER (PROGRESSIVE STREAM ALIGNMENT)
   // =========================================================================
   function processIncomingRecitation(transcript) {
     if (!transcript) return;
@@ -406,39 +421,42 @@
     const targets = murajaaState.targetTokens;
     if (!targets || targets.length === 0) return;
 
-    // Generous windows: up to 14 words backward for breath-pause & repeat, 8 words forward
-    const backtrackWindow = 14;
-    const forwardWindow = 8;
+    const backtrackWindow = 12;
+    const forwardWindow = 5;
     let didBacktrack = false;
 
-    spokenTokens.forEach(spToken => {
+    // Inspect recent tokens (last 1 to 3 words uttered)
+    const recentTokens = spokenTokens.slice(-3);
+
+    for (let sIdx = 0; sIdx < recentTokens.length; sIdx++) {
+      const spToken = recentTokens[sIdx];
       let matchedIndex = -1;
 
-      // 1. First check the immediate current target word (highest priority)
+      // 1. Immediate Target: Check expected current word
       if (murajaaState.currentWordIndex < targets.length) {
-        if (stringSimilarity(spToken, targets[murajaaState.currentWordIndex]) >= 0.68) {
+        if (stringSimilarity(spToken, targets[murajaaState.currentWordIndex]) >= 0.64) {
           matchedIndex = murajaaState.currentWordIndex;
         }
       }
 
-      // 2. Check Backtrack Window (reciter repeated a preceding word / وقف و ابتدا / نفس‌گیری)
+      // 2. Forward Lookahead (1 to 5 words ahead): skipped short particle or ongoing recitation
+      if (matchedIndex === -1) {
+        const lookaheadEnd = Math.min(targets.length - 1, murajaaState.currentWordIndex + forwardWindow);
+        for (let j = murajaaState.currentWordIndex + 1; j <= lookaheadEnd; j++) {
+          if (stringSimilarity(spToken, targets[j]) >= 0.67) {
+            matchedIndex = j;
+            break;
+          }
+        }
+      }
+
+      // 3. Backtrack Window: Reciter repeated a preceding phrase or word (وقف و ابتدا / نفس‌گیری)
       if (matchedIndex === -1) {
         const lookbackStart = Math.max(0, murajaaState.currentWordIndex - backtrackWindow);
         for (let i = murajaaState.currentWordIndex - 1; i >= lookbackStart; i--) {
           if (stringSimilarity(spToken, targets[i]) >= 0.70) {
             matchedIndex = i;
             didBacktrack = true;
-            break;
-          }
-        }
-      }
-
-      // 3. If not backtracking, check forward window (skipped short words or continuing ahead)
-      if (matchedIndex === -1) {
-        const lookaheadEnd = Math.min(targets.length - 1, murajaaState.currentWordIndex + forwardWindow);
-        for (let j = murajaaState.currentWordIndex + 1; j <= lookaheadEnd; j++) {
-          if (stringSimilarity(spToken, targets[j]) >= 0.68) {
-            matchedIndex = j;
             break;
           }
         }
@@ -452,8 +470,17 @@
           murajaaState.revealedIndices.add(matchedIndex);
         }
         highlightWord(matchedIndex, didBacktrack);
+
+        // Auto page-turn when all words on current page are completed
+        if (murajaaState.currentWordIndex >= targets.length && (window.state && window.state.currentPage < 604)) {
+          setTimeout(() => {
+            if (murajaaState.isListening && window.state) {
+              window.jumpToPage(window.state.currentPage + 1);
+            }
+          }, 800);
+        }
       }
-    });
+    }
 
     updateMurajaaStatusPill(didBacktrack);
   }
@@ -498,11 +525,28 @@
   }
   window.Murajaa.toggleSpeechRecognition = toggleSpeechRecognition;
 
-  function startSpeechRecognition() {
+  // =========================================================================
+  // 5. IMMORTAL CONTINUOUS SPEECH SENTINEL (AUTO-HEALING INSTANCES)
+  // =========================================================================
+  let activeSpeechSession = null;
+  let recognitionRestartTimer = null;
+  let watchdogInterval = null;
+  let lastSpeechTimestamp = 0;
+
+  function launchSpeechSession() {
+    if (!murajaaState.isListening) return;
+
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRec) {
-      alert(t('mic_not_supported'));
-      return;
+    if (!SpeechRec) return;
+
+    if (activeSpeechSession) {
+      try {
+        activeSpeechSession.onend = null;
+        activeSpeechSession.onerror = null;
+        activeSpeechSession.onresult = null;
+        activeSpeechSession.abort();
+      } catch(e) {}
+      activeSpeechSession = null;
     }
 
     try {
@@ -510,47 +554,118 @@
       rec.lang = 'ar-SA';
       rec.continuous = true;
       rec.interimResults = true;
+      rec.maxAlternatives = 3;
 
       rec.onstart = function () {
-        murajaaState.isListening = true;
+        lastSpeechTimestamp = Date.now();
         updateMicBtnState(true);
-        updateMurajaaStatusPill(false);
       };
 
       rec.onresult = function (event) {
+        lastSpeechTimestamp = Date.now();
+        let interimText = '';
+        let finalText = '';
+
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const res = event.results[i];
           const transcript = res[0].transcript;
-          processIncomingRecitation(transcript);
+          if (res.isFinal) {
+            finalText += ' ' + transcript;
+          } else {
+            interimText += ' ' + transcript;
+          }
+        }
+        const textToProcess = (finalText.trim() || interimText.trim());
+        if (textToProcess) {
+          processIncomingRecitation(textToProcess);
         }
       };
 
       rec.onerror = function (e) {
-        console.warn('[Murajaa Voice] Error:', e);
+        lastSpeechTimestamp = Date.now();
+        console.warn('[Murajaa Voice] Error:', e.error);
+        if (e.error === 'not-allowed') {
+          murajaaState.isListening = false;
+          updateMicBtnState(false);
+          alert(t('mic_not_supported'));
+        }
       };
 
       rec.onend = function () {
         if (murajaaState.isListening) {
-          try { rec.start(); } catch (err) {}
+          if (recognitionRestartTimer) clearTimeout(recognitionRestartTimer);
+          recognitionRestartTimer = setTimeout(() => {
+            if (murajaaState.isListening) {
+              launchSpeechSession();
+            }
+          }, 80);
         } else {
           updateMicBtnState(false);
         }
       };
 
       rec.start();
+      activeSpeechSession = rec;
       murajaaState.speechRecognition = rec;
-    } catch (e) {
-      console.error('[Murajaa Voice] Exception:', e);
-      alert(t('mic_not_supported'));
+    } catch(err) {
+      console.warn('[Murajaa Voice] Session start error:', err);
+      if (murajaaState.isListening) {
+        if (recognitionRestartTimer) clearTimeout(recognitionRestartTimer);
+        recognitionRestartTimer = setTimeout(launchSpeechSession, 300);
+      }
     }
+  }
+
+  function startSpeechRecognition() {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+      alert(t('mic_not_supported'));
+      return;
+    }
+
+    murajaaState.isListening = true;
+    updateMicBtnState(true);
+    updateMurajaaStatusPill(false);
+
+    launchSpeechSession();
+
+    // Sentinel Watchdog: Keeps recognition alive even across long breath pauses
+    if (watchdogInterval) clearInterval(watchdogInterval);
+    watchdogInterval = setInterval(() => {
+      if (!murajaaState.isListening) {
+        clearInterval(watchdogInterval);
+        watchdogInterval = null;
+        return;
+      }
+      const now = Date.now();
+      // If no speech/heartbeat in 6 seconds, refresh the session
+      if (now - lastSpeechTimestamp > 6000) {
+        lastSpeechTimestamp = now;
+        launchSpeechSession();
+      }
+    }, 4000);
   }
 
   function stopSpeechRecognition() {
     murajaaState.isListening = false;
-    if (murajaaState.speechRecognition) {
-      try { murajaaState.speechRecognition.stop(); } catch (e) {}
-      murajaaState.speechRecognition = null;
+    if (watchdogInterval) {
+      clearInterval(watchdogInterval);
+      watchdogInterval = null;
     }
+    if (recognitionRestartTimer) {
+      clearTimeout(recognitionRestartTimer);
+      recognitionRestartTimer = null;
+    }
+    if (activeSpeechSession) {
+      try {
+        activeSpeechSession.onend = null;
+        activeSpeechSession.onerror = null;
+        activeSpeechSession.onresult = null;
+        activeSpeechSession.stop();
+      } catch (e) {}
+      activeSpeechSession = null;
+    }
+    murajaaState.speechRecognition = null;
     updateMicBtnState(false);
   }
   window.Murajaa.stopSpeechRecognition = stopSpeechRecognition;
@@ -670,27 +785,33 @@
     `;
 
     let globalWordIdx = 0;
+    let inFlowingText = false;
     let lastSurah = null;
 
     verses.forEach((v, vIdx) => {
       // Surah Cartouche if Ayah 1 of a new Surah
       if (v.num === 1 && lastSurah !== v.surahNum) {
         lastSurah = v.surahNum;
+        if (inFlowingText) {
+          html += `</div>`;
+          inFlowingText = false;
+        }
         const curMeta = (typeof window.ALL_114_SURAHS !== 'undefined') ? window.ALL_114_SURAHS.find(s => s.id === v.surahNum) : null;
         html += `
-          <div class="mushaf-surah-cartouche-container">
-            <div class="mushaf-surah-banner-art">
+          <div class="mushaf-surah-cartouche-container" style="margin: 12px 0 10px; text-align: center;">
+            <div class="mushaf-surah-banner-art" style="display: inline-block; padding: 6px 24px; border-radius: 8px; border: 1.2px solid rgba(217, 119, 6, 0.45); background: rgba(254, 243, 199, 0.7); color: #92400e; font-weight: 800; font-size: 1.15rem; font-family: 'KFGQPC Uthman Taha Naskh', 'Amiri Quran', serif;">
               <span class="mushaf-surah-cartouche-title">سُورَةُ ${curMeta ? curMeta.arabic : v.surahAr}</span>
             </div>
           </div>
         `;
         if (v.surahNum !== 1 && v.surahNum !== 9) {
-          html += `<div class="mushaf-bismillah">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>`;
+          html += `<div class="mushaf-bismillah" style="text-align: center; font-size: 1.35rem; color: #1c1917; margin: 6px 0 14px; font-family: 'KFGQPC Uthman Taha Naskh', 'Amiri Quran', serif;">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>`;
         }
       }
 
-      if (vIdx === 0) {
+      if (!inFlowingText) {
         html += `<div class="mushaf-flowing-text" dir="rtl">`;
+        inFlowingText = true;
       }
 
       let verseRaw = (typeof window.cleanArabicText === 'function') ? window.cleanArabicText(v.ar) : v.ar;
@@ -702,7 +823,18 @@
                            .trim();
       }
 
-      const words = verseRaw.split(/\s+/).filter(Boolean);
+      const rawTokens = verseRaw.split(/\s+/).filter(Boolean);
+      const words = [];
+      rawTokens.forEach(tok => {
+        // If token consists only of Quranic stop signs, waqf marks, or punctuation
+        if (!/[\u0620-\u064A\u0671-\u06D3]/.test(tok)) {
+          if (words.length > 0) {
+            words[words.length - 1] += '\u00A0' + tok;
+          }
+        } else {
+          words.push(tok);
+        }
+      });
 
       words.forEach(w => {
         const normW = normalizeArabic(w);
@@ -736,8 +868,11 @@
       html += `<span class="murajaa-ayah-rosette" title="${t('ayah_label')} ${v.num}"><span>${toArabicDigits(v.num)}</span></span> `;
     });
 
+    if (inFlowingText) {
+      html += `</div>`;
+      inFlowingText = false;
+    }
     html += `
-        </div>
         <!-- Centered Page Number at the bottom -->
         <div class="murajaa-card-bottom-page">${toArabicDigits(pageNum)}</div>
       </div>
@@ -1246,23 +1381,28 @@
         to { opacity: 1; transform: translateY(0); }
       }
 
-      /* Words in Mushaf Page */
+      /* Words in Mushaf Page - Perfect Arabic Cursive Flow */
       .murajaa-word {
-        display: inline-block;
-        padding: 1px 3px;
-        margin: 0 1px;
-        border-radius: 6px;
+        display: inline !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border-radius: 4px;
         cursor: pointer;
-        transition: all 0.25s ease;
+        transition: all 0.2s ease;
+        white-space: normal !important;
+        letter-spacing: normal !important;
+        word-spacing: normal !important;
+        line-height: inherit !important;
       }
       .murajaa-word:hover {
         background: rgba(251, 191, 36, 0.25);
       }
       /* Spoken Highlight with Aura */
       .murajaa-word.murajaa-spoken {
-        background: rgba(16, 185, 129, 0.28) !important;
+        background: rgba(16, 185, 129, 0.25) !important;
         color: #064e3b !important;
-        box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        box-shadow: 0 0 6px rgba(16, 185, 129, 0.35);
+        border-radius: 4px;
       }
       .mushaf-theme-dark .murajaa-word.murajaa-spoken {
         background: rgba(16, 185, 129, 0.35) !important;
@@ -1270,19 +1410,21 @@
       }
       /* Backtrack Flash */
       .murajaa-word.murajaa-backtracked {
-        background: rgba(56, 189, 248, 0.4) !important;
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+        background: rgba(56, 189, 248, 0.35) !important;
+        color: #0369a1 !important;
+        box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+        border-radius: 4px;
       }
       /* Tasmīʿ Hidden Mask (Capsule Pill veil matching Murajaa App) */
       .murajaa-word.murajaa-veiled {
         background: rgba(100, 116, 139, 0.22) !important;
         color: transparent !important;
-        border-radius: 6px;
+        border-radius: 4px;
         border-bottom: 2px solid rgba(148, 163, 184, 0.4);
         user-select: none;
         cursor: pointer;
-        filter: blur(3px);
-        transition: filter 0.3s ease, color 0.3s ease;
+        filter: blur(4px);
+        transition: filter 0.25s ease, color 0.25s ease;
       }
       .murajaa-word.murajaa-veiled:hover {
         background: rgba(251, 191, 36, 0.25) !important;

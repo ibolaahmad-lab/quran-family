@@ -729,36 +729,54 @@ function startTarteelVoiceListening() {
     showToast('Spracherkennung wird von diesem Browser nicht unterstützt.');
     return;
   }
-  if (!tarteelSpeechRec) {
-    tarteelSpeechRec = new SpeechRecognition();
-    tarteelSpeechRec.lang = 'ar-SA';
-    tarteelSpeechRec.continuous = true;
-    tarteelSpeechRec.interimResults = true;
-
-    tarteelSpeechRec.onresult = (event) => {
-      let transcript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        transcript += event.results[i][0].transcript;
-      }
-      matchTarteelVoiceToPage(transcript);
-    };
-
-    tarteelSpeechRec.onerror = (e) => {
-      console.warn('Tarteel voice rec:', e);
-    };
-
-    tarteelSpeechRec.onend = () => {
-      if (state.tarteelVoiceActive) {
-        try { tarteelSpeechRec.start(); } catch(e){}
-      }
-    };
+  if (tarteelSpeechRec) {
+    try {
+      tarteelSpeechRec.onend = null;
+      tarteelSpeechRec.onerror = null;
+      tarteelSpeechRec.onresult = null;
+      tarteelSpeechRec.abort();
+    } catch(e) {}
+    tarteelSpeechRec = null;
   }
+
+  tarteelSpeechRec = new SpeechRecognition();
+  tarteelSpeechRec.lang = 'ar-SA';
+  tarteelSpeechRec.continuous = true;
+  tarteelSpeechRec.interimResults = true;
+  tarteelSpeechRec.maxAlternatives = 3;
+
+  tarteelSpeechRec.onresult = (event) => {
+    let transcript = '';
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      transcript += ' ' + event.results[i][0].transcript;
+    }
+    matchTarteelVoiceToPage(transcript.trim());
+  };
+
+  tarteelSpeechRec.onerror = (e) => {
+    console.warn('Tarteel voice rec event:', e.error);
+  };
+
+  tarteelSpeechRec.onend = () => {
+    if (state.tarteelVoiceActive) {
+      setTimeout(() => {
+        if (state.tarteelVoiceActive) startTarteelVoiceListening();
+      }, 80);
+    }
+  };
+
   try { tarteelSpeechRec.start(); } catch(e){}
 }
 
 function stopTarteelVoiceListening() {
   if (tarteelSpeechRec) {
-    try { tarteelSpeechRec.stop(); } catch(e){}
+    try {
+      tarteelSpeechRec.onend = null;
+      tarteelSpeechRec.onerror = null;
+      tarteelSpeechRec.onresult = null;
+      tarteelSpeechRec.stop();
+    } catch(e){}
+    tarteelSpeechRec = null;
   }
 }
 
@@ -2773,13 +2791,9 @@ function toggleSpeechTest(autoMode) {
     if (autoContinuousActive) {
       setTimeout(() => {
         if (autoContinuousActive) {
-          try {
-            recognition.start();
-            isReciteListening = true;
-            updateMicButtonsUI(true);
-          } catch(e) {}
+          toggleSpeechTest(true);
         }
-      }, 250);
+      }, 100);
     } else {
       updateMicButtonsUI(false);
     }
