@@ -206,16 +206,22 @@
         <div style="flex: 1; overflow-y: auto; padding: 6px 4px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
           ${(s.categories || []).map(cat => `
             <div onclick="QuranHujra.selectCategory('${cat.id}')" style="cursor: pointer; border-radius: 18px; padding: 14px; background: rgba(15, 23, 42, 0.8); border: 1.5px solid ${cat.color || '#10b981'}40; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; transition: all 0.22s ease;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 12px; font-size: 1rem; background: ${cat.color || '#10b981'}; color: #fff;">
-                  <i class="${cat.icon || 'fa-solid fa-book'}"></i>
-                </div>
-                <div>
-                  <div style="font-weight: 800; color: #fff; font-size: 0.94rem;">${cat.titleKu}</div>
-                  <div style="font-size: 0.72rem; color: ${cat.color || '#10b981'}; font-weight: 700;">${(cat.lessons || []).length} وانە و دەرس</div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                ${cat.coverImage ? `
+                  <div style="position: relative; width: 44px; height: 58px; border-radius: 8px; overflow: hidden; box-shadow: -2px 3px 10px rgba(0,0,0,0.6); flex-shrink: 0; border: 1.5px solid ${cat.color || '#10b981'}80; background: #0f172a;">
+                    <img src="${cat.coverImage}" onerror="this.parentElement.style.display='none'" style="width: 100%; height: 100%; object-fit: cover;" />
+                  </div>
+                ` : `
+                  <div class="neo3d-orb-icon" style="width: 42px; height: 42px; border-radius: 12px; font-size: 1.1rem; background: ${cat.color || '#10b981'}; color: #fff; flex-shrink: 0;">
+                    <i class="${cat.icon || 'fa-solid fa-book'}"></i>
+                  </div>
+                `}
+                <div style="flex: 1; overflow: hidden;">
+                  <div style="font-weight: 800; color: #fff; font-size: 0.94rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${cat.titleKu}</div>
+                  <div style="font-size: 0.72rem; color: ${cat.color || '#10b981'}; font-weight: 700; margin-top: 2px;">${(cat.lessons || []).length} وانە و دەرس</div>
                 </div>
               </div>
-              <div style="font-size: 0.72rem; color: #94a3b8; line-height: 1.4;">${cat.descKu || ''}</div>
+              <div style="font-size: 0.72rem; color: #94a3b8; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${cat.descKu || ''}</div>
               <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
                 <span style="font-size: 0.68rem; color: #cbd5e1;">🎧 دەنگی و 🎬 ڤیدیۆ</span>
                 <span style="font-size: 0.74rem; color: ${cat.color || '#10b981'}; font-weight: 800;">بینینی دەرسەکان <i class="fa-solid fa-arrow-left"></i></span>
@@ -277,9 +283,15 @@
             return `
               <div onclick="QuranHujra.openInAppPlayerById(${l.id})" style="cursor: pointer; border-radius: 14px; padding: 10px 12px; background: ${isCur ? 'linear-gradient(135deg, rgba(16,185,129,0.22), rgba(6,95,70,0.32))' : 'rgba(15, 23, 42, 0.65)'}; border: 1.2px solid ${isCur ? '#10b981' : 'rgba(255,255,255,0.06)'}; display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: all 0.18s ease;">
                 <div style="display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden;">
-                  <div style="width: 32px; height: 32px; border-radius: 10px; background: ${l.isVideo ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}; color: ${l.isVideo ? '#f87171' : '#34d399'}; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0;">
-                    <i class="${isCur && isPlaying ? 'fa-solid fa-circle-pause' : (l.isVideo ? 'fa-solid fa-video' : 'fa-solid fa-play')}"></i>
-                  </div>
+                  ${(l.coverImage || cat.coverImage) ? `
+                    <div style="position: relative; width: 34px; height: 46px; border-radius: 6px; overflow: hidden; box-shadow: -1px 2px 6px rgba(0,0,0,0.5); flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15); background: #000;">
+                      <img src="${l.coverImage || cat.coverImage}" onerror="this.parentElement.style.display='none'" style="width: 100%; height: 100%; object-fit: cover;" />
+                    </div>
+                  ` : `
+                    <div style="width: 32px; height: 32px; border-radius: 10px; background: ${l.isVideo ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}; color: ${l.isVideo ? '#f87171' : '#34d399'}; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0;">
+                      <i class="${isCur && isPlaying ? 'fa-solid fa-circle-pause' : (l.isVideo ? 'fa-solid fa-video' : 'fa-solid fa-play')}"></i>
+                    </div>
+                  `}
                   <div style="flex: 1; overflow: hidden;">
                     <div style="font-weight: 800; color: #fff; font-size: 0.84rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${l.title}</div>
                     <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 2px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${l.subtopic || l.summary || ''}</div>
@@ -384,15 +396,27 @@
           ${playerMode === 'audio' ? `
             <!-- AUDIO-ONLY VIEW -->
             <div style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 10px 0;">
-              <!-- Glowing Pulsing Avatar -->
-              <div style="position: relative; width: 110px; height: 110px; display: flex; align-items: center; justify-content: center;">
-                <div style="position: absolute; inset: -6px; border-radius: 50%; border: 2px dashed rgba(16, 185, 129, 0.45); animation: spin 20s linear infinite;"></div>
-                <img src="${s.avatar || DEFAULT_AVATAR}" onerror="this.src='${DEFAULT_AVATAR}'" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #10b981; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);" />
-              </div>
+              ${(l.coverImage || (cat && cat.coverImage)) ? `
+                <!-- 3D Book Cover with Scholar Badge -->
+                <div style="position: relative; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 4px;">
+                  <div style="width: 100px; height: 135px; border-radius: 12px; overflow: hidden; box-shadow: -6px 8px 24px rgba(0,0,0,0.85), 0 0 30px ${(cat && cat.color) || '#10b981'}35; border: 2px solid ${(cat && cat.color) || '#10b981'}; background: #0b111a;">
+                    <img src="${l.coverImage || cat.coverImage}" onerror="this.src='${s.avatar || DEFAULT_AVATAR}'" style="width: 100%; height: 100%; object-fit: cover;" />
+                  </div>
+                  <div style="position: absolute; right: -14px; bottom: -8px; width: 44px; height: 44px; border-radius: 50%; border: 2.5px solid #10b981; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.8); background: #000;">
+                    <img src="${s.avatar || DEFAULT_AVATAR}" onerror="this.src='${DEFAULT_AVATAR}'" style="width: 100%; height: 100%; object-fit: cover;" title="${s.name}" />
+                  </div>
+                </div>
+              ` : `
+                <!-- Glowing Pulsing Avatar -->
+                <div style="position: relative; width: 110px; height: 110px; display: flex; align-items: center; justify-content: center;">
+                  <div style="position: absolute; inset: -6px; border-radius: 50%; border: 2px dashed rgba(16, 185, 129, 0.45); animation: spin 20s linear infinite;"></div>
+                  <img src="${s.avatar || DEFAULT_AVATAR}" onerror="this.src='${DEFAULT_AVATAR}'" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #10b981; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);" />
+                </div>
+              `}
               
               <div style="text-align: center; max-width: 95%;">
                 <div style="font-weight: 800; color: #fff; font-size: 0.94rem;">${l.title}</div>
-                <div style="font-size: 0.74rem; color: #34d399; margin-top: 3px;">${l.subtopic || l.summary || 'وانەی فەرمی حوجرەی شەمسولعاریفین'}</div>
+                <div style="font-size: 0.74rem; color: #34d399; margin-top: 3px;">${l.subtopic || l.summary || (cat ? cat.titleKu : 'وانەی فەرمی حوجرەی شەمسولعاریفین')}</div>
               </div>
 
               <!-- In-App Responsive Audio Player Stream -->
