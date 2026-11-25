@@ -1604,35 +1604,35 @@ window.renderDedicatedNamiPdf = renderDedicatedNamiPdf;
 // 16. TARTEEL AI SMART RECITATION & HIFZ REVEALING ENGINE (MASTERCLASS V4 - PROGRESSIVE LIVE REVEAL)
 // ============================================================
 const TARTEEL_I18N = {
-  de: {
-    singleModeBadge: 'Einzelvers',
-    contModeBadge: 'Fortlaufend',
-    singleModeDesc: (a) => `🎯 Ziel: Vers ${a} · Rezitiere den Vers (Tippe danach erneut auf das Mikrofon für den nächsten Vers)`,
-    contModeDesc: (a) => `🎯 Ziel: Vers ${a} · Fortlaufend rezitieren, Verse rücken automatisch vor`,
-    listening: '🎙️ Höre Rezitation... (Sprich arabisch)',
-    listeningShort: 'Höre...',
-    wordProgressBadge: (cur, tot) => `${cur}/${tot} Wörter`,
-    matchSuccess: (a) => `✓ Vers ${a} vollständig erkannt!`,
-    matchMistake: (a, pct) => `⚠️ Vers ${a} nicht genau genug (${pct}%) · Bitte wiederholen`,
-    pageComplete: (p) => `🎉 Seite ${p} abgeschlossen! Nächste Seite...`,
-    shortPause: 'Kurze Atempause...',
-    nextAyahAutoPrompt: (a) => `🎯 Weiter mit Vers ${a}...`,
-    noSpeechError: 'Keine Stimme erkannt',
-    micDeniedError: 'Mikrofonzugriff verweigert',
-    offlineNotice: 'ℹ️ Offline-Modus aktiv: Nutzt geräteinterne Spracherkennung',
-    networkNotice: '⚠️ Offline: Bitte arabisches Sprachpaket auf dem Gerät installieren',
-    rewindToast: '« Seite neu gestartet',
-    readingModeToast: '📖 Volltext-Muṣḥaf Lesemodus',
-    hifzModeToast: '📝 Hifz-Prüfmodus aktiv (Wort-für-Wort Aufdeckung)',
-    singleActiveToast: '✓ Einzelvers-Modus aktiv',
-    contActiveToast: '✓ Fortlaufend-Modus aktiv',
-    noMistakes: 'Keine Fehler erkannt. Hervorragend!',
-    recitedLabel: 'Erkannt'
+  fa: {
+    singleModeBadge: 'تک‌آیه',
+    contModeBadge: 'پیوسته (خودکار)',
+    singleModeDesc: (a) => `🎯 هدف: آیه ${a} · آیه را بخوانید (با پایان آیه، خودکار به آیه بعدی می‌رود)`,
+    contModeDesc: (a) => `🎯 هدف: آیه ${a} · پیوسته قرائت کنید، آیه‌ها به طور خودکار پیش می‌روند`,
+    listening: '🎙️ در حال گوش دادن به قرائت... (به عربی تلاوت بفرمایید)',
+    listeningShort: 'در حال شنیدن...',
+    wordProgressBadge: (cur, tot) => `${cur}/${tot} کلمه`,
+    matchSuccess: (a) => `✓ آیه ${a} با موفقیت تشخیص داده شد!`,
+    matchMistake: (a, pct) => `⚠️ آیه ${a} دقیق نبود (${pct}٪) · لطفاً تکرار فرمایید`,
+    pageComplete: (p) => `🎉 صفحه ${p} کامل شد! صفحه بعد...`,
+    shortPause: 'مکث کوتاه تجویدی...',
+    nextAyahAutoPrompt: (a) => `🎯 ادامه با آیه ${a}...`,
+    noSpeechError: 'صدایی شنیده نشد',
+    micDeniedError: 'دسترسی به میکروفون داده نشده است',
+    offlineNotice: 'ℹ️ حالت آفلاین: استفاده از تشخیص صدای داخلی دستگاه',
+    networkNotice: '⚠️ ارتباط با سرور تشخیص صدای گوگل نیازمند اینترنت است',
+    rewindToast: '« صفحه از ابتدا شروع شد',
+    readingModeToast: '📖 حالت مطالعه کامل مصحف',
+    hifzModeToast: '📝 حالت آزمون حفظ (کشف کلمه به کلمه)',
+    singleActiveToast: '✓ حالت تک‌آیه فعال شد',
+    contActiveToast: '✓ حالت پیوسته (خودکار) فعال شد',
+    noMistakes: 'هیچ خطایی ثبت نشد؛ بسیار عالی!',
+    recitedLabel: 'خوانده‌شده'
   },
   ku: {
     singleModeBadge: 'تک ئایەت',
-    contModeBadge: 'بەردەوام',
-    singleModeDesc: (a) => `🎯 ئامانج: ئایەتی ${a} · ئایەتەکە بخوێنەوە (دوای تەواوبوون، دیسان مایکرۆفۆن لێبدە بۆ ئایەتی دواتر)`,
+    contModeBadge: 'بەردەوام (خۆکار)',
+    singleModeDesc: (a) => `🎯 ئامانج: ئایەتی ${a} · ئایەتەکە بخوێنەوە (خۆکار دەچێتە ئایەتی دواتر)`,
     contModeDesc: (a) => `🎯 ئامانج: ئایەتی ${a} · بەردەوام بخوێنەوە، ئایەتەکان خۆکار دەڕۆنە پێش`,
     listening: '🎙️ گوێگرتن لە خوێندنەوە... (بە عەرەبی بخوێنەوە)',
     listeningShort: 'گوێگرتن...',
@@ -1645,7 +1645,7 @@ const TARTEEL_I18N = {
     noSpeechError: 'هیچ دەنگێک نەبیسترا',
     micDeniedError: 'ڕێگەپێدانی مایکرۆفۆن نەدراوە',
     offlineNotice: 'ℹ️ دۆخی ئۆفلاین: ناسینەوەی ناوخۆیی ئامێرەکە بەکاردێت',
-    networkNotice: '⚠️ ئۆفلاین: تکایە پاکێجی عەرەبی لە ئامێرەکە دابمەزرێنە',
+    networkNotice: '⚠️ پێویستی بە ئینتەرنێت هەیە بۆ ناسینەوەی دەنگی گووگڵ',
     rewindToast: '« پەڕە لە سەرەتاوە دەستی پێکردەوە',
     readingModeToast: '📖 دۆخی خوێندنەوەی تەواوی مصحف',
     hifzModeToast: '📝 دۆخی تاقیکردنەوەی لەبەرکردن چالاکە',
@@ -1653,13 +1653,68 @@ const TARTEEL_I18N = {
     contActiveToast: '✓ دۆخی بەردەوام چالاک کرا',
     noMistakes: 'هیچ هەڵەیەک تۆمار نەکراوە. زۆر باشە!',
     recitedLabel: 'خوێندراوە'
+  },
+  ar: {
+    singleModeBadge: 'آية واحدة',
+    contModeBadge: 'مستمر (تلقائي)',
+    singleModeDesc: (a) => `🎯 الهدف: آية ${a} · اتلُ الآية الكريمة`,
+    contModeDesc: (a) => `🎯 الهدف: آية ${a} · اتلُ باستمرار، وتتقدم الآيات تلقائياً`,
+    listening: '🎙️ جاري الاستماع للتلاوة العطرة...',
+    listeningShort: 'استماع...',
+    wordProgressBadge: (cur, tot) => `${cur}/${tot} كلمات`,
+    matchSuccess: (a) => `✓ تم التعرف على الآية ${a} بنجاح!`,
+    matchMistake: (a, pct) => `⚠️ الآية ${a} تحتاج لمزيد من الدقة (${pct}%)`,
+    pageComplete: (p) => `🎉 تم إتمام الصفحة ${p}!`,
+    shortPause: 'وقفة تنفس قصيرة...',
+    nextAyahAutoPrompt: (a) => `🎯 الآية التالية ${a}...`,
+    noSpeechError: 'لم يتم التقاط صوت',
+    micDeniedError: 'تم رفض إذن المیکروفون',
+    offlineNotice: 'ℹ️ وضع عدم الاتصال: استخدام المحرك المحلي للجهاز',
+    networkNotice: '⚠️ يتطلب الاتصال بالإنترنت للتعرف الصوتي من جوجل',
+    rewindToast: '« تمت إعادة الصفحة من البداية',
+    readingModeToast: '📖 وضع قراءة المصحف كاملاً',
+    hifzModeToast: '📝 وضع اختبار الحفظ التراكمي',
+    singleActiveToast: '✓ تم تفعيل وضع الآية الواحدة',
+    contActiveToast: '✓ تم تفعيل وضع التلاوة المستمرة',
+    noMistakes: 'أحسنت! لا توجد أخطاء',
+    recitedLabel: 'تمت قراءته'
+  },
+  de: {
+    singleModeBadge: 'Einzelvers',
+    contModeBadge: 'Fortlaufend',
+    singleModeDesc: (a) => `🎯 Ziel: Vers ${a} · Rezitiere den Vers (rückt automatisch vor)`,
+    contModeDesc: (a) => `🎯 Ziel: Vers ${a} · Fortlaufend rezitieren, Verse rücken automatisch vor`,
+    listening: '🎙️ Höre Rezitation... (Sprich arabisch)',
+    listeningShort: 'Höre...',
+    wordProgressBadge: (cur, tot) => `${cur}/${tot} Wörter`,
+    matchSuccess: (a) => `✓ Vers ${a} vollständig erkannt!`,
+    matchMistake: (a, pct) => `⚠️ Vers ${a} nicht genau genug (${pct}%) · Bitte wiederholen`,
+    pageComplete: (p) => `🎉 Seite ${p} abgeschlossen! Nächste Seite...`,
+    shortPause: 'Kurze Atempause...',
+    nextAyahAutoPrompt: (a) => `🎯 Weiter mit Vers ${a}...`,
+    noSpeechError: 'Keine Stimme erkannt',
+    micDeniedError: 'Mikrofonzugriff verweigert',
+    offlineNotice: 'ℹ️ Offline-Modus aktiv: Nutzt geräteinterne Spracherkennung',
+    networkNotice: '⚠️ Internetverbindung für Google-Spracherkennung erforderlich',
+    rewindToast: '« Seite neu gestartet',
+    readingModeToast: '📖 Volltext-Muṣḥaf Lesemodus',
+    hifzModeToast: '📝 Hifz-Prüfmodus aktiv (Wort-für-Wort Aufdeckung)',
+    singleActiveToast: '✓ Einzelvers-Modus aktiv',
+    contActiveToast: '✓ Fortlaufend-Modus aktiv',
+    noMistakes: 'Keine Fehler erkannt. Hervorragend!',
+    recitedLabel: 'Erkannt'
   }
 };
 
 function getTarteelText(key, ...args) {
-  const lang = (typeof currentAppLanguage !== 'undefined' && currentAppLanguage === 'ku') || (typeof state !== 'undefined' && state.lang === 'ku') ? 'ku' : 'de';
-  const table = TARTEEL_I18N[lang] || TARTEEL_I18N['de'];
-  const val = table[key];
+  let lang = 'fa';
+  try {
+    lang = localStorage.getItem('quran_app_language') || (typeof currentAppLanguage !== 'undefined' ? currentAppLanguage : null) || (typeof state !== 'undefined' ? state.lang : null) || 'fa';
+  } catch(e) {
+    lang = 'fa';
+  }
+  const table = TARTEEL_I18N[lang] || TARTEEL_I18N['fa'] || TARTEEL_I18N['ku'] || TARTEEL_I18N['de'];
+  const val = table ? table[key] : null;
   if (typeof val === 'function') return val(...args);
   return val || key;
 }
@@ -2374,6 +2429,11 @@ function startTarteelRecitation() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (SpeechRecognition) {
     try {
+      if (tarteelState.speechRecognizer) {
+        try { tarteelState.speechRecognizer.abort(); } catch(e){}
+        tarteelState.speechRecognizer = null;
+      }
+
       tarteelState.speechRecognizer = new SpeechRecognition();
       tarteelState.speechRecognizer.lang = 'ar-SA';
       tarteelState.speechRecognizer.continuous = true;
@@ -2398,18 +2458,28 @@ function startTarteelRecitation() {
       };
 
       tarteelState.speechRecognizer.onerror = function(err) {
-        console.log('Speech recognition event:', err.error);
+        console.warn('Speech recognition event:', err.error);
+        if (err.error === 'no-speech') {
+          return; // Normal silence pause, keep listening
+        }
         if (err.error === 'network') {
           if (typeof showToast === 'function') showToast(getTarteelText('networkNotice'));
-        } else if (err.error === 'not-allowed') {
+          return;
+        }
+        if (err.error === 'not-allowed' || err.error === 'service-not-allowed') {
           if (typeof showToast === 'function') showToast(getTarteelText('micDeniedError'));
           stopTarteelRecitation();
+          return;
         }
       };
 
       tarteelState.speechRecognizer.onend = function() {
         if (tarteelState.isRecording && !tarteelState.isPacingPause) {
-          try { tarteelState.speechRecognizer.start(); } catch(e){}
+          setTimeout(() => {
+            if (tarteelState.isRecording && !tarteelState.isPacingPause && tarteelState.speechRecognizer) {
+              try { tarteelState.speechRecognizer.start(); } catch(e){}
+            }
+          }, 120);
         }
       };
 
@@ -2417,43 +2487,6 @@ function startTarteelRecitation() {
     } catch(e) {
       console.warn('SpeechRecognition start notice:', e);
     }
-  }
-
-  // Audio Waveform Visualizer (Visual Only)
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      tarteelState.audioStream = stream;
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) {
-          tarteelState.audioContext = new AudioCtx();
-          const source = tarteelState.audioContext.createMediaStreamSource(stream);
-          tarteelState.analyser = tarteelState.audioContext.createAnalyser();
-          tarteelState.analyser.fftSize = 256;
-          source.connect(tarteelState.analyser);
-
-          const dataArray = new Uint8Array(tarteelState.analyser.frequencyBinCount);
-          function monitorMicVisuals() {
-            if (!tarteelState.isRecording) return;
-            tarteelState.analyser.getByteFrequencyData(dataArray);
-            let sum = 0;
-            for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-            const avg = sum / dataArray.length;
-            if (fab && avg > 15) {
-              fab.style.transform = `scale(${1 + Math.min(0.14, avg / 220)})`;
-            } else if (fab) {
-              fab.style.transform = 'scale(1)';
-            }
-            tarteelState.audioAnimFrame = requestAnimationFrame(monitorMicVisuals);
-          }
-          monitorMicVisuals();
-        }
-      } catch(err) {
-        console.warn('AudioContext monitor notice:', err);
-      }
-    }).catch(err => {
-      console.log('Mic stream notice:', err);
-    });
   }
 
   updateTarteelStatusText(getTarteelText(tarteelState.reciteMode === 'single' ? 'singleModeDesc' : 'contModeDesc', tarteelState.targetAyah));

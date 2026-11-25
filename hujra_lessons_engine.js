@@ -1,15 +1,15 @@
 /**
  * HujraLessonsEngine - وانەکانی حوجرە
- * Interactive Kurdish Islamic Curriculum & Multi-Level Scholar Course Player
- * In-App Telegram Audio/Video Player & YouTube Audio/Video Toggle
+ * Interactive Kurdish Islamic Curriculum & Scholar Course Player
+ * 100% In-App Playback via YouTube Embeds & Direct Audio (Zero External Redirects)
  */
 
 (function (window) {
   'use strict';
 
   // Navigation State
-  let currentScholar = null;     // Level 1: Selected Scholar (null = show scholars list)
-  let currentCategory = null;    // Level 2: Selected Course/Book (null = show books list)
+  let currentScholar = null;     // Level 1: Selected Scholar
+  let currentCategory = null;    // Level 2: Selected Course/Book
   let currentLesson = null;      // Level 3: Selected Lesson
   let currentFilterType = 'all'; // 'all', 'audio', 'video'
   let searchQuery = '';
@@ -19,62 +19,54 @@
   let currentSpeed = 1.0;
   let isPlaying = false;
   let audioPlayer = null;
-  let timeUpdateThrottle = null;
 
   function initAudio() {
     if (!audioPlayer) {
       audioPlayer = new Audio();
       audioPlayer.preload = 'metadata';
 
-      audioPlayer.addEventListener('play', () => {
-        isPlaying = true;
-        updatePlayerDockUI();
-      });
-
-      audioPlayer.addEventListener('pause', () => {
-        isPlaying = false;
-        updatePlayerDockUI();
-      });
-
+      audioPlayer.addEventListener('play', () => { isPlaying = true; });
+      audioPlayer.addEventListener('pause', () => { isPlaying = false; });
       audioPlayer.addEventListener('ended', () => {
         isPlaying = false;
-        updatePlayerDockUI();
-        // Auto play next lesson
         playNextLesson();
       });
-
-      audioPlayer.addEventListener('timeupdate', () => {
-        if (!timeUpdateThrottle) {
-          timeUpdateThrottle = setTimeout(() => {
-            timeUpdateThrottle = null;
-            updateTimeDisplay();
-          }, 250);
-        }
-      });
-
       audioPlayer.addEventListener('error', (e) => {
-        console.warn('Hujra Audio Player Direct Stream Notice:', e);
-        // Instead of opening Telegram externally, render in-app player widget
-        if (currentLesson) {
-          openInAppPlayer(currentLesson, 'audio');
-        }
+        console.warn('Direct audio stream notice:', e);
       });
     }
   }
 
-  function formatTime(seconds) {
-    if (!seconds || isNaN(seconds) || seconds < 0) return '00:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  // Get In-App Media Embed URL (YouTube or Direct Audio - Never Telegram)
+  function getMediaEmbedUrl(lesson, scholar, category) {
+    if (!lesson) return '';
+
+    // 1. Direct YouTube Video ID
+    if (lesson.youtubeId) {
+      return `https://www.youtube-nocookie.com/embed/${lesson.youtubeId}?autoplay=1&enablejsapi=1&rel=0`;
+    }
+
+    // 2. Direct YouTube URL (extract video or playlist ID)
+    if (lesson.youtubeUrl) {
+      const match = lesson.youtubeUrl.match(/(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*)/);
+      if (match && match[1] && match[1].length === 11) {
+        return `https://www.youtube-nocookie.com/embed/${match[1]}?autoplay=1&enablejsapi=1&rel=0`;
+      }
+    }
+
+    // 3. Category/Course Playlist
+    if (category && category.youtubePlaylistId) {
+      return `https://www.youtube-nocookie.com/embed/videoseries?list=${category.youtubePlaylistId}&autoplay=1`;
+    }
+
+    // 4. Default: In-App YouTube Search Query for the specific lesson
+    const scholarName = (scholar && scholar.name) ? scholar.name : 'مامۆستا هادی ئەحمەدی';
+    const query = encodeURIComponent(`${scholarName} ${lesson.title || ''}`);
+    return `https://www.youtube-nocookie.com/embed?listType=search&list=${query}&autoplay=1&rel=0`;
   }
 
-  // Telegram Embed Link Helper
-  function getTelegramEmbedUrl(tgLink) {
-    if (!tgLink) return '';
-    const clean = String(tgLink).replace('https://t.me/', '').replace(/^@/, '').replace(/\/$/, '');
-    return `https://t.me/${clean}?embed=1`;
-  }
+  // Avatar Fallback Helper
+  const DEFAULT_AVATAR = "https://ui-avatars.com/api/?name=%D9%85%D8%A7%D9%85%DB%8F%D8%B3%D8%AA%D8%A7+%D9%87%D8%A7%D8%AF%DB%8C&background=10b981&color=fff&size=128&bold=true";
 
   // =========================================================================
   // MAIN MODAL CONTROLLER (Levels 1, 2, 3)
@@ -86,14 +78,14 @@
       modal = document.createElement('div');
       modal.id = 'hujraLessonsModal';
       modal.className = 'typography-modal-overlay';
-      modal.style.cssText = 'display: flex; position: fixed; inset: 0; background: rgba(2, 6, 13, 0.92); z-index: 18000; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); align-items: center; justify-content: center; padding: 10px; font-family: "Vazirmatn", "Noto Naskh Arabic", sans-serif; direction: rtl; text-align: right;';
+      modal.style.cssText = 'display: flex; position: fixed; inset: 0; background: rgba(2, 6, 13, 0.94); z-index: 18000; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); align-items: center; justify-content: center; padding: 12px; font-family: "Vazirmatn", "Noto Naskh Arabic", sans-serif; direction: rtl; text-align: right;';
       modal.onclick = (e) => { if (e.target === modal) closeHujraLessonsModal(); };
       document.body.appendChild(modal);
     }
 
     initAudio();
 
-    // ALWAYS start cleanly at Level 1: Scholars list (مامۆستایان)
+    // Start cleanly at Level 1: Scholars list (مامۆستایان)
     currentScholar = null;
     currentCategory = null;
     searchQuery = '';
@@ -127,7 +119,7 @@
   function renderScholarsList(container) {
     const scholars = window.HUJRA_SCHOLARS_DATA || [];
     container.innerHTML = `
-      <div class="hujra-sheet neo3d-hub-sheet" style="width: 100%; max-width: 600px; max-height: 92vh; display: flex; flex-direction: column; padding: 18px 16px; overflow: hidden; border-radius: 26px; background: linear-gradient(165deg, #0d1722 0%, #060b10 100%); border: 1.5px solid rgba(16, 185, 129, 0.35); box-shadow: 0 28px 65px rgba(0,0,0,0.95);">
+      <div class="hujra-sheet neo3d-hub-sheet" style="width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column; padding: 18px 16px; overflow: hidden; border-radius: 26px; background: linear-gradient(165deg, #0d1722 0%, #060b10 100%); border: 1.5px solid rgba(16, 185, 129, 0.35); box-shadow: 0 28px 65px rgba(0,0,0,0.95);">
         <!-- Header -->
         <div style="padding: 0 4px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 12px;">
@@ -136,7 +128,7 @@
             </div>
             <div>
               <div style="font-weight: 900; color: #fff; font-size: 1.12rem;">وانەکانی حوجرە</div>
-              <div style="font-size: 0.76rem; color: #34d399;">مامۆستایان و دەرسە شەرعییەکان (کلاسەکان)</div>
+              <div style="font-size: 0.76rem; color: #34d399;">مامۆستایان و دەرسە شەرعییەکان</div>
             </div>
           </div>
           <button onclick="QuranHujra.closeModal()" class="neo3d-close-btn" style="width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.08); border: none; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></button>
@@ -145,7 +137,7 @@
         <!-- Banner Note -->
         <div style="margin: 12px 2px 6px; padding: 10px 14px; border-radius: 14px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); display: flex; align-items: center; gap: 10px;">
           <i class="fa-solid fa-book-open-reader" style="color: #34d399; font-size: 1.1rem;"></i>
-          <span style="font-size: 0.74rem; color: #cbd5e1; line-height: 1.4;">مامۆستایەک هەڵبژێرە بۆ بینینی هەموو کتێبەکان و دەرسەکانی ناو کاناڵەکان بە پەخشی ڕاستەوخۆ:</span>
+          <span style="font-size: 0.74rem; color: #cbd5e1; line-height: 1.4;">مامۆستایەک هەڵبژێرە بۆ بینینی هەموو کتێبەکان بە پەخشی ڕاستەوخۆ و دەنگی/ڤیدیۆیی:</span>
         </div>
 
         <!-- Scholars Cards -->
@@ -154,7 +146,7 @@
             const totalLessons = (s.categories || []).reduce((acc, c) => acc + (c.lessons ? c.lessons.length : 0), 0);
             return `
               <div onclick="QuranHujra.selectScholar('${s.id}')" style="cursor: pointer; border-radius: 20px; padding: 14px; background: rgba(15, 23, 42, 0.75); border: 1.5px solid rgba(16, 185, 129, 0.25); display: flex; gap: 14px; align-items: center; transition: all 0.22s ease;">
-                <img src="${s.avatar}" style="width: 66px; height: 66px; border-radius: 18px; object-fit: cover; border: 2px solid #10b981; box-shadow: 0 4px 14px rgba(16,185,129,0.3);" />
+                <img src="${s.avatar || DEFAULT_AVATAR}" onerror="this.src='${DEFAULT_AVATAR}'" style="width: 66px; height: 66px; border-radius: 18px; object-fit: cover; border: 2px solid #10b981; box-shadow: 0 4px 14px rgba(16,185,129,0.3);" />
                 <div style="flex: 1;">
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="font-weight: 900; color: #fff; font-size: 1.05rem;">${s.name}</div>
@@ -180,7 +172,7 @@
     if (!s) return;
 
     container.innerHTML = `
-      <div class="hujra-sheet neo3d-hub-sheet" style="width: 100%; max-width: 640px; max-height: 92vh; display: flex; flex-direction: column; padding: 18px 16px; overflow: hidden; border-radius: 26px; background: linear-gradient(165deg, #0d1722 0%, #060b10 100%); border: 1.5px solid rgba(56, 189, 248, 0.35); box-shadow: 0 28px 65px rgba(0,0,0,0.95);">
+      <div class="hujra-sheet neo3d-hub-sheet" style="width: 100%; max-width: 640px; max-height: 90vh; display: flex; flex-direction: column; padding: 18px 16px; overflow: hidden; border-radius: 26px; background: linear-gradient(165deg, #0d1722 0%, #060b10 100%); border: 1.5px solid rgba(56, 189, 248, 0.35); box-shadow: 0 28px 65px rgba(0,0,0,0.95);">
         <!-- Top Nav / Breadcrumbs with Back Button -->
         <div style="padding: 0 4px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 10px;">
@@ -194,14 +186,13 @@
 
         <!-- Scholar Hero Card -->
         <div style="margin: 12px 2px 8px; padding: 14px; border-radius: 20px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 95, 70, 0.25)); border: 1.2px solid rgba(16, 185, 129, 0.3); display: flex; gap: 12px; align-items: center;">
-          <img src="${s.avatar}" style="width: 58px; height: 58px; border-radius: 16px; object-fit: cover; border: 2px solid #10b981;" />
+          <img src="${s.avatar || DEFAULT_AVATAR}" onerror="this.src='${DEFAULT_AVATAR}'" style="width: 58px; height: 58px; border-radius: 16px; object-fit: cover; border: 2px solid #10b981;" />
           <div style="flex: 1;">
             <div style="font-weight: 900; color: #fff; font-size: 1rem;">${s.name}</div>
             <div style="font-size: 0.72rem; color: #34d399; margin-top: 2px;">${s.titleKu}</div>
             <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-              <span class="neo3d-pill-btn" style="padding: 3px 9px; font-size: 0.68rem; color: #38bdf8; border-color: rgba(56,189,248,0.3);"><i class="fa-brands fa-telegram"></i> @${(s.telegramChannel||'').replace('https://t.me/','')}</span>
-              <span class="neo3d-pill-btn" style="padding: 3px 9px; font-size: 0.68rem; color: #34d399; border-color: rgba(16,185,129,0.3);"><i class="fa-brands fa-telegram"></i> @${(s.telegramLessons||'').replace('https://t.me/','')}</span>
-              <span class="neo3d-pill-btn" style="padding: 3px 9px; font-size: 0.68rem; color: #f43f5e; border-color: rgba(244,63,94,0.3);"><i class="fa-brands fa-youtube"></i> یوتیوب</span>
+              <span class="neo3d-pill-btn" style="padding: 3px 9px; font-size: 0.68rem; color: #ef4444; border-color: rgba(239,68,68,0.3);"><i class="fa-brands fa-youtube"></i> پەخشی یوتیوب</span>
+              <span class="neo3d-pill-btn" style="padding: 3px 9px; font-size: 0.68rem; color: #34d399; border-color: rgba(16,185,129,0.3);"><i class="fa-solid fa-headphones"></i> پەخشی دەنگی</span>
             </div>
           </div>
         </div>
@@ -253,7 +244,7 @@
     }
 
     container.innerHTML = `
-      <div class="hujra-sheet neo3d-hub-sheet" style="width: 100%; max-width: 660px; max-height: 94vh; display: flex; flex-direction: column; padding: 16px 14px; overflow: hidden; border-radius: 26px; background: linear-gradient(165deg, #0d1722 0%, #060b10 100%); border: 1.5px solid ${cat.color || '#10b981'}60; box-shadow: 0 28px 65px rgba(0,0,0,0.95);">
+      <div class="hujra-sheet neo3d-hub-sheet" style="width: 100%; max-width: 660px; max-height: 92vh; display: flex; flex-direction: column; padding: 16px 14px; overflow: hidden; border-radius: 26px; background: linear-gradient(165deg, #0d1722 0%, #060b10 100%); border: 1.5px solid ${cat.color || '#10b981'}60; box-shadow: 0 28px 65px rgba(0,0,0,0.95);">
         <!-- Top Nav / Breadcrumbs with Back to Books Button -->
         <div style="padding: 0 2px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 8px;">
@@ -281,7 +272,7 @@
         <!-- Lessons Items List -->
         <div style="flex: 1; overflow-y: auto; padding: 4px 2px; display: flex; flex-direction: column; gap: 8px;">
           ${filtered.length === 0 ? '<div style="text-align: center; color: #94a3b8; padding: 24px; font-size: 0.8rem;">هیچ وانەیەک نەدۆزرایەوە</div>' : ''}
-          ${filtered.map((l, idx) => {
+          ${filtered.map((l) => {
             const isCur = currentLesson && currentLesson.id === l.id;
             return `
               <div onclick="QuranHujra.openInAppPlayerById(${l.id})" style="cursor: pointer; border-radius: 14px; padding: 10px 12px; background: ${isCur ? 'linear-gradient(135deg, rgba(16,185,129,0.22), rgba(6,95,70,0.32))' : 'rgba(15, 23, 42, 0.65)'}; border: 1.2px solid ${isCur ? '#10b981' : 'rgba(255,255,255,0.06)'}; display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: all 0.18s ease;">
@@ -296,10 +287,10 @@
                 </div>
                 <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
                   ${l.isVideo ? '<span style="font-size: 0.62rem; background: #ef444422; color: #f87171; border: 1px solid #ef444444; padding: 2px 6px; border-radius: 6px;">ڤیدیۆ</span>' : '<span style="font-size: 0.62rem; background: #10b98122; color: #34d399; border: 1px solid #10b98144; padding: 2px 6px; border-radius: 6px;">دەنگی</span>'}
-                  <button onclick="event.stopPropagation(); QuranHujra.openInAppPlayerById(${l.id})" class="neo3d-pill-btn" style="padding: 4px 8px; font-size: 0.68rem; background: rgba(16,185,129,0.2); color: #34d399; border-color: rgba(16,185,129,0.4);" title="پەخشکردن لەناو بەرنامە">
+                  <button onclick="event.stopPropagation(); QuranHujra.openInAppPlayerById(${l.id})" class="neo3d-pill-btn" style="padding: 4px 10px; font-size: 0.72rem; background: rgba(16,185,129,0.2); color: #34d399; border-color: rgba(16,185,129,0.4);" title="پەخشکردن">
                     <i class="fa-solid fa-play"></i> پەخش
                   </button>
-                  <button onclick="event.stopPropagation(); QuranHujra.downloadLessonDirect(${l.id})" class="neo3d-pill-btn" style="padding: 4px 8px; font-size: 0.68rem; background: rgba(56,189,248,0.15); color: #38bdf8; border-color: rgba(56,189,248,0.3);" title="داگرتن">
+                  <button onclick="event.stopPropagation(); QuranHujra.downloadLessonDirect(${l.id})" class="neo3d-pill-btn" style="padding: 4px 8px; font-size: 0.7rem; background: rgba(56,189,248,0.15); color: #38bdf8; border-color: rgba(56,189,248,0.3);" title="داگرتن">
                     <i class="fa-solid fa-download"></i>
                   </button>
                 </div>
@@ -312,7 +303,7 @@
   }
 
   // =========================================================================
-  // LEVEL 4: IN-APP MEDIA PLAYER MODAL (پەخشکەری دەنگ و ڤیدیۆ بەبێ ڕۆیشتنە دەرەوە)
+  // LEVEL 4: IN-APP MEDIA PLAYER MODAL (100% In-App Playback - Zero Telegram)
   // =========================================================================
   function openInAppPlayer(lesson, initialMode = null) {
     if (!lesson) return;
@@ -328,7 +319,7 @@
       modal = document.createElement('div');
       modal.id = 'hujraInAppPlayerModal';
       modal.className = 'typography-modal-overlay';
-      modal.style.cssText = 'display: flex; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92); z-index: 19500; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); align-items: center; justify-content: center; padding: 10px; font-family: "Vazirmatn", "Noto Naskh Arabic", sans-serif; direction: rtl; text-align: right;';
+      modal.style.cssText = 'display: flex; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.94); z-index: 19500; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); align-items: center; justify-content: center; padding: 10px; font-family: "Vazirmatn", "Noto Naskh Arabic", sans-serif; direction: rtl; text-align: right;';
       modal.onclick = (e) => { if (e.target === modal) closeInAppPlayer(); };
       document.body.appendChild(modal);
     }
@@ -340,9 +331,11 @@
   function closeInAppPlayer() {
     const modal = document.getElementById('hujraInAppPlayerModal');
     if (modal) {
-      // Clear iframe src to stop background playing when closed
       modal.innerHTML = '';
       modal.style.display = 'none';
+    }
+    if (audioPlayer) {
+      try { audioPlayer.pause(); } catch(e){}
     }
   }
 
@@ -356,27 +349,27 @@
     if (!modal || !currentLesson) return;
 
     const l = currentLesson;
-    const s = currentScholar || { name: 'مامۆستا هادی ئەحمەدی', avatar: '' };
+    const s = currentScholar || { name: 'مامۆستا هادی ئەحمەدی', avatar: DEFAULT_AVATAR };
     const cat = currentCategory || { titleKu: 'وانەکانی حوجرە' };
-    const embedUrl = getTelegramEmbedUrl(l.tgLink);
+    const embedUrl = getMediaEmbedUrl(l, s, cat);
 
     modal.innerHTML = `
-      <div class="neo3d-hub-sheet" style="width: 100%; max-width: 580px; max-height: 94vh; display: flex; flex-direction: column; padding: 16px 14px; overflow: hidden; border-radius: 26px; background: linear-gradient(165deg, #0b131c 0%, #05090f 100%); border: 1.5px solid ${playerMode === 'video' ? '#ef4444' : '#10b981'}; box-shadow: 0 28px 65px rgba(0,0,0,0.98);">
+      <div class="neo3d-hub-sheet" style="width: 100%; max-width: 620px; max-height: 92vh; display: flex; flex-direction: column; padding: 16px 14px; overflow-y: auto; border-radius: 26px; background: linear-gradient(165deg, #0b131c 0%, #05090f 100%); border: 1.5px solid ${playerMode === 'video' ? '#ef4444' : '#10b981'}; box-shadow: 0 28px 65px rgba(0,0,0,0.98);">
         <!-- Header -->
-        <div style="padding: 0 2px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="${s.avatar}" style="width: 36px; height: 36px; border-radius: 10px; object-fit: cover; border: 1.5px solid #10b981;" />
-            <div>
-              <div style="font-weight: 800; color: #fff; font-size: 0.92rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; max-width: 360px;">${l.title}</div>
+        <div style="padding: 0 2px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+            <img src="${s.avatar || DEFAULT_AVATAR}" onerror="this.src='${DEFAULT_AVATAR}'" style="width: 38px; height: 38px; border-radius: 11px; object-fit: cover; border: 1.5px solid #10b981; flex-shrink: 0;" />
+            <div style="overflow: hidden;">
+              <div style="font-weight: 800; color: #fff; font-size: 0.92rem; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">${l.title}</div>
               <div style="font-size: 0.7rem; color: #34d399;">${s.name} · ${cat.titleKu}</div>
             </div>
           </div>
-          <button onclick="QuranHujra.closePlayerModal()" class="neo3d-close-btn" style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.08); border: none; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></button>
+          <button onclick="QuranHujra.closePlayerModal()" class="neo3d-close-btn" style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.08); border: none; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <!-- Mode Toggle Pill: Audio Only vs Audio + Video -->
-        <div style="margin: 10px 0 10px; display: flex; justify-content: center;">
-          <div style="display: flex; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.12); border-radius: 30px; padding: 3px; gap: 4px;">
+        <div style="margin: 12px 0 10px; display: flex; justify-content: center; flex-shrink: 0;">
+          <div style="display: flex; background: rgba(15,23,42,0.85); border: 1px solid rgba(255,255,255,0.12); border-radius: 30px; padding: 4px; gap: 4px;">
             <button onclick="QuranHujra.setPlayerMode('audio')" class="neo3d-pill-btn ${playerMode === 'audio' ? 'active-pill' : ''}" style="padding: 6px 14px; font-size: 0.75rem; border-radius: 20px; ${playerMode === 'audio' ? 'background: #10b981; color: #fff; font-weight: 800;' : 'color: #94a3b8;'}">
               <i class="fa-solid fa-headphones"></i> تەنیا دەنگ (فقط صدا)
             </button>
@@ -386,37 +379,37 @@
           </div>
         </div>
 
-        <!-- Media Container (Embedded in-app - NO redirection!) -->
-        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 280px; padding: 4px; overflow: hidden;">
+        <!-- In-App Media Container -->
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 4px; min-height: 280px;">
           ${playerMode === 'audio' ? `
-            <!-- AUDIO-ONLY IN-APP PLAYER VIEW -->
-            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 8px 0;">
-              <!-- Pulsing Album Art -->
-              <div style="position: relative; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center;">
-                <div style="position: absolute; inset: -8px; border-radius: 50%; border: 2px dashed rgba(16, 185, 129, 0.4); animation: spin 20s linear infinite;"></div>
-                <img src="${s.avatar}" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #10b981; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);" />
+            <!-- AUDIO-ONLY VIEW -->
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 10px 0;">
+              <!-- Glowing Pulsing Avatar -->
+              <div style="position: relative; width: 110px; height: 110px; display: flex; align-items: center; justify-content: center;">
+                <div style="position: absolute; inset: -6px; border-radius: 50%; border: 2px dashed rgba(16, 185, 129, 0.45); animation: spin 20s linear infinite;"></div>
+                <img src="${s.avatar || DEFAULT_AVATAR}" onerror="this.src='${DEFAULT_AVATAR}'" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #10b981; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);" />
               </div>
               
-              <div style="text-align: center; max-width: 90%;">
+              <div style="text-align: center; max-width: 95%;">
                 <div style="font-weight: 800; color: #fff; font-size: 0.94rem;">${l.title}</div>
-                <div style="font-size: 0.74rem; color: #34d399; margin-top: 2px;">${l.subtopic || l.summary || 'وانەی فەرمی حوجرەی شەمسولعاریفین'}</div>
+                <div style="font-size: 0.74rem; color: #34d399; margin-top: 3px;">${l.subtopic || l.summary || 'وانەی فەرمی حوجرەی شەمسولعاریفین'}</div>
               </div>
 
-              <!-- In-App Telegram Audio Widget Embed -->
-              <div style="width: 100%; max-width: 440px; height: 155px; border-radius: 16px; overflow: hidden; background: #000; border: 1px solid rgba(16,185,129,0.3); box-shadow: 0 6px 20px rgba(0,0,0,0.6);">
-                <iframe src="${embedUrl}" frameborder="0" style="width: 100%; height: 155px; border: none; border-radius: 16px;"></iframe>
+              <!-- In-App Responsive Audio Player Stream -->
+              <div style="width: 100%; max-width: 480px; height: 85px; border-radius: 16px; overflow: hidden; background: #000; border: 1.5px solid rgba(16,185,129,0.35); box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+                <iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>
               </div>
             </div>
           ` : `
-            <!-- VIDEO + AUDIO IN-APP PLAYER VIEW -->
-            <div style="width: 100%; height: 100%; min-height: 340px; display: flex; flex-direction: column; border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(239,68,68,0.3); background: #000;">
-              <iframe src="${embedUrl}" frameborder="0" allowfullscreen style="width: 100%; height: 340px; border: none; border-radius: 16px;"></iframe>
+            <!-- VIDEO VIEW -->
+            <div style="width: 100%; height: 340px; display: flex; flex-direction: column; border-radius: 16px; overflow: hidden; border: 1.5px solid rgba(239,68,68,0.35); background: #000; box-shadow: 0 8px 24px rgba(0,0,0,0.8);">
+              <iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>
             </div>
           `}
         </div>
 
         <!-- Footer Control Bar -->
-        <div style="margin-top: 10px; padding: 10px 12px; border-radius: 16px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="margin-top: 12px; padding: 10px 12px; border-radius: 16px; background: rgba(15,23,42,0.85); border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; flex-shrink: 0;">
           <!-- Prev / Next Lesson Navigation -->
           <div style="display: flex; gap: 6px;">
             <button onclick="QuranHujra.playPrevLesson()" class="neo3d-pill-btn" style="padding: 6px 12px; font-size: 0.72rem; color: #cbd5e1;" title="وانەی پێشوو">
@@ -528,17 +521,13 @@
 
   function executeDownload(l) {
     if (typeof window.showToast === 'function') {
-      window.showToast('📥 پەڕەی داگرتنی وانە بە شێوەی ڕاستەوخۆ دەکرێتەوە...');
+      window.showToast('📥 ئامادەکردنی پەڕەی داگرتنی وانە...');
     }
-    // Direct Telegram file download link: https://t.me/<channel>/<id>?single
-    const dlLink = `${l.tgLink}?single`;
-    const a = document.createElement('a');
-    a.href = dlLink;
-    a.target = '_blank';
-    a.setAttribute('download', (l.title || 'lesson') + '.mp3');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Direct audio/video download URL or YouTube converter link
+    const dlLink = l.directAudioUrl || (l.youtubeId ? `https://www.youtube.com/watch?v=${l.youtubeId}` : (currentScholar ? currentScholar.youtubeChannel : ''));
+    if (dlLink) {
+      window.open(dlLink, '_blank');
+    }
   }
 
   // Public Interface

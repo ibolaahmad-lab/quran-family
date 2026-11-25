@@ -100,6 +100,15 @@
   // 1. ENGINE: GROQ WHISPER CLOUD (Ultra-Fast)
   // =========================================================================
   async function startGroqWhisperListening(callbacks) {
+    if (!groqApiKey) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('ℹ️ کلید Groq وارد نشده است؛ استفاده از موتور پیش‌فرض مرورگر...');
+      }
+      changeActiveEngine('google_speech');
+      startNativeGoogleListening(callbacks);
+      return;
+    }
+
     audioChunks = [];
     try {
       audioStream = await navigator.mediaDevices.getUserMedia({
@@ -191,7 +200,7 @@
       if (typeof window.showToast === 'function') {
         window.showToast('ℹ️ برای استفاده از Groq Whisper، کلید API را وارد کنید. بازگشت به موتور مرورگر...');
       }
-      setEngine('google_speech');
+      changeActiveEngine('google_speech');
       stopListening();
       startNativeGoogleListening(callbacks);
       return;
@@ -296,10 +305,10 @@
         });
       } catch (e) {
         if (typeof window.showToast === 'function') {
-          window.showToast('⚠️ بارگذاری مدل آفلاین ناموفق بود؛ سوئیچ به حالت آنلاین...');
+          window.showToast('ℹ️ بارگذاری مدل آفلاین ناموفق بود؛ سوئیچ خودکار به موتور پیش‌فرض مرورگر...');
         }
-        setEngine('groq_whisper');
-        startGroqWhisperListening(callbacks);
+        changeActiveEngine('google_speech');
+        startNativeGoogleListening(callbacks);
         return;
       }
     }
@@ -416,19 +425,21 @@
   }
 
   // =========================================================================
+  function changeActiveEngine(engineId) {
+    if (!ENGINES[engineId]) return;
+    activeEngineId = engineId;
+    localStorage.setItem(STORAGE_ENGINE_KEY, engineId);
+    updateEngineBadgesUI();
+    if (typeof window.showToast === 'function') {
+      window.showToast(`✨ موتور تشخیص صدا: ${ENGINES[engineId].titleFa}`);
+    }
+  }
+
   // UNIFIED PUBLIC INTERFACE
   // =========================================================================
   const QuranVoiceAI = {
     getEngine: () => activeEngineId,
-    setEngine: (engineId) => {
-      if (!ENGINES[engineId]) return;
-      activeEngineId = engineId;
-      localStorage.setItem(STORAGE_ENGINE_KEY, engineId);
-      updateEngineBadgesUI();
-      if (typeof window.showToast === 'function') {
-        window.showToast(`✨ موتور تشخیص صدا: ${ENGINES[engineId].titleFa}`);
-      }
-    },
+    setEngine: changeActiveEngine,
     getEnginesList: () => Object.values(ENGINES),
     isListening: () => isCurrentlyListening,
 
