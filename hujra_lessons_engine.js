@@ -204,7 +204,7 @@
 
         <!-- Categories / Books Grid -->
         <div style="flex: 1; overflow-y: auto; padding: 6px 4px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px;">
-          ${(s.categories || []).map(cat => `
+          ${(s.categories && s.categories.length > 0) ? (s.categories || []).map(cat => `
             <div onclick="QuranHujra.selectCategory('${cat.id}')" style="cursor: pointer; border-radius: 18px; padding: 14px; background: rgba(15, 23, 42, 0.8); border: 1.5px solid ${cat.color || '#10b981'}40; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; transition: all 0.22s ease;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 ${cat.coverImage ? `
@@ -227,7 +227,13 @@
                 <span style="font-size: 0.74rem; color: ${cat.color || '#10b981'}; font-weight: 800;">بینینی دەرسەکان <i class="fa-solid fa-arrow-left"></i></span>
               </div>
             </div>
-          `).join('')}
+          `).join('') : `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: rgba(15,23,42,0.6); border-radius: 20px; border: 1px dashed rgba(255,255,255,0.15);">
+              <div style="font-size: 2.2rem; color: #10b981; margin-bottom: 12px;"><i class="fa-solid fa-folder-plus"></i></div>
+              <div style="font-weight: 800; color: #fff; font-size: 0.95rem;">ئامادەیە بۆ ئەپلۆدکردنی دەرسە نوێیەکان</div>
+              <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 6px; line-height: 1.6;">تکایە لە ڕێگەی ئایکۆنی «مدیریت درس‌های حوجره» لەسەر دێسکتۆپ، دەرسە دەنگییەکان بۆ ئەم مامۆستایە ئەپلۆد بکە.</div>
+            </div>
+          `}
         </div>
       </div>
     `;
@@ -420,9 +426,19 @@
               </div>
 
               <!-- In-App Responsive Audio Player Stream -->
-              <div style="width: 100%; max-width: 480px; height: 85px; border-radius: 16px; overflow: hidden; background: #000; border: 1.5px solid rgba(16,185,129,0.35); box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
-                <iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>
-              </div>
+              ${l.directAudioUrl ? `
+                <div style="width: 100%; max-width: 480px; padding: 10px 14px; border-radius: 18px; background: rgba(0,0,0,0.7); border: 1.5px solid rgba(16,185,129,0.4); box-shadow: 0 8px 24px rgba(0,0,0,0.7); display: flex; flex-direction: column; gap: 8px;">
+                  <audio id="hujraHtml5Audio" controls autoplay src="${l.directAudioUrl}" style="width: 100%; height: 46px; border-radius: 10px; outline: none;"></audio>
+                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #94a3b8; padding: 0 4px;">
+                    <span style="color: #34d399;"><i class="fa-solid fa-circle-check"></i> فایلی دەنگی ڕاستەوخۆ و فشرده</span>
+                    <span>خێرایی، کات و بەرزکردنەوەی دەنگ چالاکە</span>
+                  </div>
+                </div>
+              ` : `
+                <div style="width: 100%; max-width: 480px; height: 85px; border-radius: 16px; overflow: hidden; background: #000; border: 1.5px solid rgba(16,185,129,0.35); box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+                  <iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+              `}
             </div>
           ` : `
             <!-- VIDEO VIEW -->
@@ -545,12 +561,17 @@
 
   function executeDownload(l) {
     if (typeof window.showToast === 'function') {
-      window.showToast('📥 ئامادەکردنی پەڕەی داگرتنی وانە...');
+      window.showToast('📥 داگرتنی فایلی وانە دەستی پێکرد...');
     }
-    // Direct audio/video download URL or YouTube converter link
     const dlLink = l.directAudioUrl || (l.youtubeId ? `https://www.youtube.com/watch?v=${l.youtubeId}` : (currentScholar ? currentScholar.youtubeChannel : ''));
     if (dlLink) {
-      window.open(dlLink, '_blank');
+      const a = document.createElement('a');
+      a.href = dlLink;
+      a.target = '_blank';
+      a.setAttribute('download', (l.title || 'lesson').replace(/[^a-zA-Z0-9_\-\u0600-\u06FF]/g, '_') + '.mp3');
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { if (a.parentNode) a.parentNode.removeChild(a); }, 1200);
     }
   }
 
