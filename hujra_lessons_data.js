@@ -1,6 +1,6 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Authentic Scholar Data & 74 Golestan Lessons
+ * Updated via Hujra Lessons Studio on 2026-11-25T22:09:18.054Z
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
@@ -834,6 +834,181 @@ window.HUJRA_SCHOLARS_DATA = [
             "isAudio": true,
             "isVideo": false,
             "summary": "وانەی فەرمی ژمارە 76 لە دەنگی مامۆستا هادی ئەحمەدی"
+          }
+        ]
+      },
+      {
+        "id": "sulook",
+        "titleKu": "زەنجیرە بەرنامەی سلووک",
+        "descKu": "زەنجیرە وتار و وانەکانی سلووک و ڕێگاکانی بەدەستهێنانی ڕەزامەندی خوای گەورە",
+        "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+        "color": "#10b981",
+        "icon": "fa-solid fa-book-quran",
+        "lessons": [
+          {
+            "id": 1795644271095,
+            "lessonNumber": 1,
+            "title": "دەرس 1: مامۆستا هادی ئەحمەدی سلووک 01",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_01.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 1 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644294603,
+            "lessonNumber": 2,
+            "title": "دەرس 2: مامۆستا هادی ئەحمەدی سلووک 02",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_02.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 2 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644314832,
+            "lessonNumber": 3,
+            "title": "دەرس 3: مامۆستا هادی ئەحمەدی سلووک 03",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_03.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 3 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644336828,
+            "lessonNumber": 4,
+            "title": "دەرس 4: مامۆستا هادی ئەحمەدی سلووک 04",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_04.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 4 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644358351,
+            "lessonNumber": 5,
+            "title": "دەرس 5: سلوک ڕێگاکانى بەدەستهێنانى ڕەزامەندى خودا بەشى پێنجەم",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_05.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 5 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644378562,
+            "lessonNumber": 6,
+            "title": "دەرس 6: سلوک ڕێگاکانى بەدەستهێنانى ڕەزامەندى خودا بەشى شەشەم",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_06.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 6 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644394925,
+            "lessonNumber": 7,
+            "title": "دەرس 7: سلوک ڕێگاکانى بەدەستهێنانى ڕەزامەندى خودا بەشى حەوتەم",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_07.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 7 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644415907,
+            "lessonNumber": 8,
+            "title": "دەرس 8: سلوک ڕێگاکانى بەدەستهێنانى ڕەزامەندى خودا بەشى هەشتەم",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_08.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 8 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644435918,
+            "lessonNumber": 9,
+            "title": "دەرس 9: سلوک ڕێگەکانی بەدەستهێنانی ڕەزامەندیی خودای گەورە بەشی نۆیەم",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_09.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 9 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644455011,
+            "lessonNumber": 10,
+            "title": "دەرس 10: سلوک ڕێگاکانى بەدەستهێنانى ڕەزامەندى خودا بەشى دەیەم",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_10.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 10 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644474273,
+            "lessonNumber": 11,
+            "title": "دەرس 11: سلوک ڕێگەکانی بەدەستهێنانی ڕەزامەندیی خودای گەورە بەشی یازدەیەم",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_11.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 11 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644493377,
+            "lessonNumber": 12,
+            "title": "دەرس 12: سلوک ڕێگەکانى بەدەستهێنانى ڕەزامەندى خودا بەشى دوازدەیەم",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_12.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 12 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644514931,
+            "lessonNumber": 13,
+            "title": "دەرس 13: سلوک ڕێگەکانی بەدەستهێنانی ڕەزامەندیی خودای گەورە بەشی سیازدەیەم",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_13.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 13 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644536273,
+            "lessonNumber": 14,
+            "title": "دەرس 14: سلوک ڕێگەکانی بەدەستهێنانی ڕەزامەندیی خوای گەورە بەشی چواردەیەم",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_14.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 14 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795644558068,
+            "lessonNumber": 15,
+            "title": "دەرس 15: سلوک ڕێگەکانی بەدەستهێنانی ڕەزامەندیی خوای گەورە بەشی پازدەیەم و",
+            "subtopic": "زەنجیرە بەرنامەی سلووک",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/sulook_dars_15.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 15 لە دەنگی مامۆستا هادی ئەحمەدی"
           }
         ]
       }
