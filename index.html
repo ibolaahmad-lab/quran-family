@@ -5948,15 +5948,21 @@
             </select>
           </div>
 
-          <!-- Row 3: Tafsir Edition Source Picker + Compact Nami Book Pill -->
+          <!-- Row 3: Tafsir Edition Source Picker + Close/Reset Pill + Nami Book Pill -->
           <div style="display: flex; align-items: center; gap: 6px; width: 100%; margin-top: 2px;">
             <!-- Tafsir Picker Trigger Button -->
             <button type="button" onclick="openTafsirSourcePickerModal()" class="neo3d-pill-btn" style="flex: 1; min-width: 0; justify-content: space-between; padding: 7px 12px; font-size: 0.8rem; background: rgba(59, 130, 246, 0.18); border-color: rgba(59, 130, 246, 0.4); color: #93c5fd;">
               <span style="display: flex; align-items: center; gap: 7px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <i class="fa-solid fa-layer-group" style="color: #60a5fa;"></i>
-                <span id="activeTafsirEditionBtnLabel" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Tafsīr: Alle 4</span>
+                <i class="fa-solid fa-book-quran" style="color: #60a5fa;"></i>
+                <span id="activeTafsirEditionBtnLabel" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">تەفسیر: هەڵبژاردن</span>
               </span>
               <i class="fa-solid fa-chevron-down" style="font-size: 0.68rem; color: #94a3b8; flex-shrink: 0;"></i>
+            </button>
+
+            <!-- Reset / Close Tafsir Button (Returns to hub without tafsirs) -->
+            <button type="button" onclick="selectTafsirEdition('none')" class="neo3d-pill-btn" style="padding: 7px 10px; font-size: 0.78rem; background: rgba(239, 68, 68, 0.16); border-color: rgba(239, 68, 68, 0.35); color: #fca5a5; flex-shrink: 0;" title="داخستنی تەفسیر و گەڕانەوە بۆ پێڕست / بستن تفسیر">
+              <i class="fa-solid fa-xmark" style="color: #f87171;"></i>
+              <span>داخستن</span>
             </button>
 
             <!-- Compact Nami Book Pill Button -->
@@ -6850,63 +6856,165 @@
   </div>
 
   <!-- ======================================================= -->
-  <!-- MODAL: TAFSĪR SOURCE PICKER (Point 13 Unified Picker)     -->
+  <!-- MODAL: MODERN AUTHENTIC SUNNI TAFSIR PICKER              -->
   <!-- ======================================================= -->
-  <div id="tafsirSourcePickerModal" class="typography-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(5, 10, 18, 0.88); z-index: 13000; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); align-items: center; justify-content: center; padding: 14px;" onclick="if(event.target===this)closeTafsirSourcePickerModal()">
-    <div class="neo3d-hub-sheet" style="max-width: 440px; width: 100%; max-height: 85vh; border-radius: 22px; background: linear-gradient(165deg, #101c28 0%, #070d14 100%); border: 1.5px solid rgba(59, 130, 246, 0.35); box-shadow: 0 24px 60px rgba(0,0,0,0.92), inset 0 1px 2px rgba(255,255,255,0.18); padding: 16px 18px; box-sizing: border-box; overflow-y: auto;">
+  <div id="tafsirSourcePickerModal" class="typography-modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(5, 10, 18, 0.9); z-index: 13000; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); align-items: center; justify-content: center; padding: 14px;" onclick="if(event.target===this)closeTafsirSourcePickerModal()">
+    <div class="neo3d-hub-sheet" style="max-width: 480px; width: 100%; max-height: 88vh; border-radius: 24px; background: linear-gradient(165deg, #101c28 0%, #070d14 100%); border: 1.5px solid rgba(59, 130, 246, 0.35); box-shadow: 0 24px 60px rgba(0,0,0,0.92), inset 0 1px 2px rgba(255,255,255,0.18); padding: 16px 18px; box-sizing: border-box; overflow-y: auto;">
+      <!-- Header -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 10px;">
         <div style="display: flex; align-items: center; gap: 9px;">
-          <div class="neo3d-orb-icon" style="width: 34px; height: 34px; border-radius: 10px; font-size: 0.95rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8); box-shadow: 0 4px 12px rgba(59,130,246,0.35);">
-            <i class="fa-solid fa-layer-group"></i>
+          <div class="neo3d-orb-icon" style="width: 36px; height: 36px; border-radius: 11px; font-size: 1rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8); box-shadow: 0 4px 12px rgba(59,130,246,0.35);">
+            <i class="fa-solid fa-book-quran"></i>
           </div>
           <div>
-            <div style="font-weight: 900; color: #fff; font-size: 0.95rem;">Tafsīr-Quelle auswählen</div>
-            <div style="font-size: 0.72rem; color: #94a3b8;">Wähle eine Quelle oder alle 4 gemeinsam</div>
+            <div style="font-weight: 900; color: #fff; font-size: 0.96rem;">هەڵبژاردنی تەفسیری ئەهلی سوننەت</div>
+            <div style="font-size: 0.72rem; color: #94a3b8;">تفاسیر معتبر أهل السنة والجماعة والأزهر الشريف</div>
           </div>
         </div>
         <button onclick="closeTafsirSourcePickerModal()" class="neo3d-close-btn" style="width: 30px; height: 30px; border-radius: 9px; font-size: 0.85rem;"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <button type="button" onclick="selectTafsirEdition('all')" class="neo3d-hub-item-card" style="padding: 10px 12px; border-color: rgba(59, 130, 246, 0.35);">
-          <div class="neo3d-orb-icon" style="width: 32px; height: 32px; border-radius: 9px; font-size: 0.88rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8);"><i class="fa-solid fa-layer-group"></i></div>
-          <div style="flex: 1; text-align: left;">
-            <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">Alle 4 Quellen (Synthese)</div>
-            <div style="font-size: 0.7rem; color: #94a3b8;">Bubenheim · Zaidan · Abu Rida · Nāmī</div>
+      <!-- Option to Reset / Close (No Tafsir shown) -->
+      <div style="margin-bottom: 12px;">
+        <button type="button" onclick="selectTafsirEdition('none')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08);">
+          <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.82rem; background: linear-gradient(135deg, #ef4444, #991b1b);"><i class="fa-solid fa-ban"></i></div>
+          <div style="flex: 1; text-align: right; direction: rtl;">
+            <div style="font-weight: 800; font-size: 0.86rem; color: #fca5a5;">داخستن و پاککردنەوە (پیشان نەدانی هیچ تەفسیرێک)</div>
+            <div style="font-size: 0.68rem; color: #f87171;">بستن تفسیر و بازگشت به صفحه انتخاب</div>
           </div>
         </button>
+      </div>
 
-        <button type="button" onclick="selectTafsirEdition('bubenheim')" class="neo3d-hub-item-card" style="padding: 10px 12px; border-color: rgba(16, 185, 129, 0.35);">
-          <div class="neo3d-orb-icon" style="width: 32px; height: 32px; border-radius: 9px; font-size: 0.88rem; background: linear-gradient(135deg, #10b981, #047857);"><i class="fa-solid fa-book-open"></i></div>
-          <div style="flex: 1; text-align: left;">
-            <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">Frank Bubenheim &amp; Dr. Nadeem Elyas</div>
-            <div style="font-size: 0.7rem; color: #94a3b8;">König-Fahd-Komplex zur Druckung des Edlen Qur'an, Medina</div>
-          </div>
-        </button>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
 
-        <button type="button" onclick="selectTafsirEdition('zaidan')" class="neo3d-hub-item-card" style="padding: 10px 12px; border-color: rgba(56, 189, 248, 0.35);">
-          <div class="neo3d-orb-icon" style="width: 32px; height: 32px; border-radius: 9px; font-size: 0.88rem; background: linear-gradient(135deg, #38bdf8, #0284c7);"><i class="fa-solid fa-scale-balanced"></i></div>
-          <div style="flex: 1; text-align: left;">
-            <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">Amir Zaidan (At-Tafsīr)</div>
-            <div style="font-size: 0.7rem; color: #94a3b8;">Ausführliche theologische Erläuterung &amp; Terminologie</div>
+        <!-- 1. Arabic Sunni Section -->
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 800; color: #60a5fa; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-scroll"></i> <span>العربية (الأزهر الشريف وأهل السنة)</span>
           </div>
-        </button>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <button type="button" onclick="selectTafsirEdition('ar_jalalayn')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(59, 130, 246, 0.3); text-align: right; direction: rtl;">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8);"><i class="fa-solid fa-book-open"></i></div>
+              <div style="flex: 1;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسير الجلالين</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">الإمامان جلال الدين المحلي وجلال الدين السيوطي رحمهما الله</div>
+              </div>
+            </button>
 
-        <button type="button" onclick="selectTafsirEdition('aburida')" class="neo3d-hub-item-card" style="padding: 10px 12px; border-color: rgba(245, 158, 11, 0.35);">
-          <div class="neo3d-orb-icon" style="width: 32px; height: 32px; border-radius: 9px; font-size: 0.88rem; background: linear-gradient(135deg, #f59e0b, #b45309);"><i class="fa-solid fa-feather"></i></div>
-          <div style="flex: 1; text-align: left;">
-            <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">Abu Rida (M. ibn Ahmad ibn Rassoul)</div>
-            <div style="font-size: 0.7rem; color: #94a3b8;">Islamische Bibliothek Köln</div>
-          </div>
-        </button>
+            <button type="button" onclick="selectTafsirEdition('ar_ibnkathir')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(59, 130, 246, 0.3); text-align: right; direction: rtl;">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #2563eb, #1e40af);"><i class="fa-solid fa-scale-balanced"></i></div>
+              <div style="flex: 1;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسير القرآن العظيم (ابن كثير - الأصل)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">النسخة الأصلية المعتمدة لأهل السنة والجماعة</div>
+              </div>
+            </button>
 
-        <button type="button" onclick="selectTafsirEdition('nami')" class="neo3d-hub-item-card" style="padding: 10px 12px; border-color: rgba(168, 85, 247, 0.35); direction: rtl; text-align: right;">
-          <div class="neo3d-orb-icon" style="width: 32px; height: 32px; border-radius: 9px; font-size: 0.88rem; background: linear-gradient(135deg, #a855f7, #6d28d9);"><i class="fa-solid fa-feather-pointed"></i></div>
-          <div style="flex: 1;">
-            <div style="font-weight: 800; font-size: 0.88rem; color: #fff; font-family: var(--kurdish-font);">تەفسیری نامی (کوردی)</div>
-            <div style="font-size: 0.7rem; color: #94a3b8; font-family: var(--kurdish-font);">مامۆستا مەلا عەبدولکەریمی مودەڕڕیس</div>
+            <button type="button" onclick="selectTafsirEdition('ar_qurtubi')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(59, 130, 246, 0.3); text-align: right; direction: rtl;">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #0ea5e9, #0369a1);"><i class="fa-solid fa-landmark"></i></div>
+              <div style="flex: 1;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">الجامع لأحكام القرآن (القرطبي)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">تفسير فقهي وعقدي معتمد للإمام القرطبي رحمه الله</div>
+              </div>
+            </button>
+
+            <button type="button" onclick="selectTafsirEdition('ar_muyassar')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(16, 185, 129, 0.3); text-align: right; direction: rtl;">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #10b981, #047857);"><i class="fa-solid fa-bolt"></i></div>
+              <div style="flex: 1;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">التفسير الميسر (أوفلاين سريع 100%)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">نخبة من علماء الأمة · مجمع الملك فهد لطباعة المصحف</div>
+              </div>
+            </button>
           </div>
-        </button>
+        </div>
+
+        <!-- 2. Persian Sunni Section -->
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 800; color: #fbbf24; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-feather"></i> <span>فارسی (مفسران بزرگ اهل سنت و جماعت)</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <button type="button" onclick="selectTafsirEdition('fa_khorramdel')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(245, 158, 11, 0.35); text-align: right; direction: rtl;">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #f59e0b, #b45309);"><i class="fa-solid fa-sun"></i></div>
+              <div style="flex: 1;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسیر نور (دکتر مصطفی خرمدل)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">تفسیر معتبر و بی‌نظیر اهل سنت به قلم ادیب نامدار کُرد</div>
+              </div>
+            </button>
+
+            <button type="button" onclick="selectTafsirEdition('fa_jalalayn')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(245, 158, 11, 0.35); text-align: right; direction: rtl;">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #d97706, #92400e);"><i class="fa-solid fa-feather-pointed"></i></div>
+              <div style="flex: 1;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسیر جلالین (فارسی اهل سنت)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">ترجمه و توضیح مستند تفسیر جلالین به زبان فارسی</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Kurdish Sunni Section -->
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 800; color: #a855f7; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-pen-nib"></i> <span>کوردی (تەفسیرەکانی ئەهلی سوننەت)</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <button type="button" onclick="selectTafsirEdition('nami')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(168, 85, 247, 0.35); text-align: right; direction: rtl;">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #a855f7, #6d28d9);"><i class="fa-solid fa-feather-pointed"></i></div>
+              <div style="flex: 1;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تەفسیری نامی (دەق و پەڕتووک)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">حەزرەتی مامۆستا مەلا عەبدولکەریمی مودەڕڕیس رحمه الله</div>
+              </div>
+            </button>
+
+            <button type="button" onclick="selectTafsirEdition('asan_pukhta')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(168, 85, 247, 0.35); text-align: right; direction: rtl;">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #8b5cf6, #5b21b6);"><i class="fa-solid fa-book"></i></div>
+              <div style="flex: 1;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تەفسیری ئاسان و پوختە (ئۆفلاین 100%)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">تەفسیری ئاسانی قورئانی پیرۆز بۆ هەموو ئایەتەکان</div>
+              </div>
+            </button>
+
+            <button type="button" onclick="selectTafsirEdition('rebar')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(168, 85, 247, 0.35); text-align: right; direction: rtl;">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #7c3aed, #4c1d95);"><i class="fa-solid fa-compass"></i></div>
+              <div style="flex: 1;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تەفسیری ڕێبەر (پوختەی مانا)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">مانا و مەبەستی ئایەتە پیرۆزەکان بە کوردییەکی ڕەوان</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. German Authentic Section -->
+        <div>
+          <div style="font-size: 0.75rem; font-weight: 800; color: #34d399; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-globe"></i> <span>Deutsche authentische Quellen</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <button type="button" onclick="selectTafsirEdition('bubenheim')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(16, 185, 129, 0.35);">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #10b981, #047857);"><i class="fa-solid fa-book-open"></i></div>
+              <div style="flex: 1; text-align: left;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">Frank Bubenheim &amp; Dr. Nadeem Elyas</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">König-Fahd-Komplex, Medina</div>
+              </div>
+            </button>
+
+            <button type="button" onclick="selectTafsirEdition('zaidan')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(56, 189, 248, 0.35);">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #38bdf8, #0284c7);"><i class="fa-solid fa-scale-balanced"></i></div>
+              <div style="flex: 1; text-align: left;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">Amir Zaidan (At-Tafsīr)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">Ausführliche theologische Erläuterung</div>
+              </div>
+            </button>
+
+            <button type="button" onclick="selectTafsirEdition('aburida')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(245, 158, 11, 0.35);">
+              <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #f59e0b, #b45309);"><i class="fa-solid fa-feather"></i></div>
+              <div style="flex: 1; text-align: left;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">Abu Rida (M. ibn Ahmad ibn Rassoul)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">Islamische Bibliothek Köln</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

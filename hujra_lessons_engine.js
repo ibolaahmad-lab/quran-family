@@ -154,6 +154,18 @@
                   </div>
                   <div style="font-size: 0.76rem; color: #34d399; margin-top: 2px;">${s.titleKu}</div>
                   <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 5px; line-height: 1.4;">${(s.bioKu || '').substring(0, 95)}...</div>
+                  <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+                    ${s.youtubeChannel ? `
+                      <a href="${s.youtubeChannel}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="neo3d-pill-btn" style="padding: 2px 8px; font-size: 0.68rem; color: #fca5a5; background: rgba(239,68,68,0.16); border-color: rgba(239,68,68,0.35); text-decoration: none; display: inline-flex; align-items: center; gap: 5px;" title="کەناڵی یوتیوب">
+                        <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> یوتیوب
+                      </a>
+                    ` : ''}
+                    ${s.telegramChannel ? `
+                      <a href="${s.telegramChannel}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="neo3d-pill-btn" style="padding: 2px 8px; font-size: 0.68rem; color: #93c5fd; background: rgba(59,130,246,0.16); border-color: rgba(59,130,246,0.35); text-decoration: none; display: inline-flex; align-items: center; gap: 5px;" title="کەناڵی تێلێگرام">
+                        <i class="fa-brands fa-telegram" style="color: #38bdf8;"></i> تێلێگرام
+                      </a>
+                    ` : ''}
+                  </div>
                 </div>
                 <i class="fa-solid fa-chevron-left" style="color: #10b981; font-size: 1.1rem;"></i>
               </div>
@@ -191,7 +203,16 @@
             <div style="font-weight: 900; color: #fff; font-size: 1rem;">${s.name}</div>
             <div style="font-size: 0.72rem; color: #34d399; margin-top: 2px;">${s.titleKu}</div>
             <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-              <span class="neo3d-pill-btn" style="padding: 3px 9px; font-size: 0.68rem; color: #ef4444; border-color: rgba(239,68,68,0.3);"><i class="fa-brands fa-youtube"></i> پەخشی یوتیوب</span>
+              ${s.youtubeChannel ? `
+                <a href="${s.youtubeChannel}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="neo3d-pill-btn" style="padding: 3px 10px; font-size: 0.7rem; color: #fca5a5; background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                  <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> کەناڵی یوتیوب
+                </a>
+              ` : ''}
+              ${s.telegramChannel ? `
+                <a href="${s.telegramChannel}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="neo3d-pill-btn" style="padding: 3px 10px; font-size: 0.7rem; color: #93c5fd; background: rgba(59,130,246,0.18); border-color: rgba(59,130,246,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                  <i class="fa-brands fa-telegram" style="color: #38bdf8;"></i> کەناڵی تێلێگرام
+                </a>
+              ` : ''}
               <span class="neo3d-pill-btn" style="padding: 3px 9px; font-size: 0.68rem; color: #34d399; border-color: rgba(16,185,129,0.3);"><i class="fa-solid fa-headphones"></i> پەخشی دەنگی</span>
             </div>
           </div>
