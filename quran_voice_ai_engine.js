@@ -770,6 +770,7 @@
               ${t.apiKeyTitle}
             </div>
             <div style="display: flex; gap: 6px;">
+              <div style="margin-bottom: 6px;"><a href="https://console.groq.com/keys" target="_blank" style="color: #38bdf8; text-decoration: underline; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><span>🔗 وەرگرتنی خۆڕایی لە کۆنسۆڵی گرووک (console.groq.com/keys)</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.65rem;"></i></a></div>
               <input type="text" id="groqApiKeyInput" placeholder="${t.apiKeyPlaceholder}" value="${currentKey}" style="flex: 1; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #fff; padding: 0 10px; font-size: 0.75rem; direction: ltr; font-family: monospace;">
               <button onclick="QuranVoiceAI.saveGroqApiKey(document.getElementById('groqApiKeyInput').value)" class="neo3d-pill-btn" style="padding: 0 12px; height: 32px; background: #10b981; color: #fff; border: none; font-size: 0.74rem;">${t.apiKeyBtn}</button>
             </div>

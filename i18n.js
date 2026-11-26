@@ -1,3 +1,11 @@
+// Force migrate users who had 'de' cached from earlier versions to Kurdish default
+try {
+  if (localStorage.getItem('quran_lang_migrated_to_ku_v4') !== 'true') {
+    localStorage.setItem('quran_app_language', 'ku');
+    localStorage.setItem('quran_lang_migrated_to_ku_v4', 'true');
+  }
+} catch (e) {}
+
 // ============================================================
 // TRILINGUAL LOCALIZATION (DEUTSCH - ENGLISH - KURDISH SORANI)
 // Standard: Deutsch (German)
@@ -430,3 +438,17 @@ window.I18N_TRANSLATIONS = I18N_TRANSLATIONS;
 window.currentAppLanguage = currentAppLanguage;
 window.t = t;
 window.setAppLanguage = setAppLanguage;
+
+
+// Auto execute on script load to apply language immediately
+try {
+  const initLang = localStorage.getItem('quran_app_language') || 'ku';
+  if (typeof setAppLanguage === 'function') {
+    setAppLanguage(initLang);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setAppLanguage(localStorage.getItem('quran_app_language') || 'ku');
+    });
+  }
+} catch(e) {}
