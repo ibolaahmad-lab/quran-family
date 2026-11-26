@@ -253,7 +253,7 @@
         }
       } else {
         lastBackExitAttempt = now;
-        const lang = window.currentAppLanguage || 'de';
+        const lang = window.currentAppLanguage || 'ku';
         const msg = lang === 'ku'
           ? 'بۆ دەرچوون لە بەرنامە جارێکی تر گەڕانەوە دابگرە'
           : (lang === 'en' ? 'Press back again to exit' : 'Zum Beenden noch einmal Zurück drücken');
@@ -508,7 +508,7 @@
       document.body.appendChild(modal);
     }
 
-    const lang = window.currentAppLanguage || 'de';
+    const lang = window.currentAppLanguage || 'ku';
     const mainTitle = lang === 'ku' ? cfg.titleKu : (lang === 'en' ? cfg.titleEn : cfg.titleDe);
     const subTitle = lang === 'ku' ? (cfg.subKu || cfg.subDe) : (lang === 'en' ? (cfg.subEn || cfg.subDe) : cfg.subDe);
 
@@ -661,7 +661,7 @@
   window.applyNeo3DTheme = applyNeo3DTheme;
 
   function translateSettingsModalUI(langCode) {
-    const lang = langCode || window.currentAppLanguage || 'de';
+    const lang = langCode || window.currentAppLanguage || 'ku';
     const map = {
       de: {
         langHdr: '1. Sprache / Language / زمان',
@@ -2557,7 +2557,7 @@
     if (!container) return;
 
     const cats = window.OFFICIAL_TAJWEED_CATEGORIES || [];
-    const lang = window.currentAppLanguage || 'de';
+    const lang = window.currentAppLanguage || 'ku';
 
     // If no category is selected, show the sleek 3D Category Menu Grid!
     if (!window.activeTajweedCategoryId) {
@@ -2689,7 +2689,7 @@
     const lexicon = window.OFFICIAL_QURAN_DICTIONARY || [];
     const q = (query || '').trim().toLowerCase();
     const qAr = normalizeArabicSearch(q);
-    const lang = window.currentAppLanguage || 'de';
+    const lang = window.currentAppLanguage || 'ku';
 
     let filtered = lexicon.filter(item => {
       if (activeDictCat !== 'all' && item.cat !== activeDictCat) return false;
@@ -3719,7 +3719,7 @@
     const container = document.getElementById('spiritualCenterMainContainer');
     if (!container) return;
 
-    const lang = window.quran_app_language || window.currentAppLanguage || 'de';
+    const lang = window.quran_app_language || window.currentAppLanguage || 'ku';
     const isKu = (lang === 'ku');
     const isFa = (lang === 'fa');
     let mode = window.activeSpiritualSubView || 'dalail_list';
@@ -4308,7 +4308,7 @@
     let audioFile = '';
     let title = '';
 
-    const lang = window.quran_app_language || window.currentAppLanguage || 'de';
+    const lang = window.quran_app_language || window.currentAppLanguage || 'ku';
     const isKu = (lang === 'ku');
     const isFa = (lang === 'fa');
     const isEn = (lang === 'en');
@@ -4394,7 +4394,7 @@
   window.updateTwinStickersUI = function () {
     const active = window.activeStickerAudio;
 
-    const lang = window.quran_app_language || window.currentAppLanguage || 'de';
+    const lang = window.quran_app_language || window.currentAppLanguage || 'ku';
     const isKu = (lang === 'ku');
     const isFa = (lang === 'fa');
     const isEn = (lang === 'en');
@@ -4544,7 +4544,7 @@
     if (navigator.vibrate) navigator.vibrate(30);
     if (window.duaCardCounters[duaId] === target) {
       if (navigator.vibrate) navigator.vibrate([50, 40, 70]);
-      const lang = window.quran_app_language || 'de';
+      const lang = window.quran_app_language || 'ku';
       const msg = lang === 'ku' ? '🎉 ماء شاء الله! ژمارەی داواکراو تەواو بوو' : (lang === 'fa' ? '🎉 ماشاءالله! تعداد ذکر به پایان رسید' : '🎉 Māshā Allāh! Zielanzahl erreicht');
       if (typeof showToast === 'function') showToast(msg);
     }
@@ -4574,7 +4574,7 @@
     renderSpiritualCenter();
 
     if (typeof showToast === 'function') {
-      const lang = window.quran_app_language || 'de';
+      const lang = window.quran_app_language || 'ku';
       const msg = item.surah
         ? (lang === 'ku' ? `🔊 دوعای قورئانی (${item.surah}:${item.ayah}) - شێخ میشاری عەفاسی` : (lang === 'fa' ? `🔊 دعای قرآنی (${item.surah}:${item.ayah}) - استاد مشاری العفاسی` : `🔊 Koran-Dua (${item.surah}:${item.ayah}) - Mishary Alafasy`))
         : (lang === 'ku' ? '🔊 خوێندنەوەی زیکری پیرۆز...' : (lang === 'fa' ? '🔊 در حال پخش صوت ذکر مبارک...' : '🔊 Dhikr-Audio wird abgespielt...'));
@@ -4747,7 +4747,7 @@
     const now = new Date();
     const curMinutes = now.getHours() * 60 + now.getMinutes();
 
-    const curLang = localStorage.getItem('quran_app_language') || (typeof state !== 'undefined' && state.lang) || 'de';
+    const curLang = localStorage.getItem('quran_app_language') || (typeof state !== 'undefined' && state.lang) || 'ku';
     const isKu = (curLang === 'ku');
 
     const cityLabelEl = document.getElementById('ptWidgetCityLabel');
@@ -4943,7 +4943,7 @@
     }
 
     const city = getSelectedPrayerCity();
-    const curLang = localStorage.getItem('quran_app_language') || (typeof state !== 'undefined' && state.lang) || 'de';
+    const curLang = localStorage.getItem('quran_app_language') || (typeof state !== 'undefined' && state.lang) || 'ku';
     const isKu = (curLang === 'ku');
     const isFa = (curLang === 'fa');
     const isRtl = (isKu || isFa);
@@ -5249,7 +5249,7 @@
 
   function updateMawaqitCardStates() {
     const selectedVoiceId = prayerSettings.adhanVoice || 'qods';
-    const curLang = localStorage.getItem('quran_app_language') || (typeof state !== 'undefined' && state.lang) || 'de';
+    const curLang = localStorage.getItem('quran_app_language') || (typeof state !== 'undefined' && state.lang) || 'ku';
     const isKu = (curLang === 'ku');
 
     window.MAWAQIT_ADHAN_LIST.forEach(item => {

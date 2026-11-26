@@ -978,7 +978,7 @@ function renderWordStudio() {
   }
 
   // Active language detection for multilingual translation/tafsir
-  const curLang = localStorage.getItem('quran_app_language') || (typeof state !== 'undefined' && state.lang) || 'de';
+  const curLang = localStorage.getItem('quran_app_language') || (typeof state !== 'undefined' && state.lang) || 'ku';
 
   state.verseRepeatMap = state.verseRepeatMap || {};
 
@@ -3306,7 +3306,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Restore saved language (default German)
   try {
-    const savedLang = localStorage.getItem('quran_app_language') || 'de';
+    const savedLang = localStorage.getItem('quran_app_language') || 'ku';
     if (typeof setAppLanguage === 'function') setAppLanguage(savedLang);
   } catch (e) {}
 
