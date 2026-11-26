@@ -323,11 +323,10 @@
     .android-bottom-nav {
       position: fixed !important;
       bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
-      transform: none !important;
+      left: 50% !important;
+      right: auto !important;
+      transform: translateX(-50%) !important;
+      margin: 0 !important;
       width: 100% !important;
       max-width: 480px !important;
       height: auto !important;
@@ -4068,11 +4067,10 @@
   .android-bottom-nav {
     position: fixed !important;
     bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    transform: none !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
     width: 100% !important;
     max-width: 480px !important;
     box-sizing: border-box !important;
@@ -4143,7 +4141,8 @@
   <script src="pdf.worker.min.js"></script>
   <script src="i18n.js?v=20261126_final_perf"></script>
   <script src="quran_voice_ai_engine.js?v=20261126_groq_v2"></script>
-  <script src="app.js?v=20261126_sunni_v11"></script>
+  <script src="tafsir_nami_audio_data.js?v=20261126_sunni_v12"></script>
+  <script src="app.js?v=20261126_sunni_v12"></script>
 
   <style id="neo3dMasterStyles">
     /* Permanently disable legacy PIN overlay */
@@ -4834,6 +4833,7 @@
         <div class="form-group">
           <select id="qariSelect" class="select-box" onchange="onQariChanged(this.value)">
             <option value="Alafasy_128kbps" selected>مشاري راشد العفاسي (Mishary Rashid Alafasy)</option>
+            <option value="Tafsir_Nami_Audio">🎙️ دەنگی تەفسیری نامی (م. مەلا عەبدولکەریم)</option>
             <option value="Mansour_Al_Salimi">منصور السالمي (Ganze Sure)</option>
             <option value="Husary_128kbps">محمود خليل الحصري - مرتل (Al-Hussary Murattal)</option>
             <option value="Husary_128kbps_Mujawwad">محمود خليل الحصري - مجود (Al-Hussary Mujawwad)</option>
@@ -5431,6 +5431,7 @@
             <!-- 2. Qari Select -->
             <select id="mushafToolbarQariSelect" onchange="onQariChanged(this.value)" style="min-width: 0; height: 32px; padding: 2px 6px; font-size: 0.76rem; font-weight: 700; background: rgba(0,0,0,0.45); color: #fef08a; border: 1px solid rgba(255,255,255,0.14); border-radius: 10px; outline: none; text-overflow: ellipsis;">
               <option value="Alafasy_128kbps" selected>🎙️ Alafasy (العفاسي)</option>
+              <option value="Tafsir_Nami_Audio">🎙️ دەنگی نامی (م. مودەڕڕیس)</option>
               <option value="Husary_128kbps">🎙️ Al-Hussary (الحصري)</option>
               <option value="Abdul_Basit_Murattal_192kbps">🎙️ Abdul Basit</option>
               <option value="Minshawy_Murattal_128kbps">🎙️ Minshawy</option>
@@ -5617,6 +5618,7 @@
             <div style="display: flex; align-items: center; width: 100%;">
               <select id="wsPlayerQariSelect" onchange="onQariChanged(this.value)" style="width: 100%; height: 34px; padding: 4px 10px; font-size: 0.78rem; font-weight: 700; background: rgba(0,0,0,0.42); color: #fef08a; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;">
                 <option value="Alafasy_128kbps" selected>🎙️ مشاري العفاسي (Mishary Alafasy)</option>
+                <option value="Tafsir_Nami_Audio">🎙️ دەنگی تەفسیری نامی (م. مەلا عەبدولکەریم)</option>
                 <option value="Husary_128kbps">🎙️ محمود خليل الحصري (Al-Hussary)</option>
                 <option value="Abdul_Basit_Murattal_192kbps">🎙️ عبد الباسط عبد الصمد</option>
                 <option value="Minshawy_Murattal_128kbps">🎙️ محمد صديق المنشاوي</option>
@@ -5940,6 +5942,7 @@
           <div style="display: flex; align-items: center; width: 100%; margin-top: 2px;">
             <select id="tafsirPlayerQariSelect" onchange="onQariChanged(this.value)" style="width: 100%; height: 34px; padding: 4px 10px; font-size: 0.78rem; font-weight: 700; background: rgba(0,0,0,0.42); color: #fef08a; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;">
               <option value="Alafasy_128kbps" selected>🎙️ مشاري العفاسي (Mishary Alafasy)</option>
+              <option value="Tafsir_Nami_Audio">🎙️ دەنگی تەفسیری نامی (م. مەلا عەبدولکەریم)</option>
               <option value="Husary_128kbps">🎙️ محمود خليل الحصري (Al-Hussary)</option>
               <option value="Abdul_Basit_Murattal_192kbps">🎙️ عبد الباسط عبد الصمد</option>
               <option value="Minshawy_Murattal_128kbps">🎙️ محمد صديق المنشاوي</option>
@@ -5966,9 +5969,15 @@
             </button>
 
             <!-- Compact Nami Book Pill Button -->
-            <button type="button" onclick="openTafsirNamiPdfModalForSurah(state.tafsirSurah || 1)" class="neo3d-pill-btn" style="padding: 7px 12px; font-size: 0.8rem; background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7; flex-shrink: 0;" title="پەڕتووکی تەفسیری نامی (PDF)">
+            <button type="button" onclick="openTafsirNamiPdfModalForSurah(state.tafsirSurah || 1)" class="neo3d-pill-btn" style="padding: 7px 10px; font-size: 0.78rem; background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7; flex-shrink: 0;" title="پەڕتووکی تەفسیری نامی (PDF)">
               <i class="fa-solid fa-book-open-reader" style="color: #34d399;"></i>
-              <span>کتێبی نامی</span>
+              <span>کتێب</span>
+            </button>
+
+            <!-- Tafsir Nami Audio Pill Button -->
+            <button type="button" onclick="playTafsirNamiSurahAudio(state.tafsirSurah || 1)" class="neo3d-pill-btn" style="padding: 7px 10px; font-size: 0.78rem; background: rgba(168, 85, 247, 0.2); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; flex-shrink: 0;" title="گوێگرتن لە دەنگی تەفسیری نامی بۆ ئەم سورەتە">
+              <i class="fa-solid fa-headphones" style="color: #c084fc;"></i>
+              <span>دەنگی نامی</span>
             </button>
           </div>
         </div>
@@ -6376,6 +6385,7 @@
     <div class="dock-left">
       <select id="dockQariSelect" class="dock-select" title="Rezitator auswählen" onchange="onQariChanged(this.value)">
         <option value="Alafasy_128kbps" selected>مشاري راشد العفاسي (Alafasy)</option>
+        <option value="Tafsir_Nami_Audio">🎙️ دەنگی تەفسیری نامی (م. مەلا عەبدولکەریم)</option>
         <option value="Mansour_Al_Salimi">منصور السالمي (Ganze Sure)</option>
         <option value="Husary_128kbps">محمود خليل الحصري - مرتل (Al-Hussary)</option>
         <option value="Husary_128kbps_Mujawwad">محمود خليل الحصري - مجود (Mujawwad)</option>
@@ -6767,7 +6777,7 @@
   <!-- ======================================================= -->
   <!-- ANDROID MOBILE BOTTOM NAVIGATION BAR                     -->
   <!-- ======================================================= -->
-  <nav class="android-bottom-nav" style="position: fixed; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto; transform: none; width: 100%; max-width: 480px; display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; justify-items: center; direction: ltr; background: rgba(8, 13, 20, 0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 5px 2px 6px; z-index: 12000; box-shadow: 0 -8px 28px rgba(0,0,0,0.85); box-sizing: border-box;">
+  <nav class="android-bottom-nav" style="position: fixed; bottom: 0; left: 50%; right: auto; transform: translateX(-50%); margin: 0; width: 100%; max-width: 480px; display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; justify-items: center; direction: ltr; background: rgba(8, 13, 20, 0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 5px 2px 6px; z-index: 12000; box-shadow: 0 -8px 28px rgba(0,0,0,0.85); box-sizing: border-box;">
     <!-- 1. Start (Home) -->
     <button class="abn-btn active" id="abnHome" onclick="switchMainTab('home')" title="Startseite">
       <div class="abn-orb" style="background: linear-gradient(135deg, #38bdf8, #0284c7); box-shadow: 0 4px 10px rgba(14,165,233,0.35), inset 0 1px 2px rgba(255,255,255,0.4);">
@@ -6890,38 +6900,38 @@
         <!-- 1. Arabic Sunni Section -->
         <div>
           <div style="font-size: 0.75rem; font-weight: 800; color: #60a5fa; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-scroll"></i> <span>العربية (الأزهر الشريف وأهل السنة)</span>
+            <i class="fa-solid fa-scroll"></i> <span>العربية (أهل السنة والجماعة)</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
             <button type="button" onclick="selectTafsirEdition('ar_jalalayn')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(59, 130, 246, 0.3); text-align: right; direction: rtl;">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8);"><i class="fa-solid fa-book-open"></i></div>
               <div style="flex: 1;">
                 <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسير الجلالين</div>
-                <div style="font-size: 0.68rem; color: #94a3b8;">الإمامان جلال الدين المحلي وجلال الدين السيوطي رحمهما الله</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">الإمامان المحلي والسيوطي</div>
               </div>
             </button>
 
             <button type="button" onclick="selectTafsirEdition('ar_ibnkathir')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(59, 130, 246, 0.3); text-align: right; direction: rtl;">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #2563eb, #1e40af);"><i class="fa-solid fa-scale-balanced"></i></div>
               <div style="flex: 1;">
-                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسير القرآن العظيم (ابن كثير - الأصل)</div>
-                <div style="font-size: 0.68rem; color: #94a3b8;">النسخة الأصلية المعتمدة لأهل السنة والجماعة</div>
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسير ابن كثير</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">الحافظ عماد الدين ابن كثير</div>
               </div>
             </button>
 
             <button type="button" onclick="selectTafsirEdition('ar_qurtubi')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(59, 130, 246, 0.3); text-align: right; direction: rtl;">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #0ea5e9, #0369a1);"><i class="fa-solid fa-landmark"></i></div>
               <div style="flex: 1;">
-                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">الجامع لأحكام القرآن (القرطبي)</div>
-                <div style="font-size: 0.68rem; color: #94a3b8;">تفسير فقهي وعقدي معتمد للإمام القرطبي رحمه الله</div>
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسير القرطبي</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">الجامع لأحكام القرآن - الإمام القرطبي</div>
               </div>
             </button>
 
             <button type="button" onclick="selectTafsirEdition('ar_muyassar')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(16, 185, 129, 0.3); text-align: right; direction: rtl;">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #10b981, #047857);"><i class="fa-solid fa-bolt"></i></div>
               <div style="flex: 1;">
-                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">التفسير الميسر (أوفلاين سريع 100%)</div>
-                <div style="font-size: 0.68rem; color: #94a3b8;">نخبة من علماء الأمة · مجمع الملك فهد لطباعة المصحف</div>
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">التفسير الميسر</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">مجمع الملك فهد لطباعة المصحف</div>
               </div>
             </button>
           </div>
@@ -6930,22 +6940,22 @@
         <!-- 2. Persian Sunni Section -->
         <div>
           <div style="font-size: 0.75rem; font-weight: 800; color: #fbbf24; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-feather"></i> <span>فارسی (مفسران بزرگ اهل سنت و جماعت)</span>
+            <i class="fa-solid fa-feather"></i> <span>فارسی</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
             <button type="button" onclick="selectTafsirEdition('fa_khorramdel')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(245, 158, 11, 0.35); text-align: right; direction: rtl;">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #f59e0b, #b45309);"><i class="fa-solid fa-sun"></i></div>
               <div style="flex: 1;">
-                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسیر نور (دکتر مصطفی خرمدل)</div>
-                <div style="font-size: 0.68rem; color: #94a3b8;">تفسیر معتبر و بی‌نظیر اهل سنت به قلم ادیب نامدار کُرد</div>
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسیر نور (خرمدل)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">دکتر مصطفی خرمدل</div>
               </div>
             </button>
 
             <button type="button" onclick="selectTafsirEdition('fa_jalalayn')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(245, 158, 11, 0.35); text-align: right; direction: rtl;">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #d97706, #92400e);"><i class="fa-solid fa-feather-pointed"></i></div>
               <div style="flex: 1;">
-                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسیر جلالین (فارسی اهل سنت)</div>
-                <div style="font-size: 0.68rem; color: #94a3b8;">ترجمه و توضیح مستند تفسیر جلالین به زبان فارسی</div>
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تفسیر جلالین (فارسی)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">تفسیر جلالین به زبان فارسی</div>
               </div>
             </button>
           </div>
@@ -6954,30 +6964,30 @@
         <!-- 3. Kurdish Sunni Section -->
         <div>
           <div style="font-size: 0.75rem; font-weight: 800; color: #a855f7; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-pen-nib"></i> <span>کوردی (تەفسیرەکانی ئەهلی سوننەت)</span>
+            <i class="fa-solid fa-pen-nib"></i> <span>کوردی</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
             <button type="button" onclick="selectTafsirEdition('nami')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(168, 85, 247, 0.35); text-align: right; direction: rtl;">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #a855f7, #6d28d9);"><i class="fa-solid fa-feather-pointed"></i></div>
               <div style="flex: 1;">
-                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تەفسیری نامی (دەق و پەڕتووک)</div>
-                <div style="font-size: 0.68rem; color: #94a3b8;">حەزرەتی مامۆستا مەلا عەبدولکەریمی مودەڕڕیس رحمه الله</div>
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تەفسیری نامی (مودەڕڕیس)</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">مامۆستا مەلا عەبدولکەریمی مودەڕڕیس</div>
               </div>
             </button>
 
             <button type="button" onclick="selectTafsirEdition('asan_pukhta')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(168, 85, 247, 0.35); text-align: right; direction: rtl;">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #8b5cf6, #5b21b6);"><i class="fa-solid fa-book"></i></div>
               <div style="flex: 1;">
-                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تەفسیری ئاسان و پوختە (ئۆفلاین 100%)</div>
-                <div style="font-size: 0.68rem; color: #94a3b8;">تەفسیری ئاسانی قورئانی پیرۆز بۆ هەموو ئایەتەکان</div>
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تەفسیری ئاسان و پوختە</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">تەفسیری کوردی هەموو ئایەتەکان</div>
               </div>
             </button>
 
             <button type="button" onclick="selectTafsirEdition('rebar')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(168, 85, 247, 0.35); text-align: right; direction: rtl;">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #7c3aed, #4c1d95);"><i class="fa-solid fa-compass"></i></div>
               <div style="flex: 1;">
-                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تەفسیری ڕێبەر (پوختەی مانا)</div>
-                <div style="font-size: 0.68rem; color: #94a3b8;">مانا و مەبەستی ئایەتە پیرۆزەکان بە کوردییەکی ڕەوان</div>
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">تەفسیری ڕێبەر</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">پوختەی مانا و تەفسیری قورئان</div>
               </div>
             </button>
           </div>
@@ -6986,7 +6996,7 @@
         <!-- 4. German Authentic Section -->
         <div>
           <div style="font-size: 0.75rem; font-weight: 800; color: #34d399; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-globe"></i> <span>Deutsche authentische Quellen</span>
+            <i class="fa-solid fa-globe"></i> <span>Deutsche Quellen</span>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px;">
             <button type="button" onclick="selectTafsirEdition('bubenheim')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(16, 185, 129, 0.35);">
@@ -7000,15 +7010,15 @@
             <button type="button" onclick="selectTafsirEdition('zaidan')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(56, 189, 248, 0.35);">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #38bdf8, #0284c7);"><i class="fa-solid fa-scale-balanced"></i></div>
               <div style="flex: 1; text-align: left;">
-                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">Amir Zaidan (At-Tafsīr)</div>
-                <div style="font-size: 0.68rem; color: #94a3b8;">Ausführliche theologische Erläuterung</div>
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">Amir Zaidan</div>
+                <div style="font-size: 0.68rem; color: #94a3b8;">At-Tafsīr</div>
               </div>
             </button>
 
             <button type="button" onclick="selectTafsirEdition('aburida')" class="neo3d-hub-item-card" style="padding: 9px 12px; border-color: rgba(245, 158, 11, 0.35);">
               <div class="neo3d-orb-icon" style="width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem; background: linear-gradient(135deg, #f59e0b, #b45309);"><i class="fa-solid fa-feather"></i></div>
               <div style="flex: 1; text-align: left;">
-                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">Abu Rida (M. ibn Ahmad ibn Rassoul)</div>
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">Abu Rida</div>
                 <div style="font-size: 0.68rem; color: #94a3b8;">Islamische Bibliothek Köln</div>
               </div>
             </button>
@@ -7182,6 +7192,7 @@
             <div id="settingsOfflineQariLabel" style="font-size: 0.76rem; color: #cbd5e1; font-weight: 700;">قورئانخوێن هەڵبژێرە:</div>
             <select id="settingsOfflineQariSelect" onchange="onQariChanged(this.value)" style="width: 100%; height: 40px; border-radius: 12px; background: rgba(0,0,0,0.45); color: #fef08a; border: 1px solid rgba(255,255,255,0.14); padding: 0 10px; font-weight: 800; font-size: 0.84rem;">
               <option value="Alafasy_128kbps" selected>🎙️ مشاري راشد العفاسي (Mishary Alafasy)</option>
+              <option value="Tafsir_Nami_Audio">🎙️ دەنگی تەفسیری نامی (م. مەلا عەبدولکەریم)</option>
               <option value="Mansour_Al_Salimi">🎙️ منصور السالمي (Mansour Al-Salimi - تلاوة كاملة)</option>
               <option value="Husary_128kbps">🎙️ محمود خليل الحصري (Al-Hussary Murattal)</option>
               <option value="Abdul_Basit_Murattal_192kbps">🎙️ عبد الباسط عبد الصمد (Abdul Basit)</option>
@@ -7202,6 +7213,120 @@
                 <option id="settingsScopeOptAll" value="all_quran">🕋 هەموو قورئانی پیرۆز (١١٤ سورەت)</option>
               </optgroup>
               <optgroup id="settingsScopeAllSurahsGroup" label="📖 هەموو ١١٤ سورەتەکە بە جیا">
+                <option value="1">1. سورة ٱلْفَاتِحَةِ (Al-Faatiha)</option>
+                <option value="2">2. سورة البَقَرَةِ (Al-Baqara)</option>
+                <option value="3">3. سورة آلِ عِمۡرَانَ (Aal-i-Imraan)</option>
+                <option value="4">4. سورة النِّسَاءِ (An-Nisaa)</option>
+                <option value="5">5. سورة المَائـِدَةِ (Al-Maaida)</option>
+                <option value="6">6. سورة الأَنۡعَامِ (Al-An'aam)</option>
+                <option value="7">7. سورة الأَعۡرَافِ (Al-A'raaf)</option>
+                <option value="8">8. سورة الأَنفَالِ (Al-Anfaal)</option>
+                <option value="9">9. سورة التَّوۡبَةِ (At-Tawba)</option>
+                <option value="10">10. سورة يُونُسَ (Yunus)</option>
+                <option value="11">11. سورة هُودٍ (Hud)</option>
+                <option value="12">12. سورة يُوسُفَ (Yusuf)</option>
+                <option value="13">13. سورة الرَّعۡدِ (Ar-Ra'd)</option>
+                <option value="14">14. سورة إِبۡرَاهِيمَ (Ibrahim)</option>
+                <option value="15">15. سورة الحِجۡرِ (Al-Hijr)</option>
+                <option value="16">16. سورة النَّحۡلِ (An-Nahl)</option>
+                <option value="17">17. سورة الإِسۡرَاءِ (Al-Israa)</option>
+                <option value="18">18. سورة الكَهۡفِ (Al-Kahf)</option>
+                <option value="19">19. سورة مَرۡيَمَ (Maryam)</option>
+                <option value="20">20. سورة طه (Taa-Haa)</option>
+                <option value="21">21. سورة الأَنبِيَاءِ (Al-Anbiyaa)</option>
+                <option value="22">22. سورة الحَجِّ (Al-Hajj)</option>
+                <option value="23">23. سورة المُؤۡمِنُونَ (Al-Muminoon)</option>
+                <option value="24">24. سورة النُّورِ (An-Noor)</option>
+                <option value="25">25. سورة الفُرۡقَانِ (Al-Furqaan)</option>
+                <option value="26">26. سورة الشُّعَرَاءِ (Ash-Shu'araa)</option>
+                <option value="27">27. سورة النَّمۡلِ (An-Naml)</option>
+                <option value="28">28. سورة القَصَصِ (Al-Qasas)</option>
+                <option value="29">29. سورة العَنكَبُوتِ (Al-Ankaboot)</option>
+                <option value="30">30. سورة الرُّومِ (Ar-Room)</option>
+                <option value="31">31. سورة لُقۡمَانَ (Luqman)</option>
+                <option value="32">32. سورة السَّجۡدَةِ (As-Sajda)</option>
+                <option value="33">33. سورة الأَحۡزَابِ (Al-Ahzaab)</option>
+                <option value="34">34. سورة سَبَإٍ (Saba)</option>
+                <option value="35">35. سورة فَاطِرٍ (Faatir)</option>
+                <option value="36">36. سورة يسٓ (Yaseen)</option>
+                <option value="37">37. سورة الصَّافَّاتِ (As-Saaffaat)</option>
+                <option value="38">38. سورة صٓ (Saad)</option>
+                <option value="39">39. سورة الزُّمَرِ (Az-Zumar)</option>
+                <option value="40">40. سورة غَافِرٍ (Ghafir)</option>
+                <option value="41">41. سورة فُصِّلَتۡ (Fussilat)</option>
+                <option value="42">42. سورة الشُّورَىٰ (Ash-Shura)</option>
+                <option value="43">43. سورة الزُّخۡرُفِ (Az-Zukhruf)</option>
+                <option value="44">44. سورة الدُّخَانِ (Ad-Dukhaan)</option>
+                <option value="45">45. سورة الجَاثِيَةِ (Al-Jaathiya)</option>
+                <option value="46">46. سورة الأَحۡقَافِ (Al-Ahqaf)</option>
+                <option value="47">47. سورة مُحَمَّدٍ (Muhammad)</option>
+                <option value="48">48. سورة الفَتۡحِ (Al-Fath)</option>
+                <option value="49">49. سورة الحُجُرَاتِ (Al-Hujuraat)</option>
+                <option value="50">50. سورة قٓ (Qaaf)</option>
+                <option value="51">51. سورة الذَّارِيَاتِ (Adh-Dhaariyat)</option>
+                <option value="52">52. سورة الطُّورِ (At-Tur)</option>
+                <option value="53">53. سورة النَّجۡمِ (An-Najm)</option>
+                <option value="54">54. سورة القَمَرِ (Al-Qamar)</option>
+                <option value="55">55. سورة الرَّحۡمَٰن (Ar-Rahmaan)</option>
+                <option value="56">56. سورة الوَاقِعَةِ (Al-Waaqia)</option>
+                <option value="57">57. سورة الحَدِيدِ (Al-Hadid)</option>
+                <option value="58">58. سورة المُجَادلَةِ (Al-Mujaadila)</option>
+                <option value="59">59. سورة الحَشۡرِ (Al-Hashr)</option>
+                <option value="60">60. سورة المُمۡتَحنَةِ (Al-Mumtahana)</option>
+                <option value="61">61. سورة الصَّفِّ (As-Saff)</option>
+                <option value="62">62. سورة الجُمُعَةِ (Al-Jumu'a)</option>
+                <option value="63">63. سورة المُنَافِقُونَ (Al-Munaafiqoon)</option>
+                <option value="64">64. سورة التَّغَابُنِ (At-Taghaabun)</option>
+                <option value="65">65. سورة الطَّلَاقِ (At-Talaaq)</option>
+                <option value="66">66. سورة التَّحۡرِيمِ (At-Tahrim)</option>
+                <option value="67">67. سورة المُلۡكِ (Al-Mulk)</option>
+                <option value="68">68. سورة القَلَمِ (Al-Qalam)</option>
+                <option value="69">69. سورة الحَاقَّةِ (Al-Haaqqa)</option>
+                <option value="70">70. سورة المَعَارِجِ (Al-Ma'aarij)</option>
+                <option value="71">71. سورة نُوحٍ (Nooh)</option>
+                <option value="72">72. سورة الجِنِّ (Al-Jinn)</option>
+                <option value="73">73. سورة المُزَّمِّلِ (Al-Muzzammil)</option>
+                <option value="74">74. سورة المُدَّثِّرِ (Al-Muddaththir)</option>
+                <option value="75">75. سورة القِيَامَةِ (Al-Qiyaama)</option>
+                <option value="76">76. سورة الإِنسَانِ (Al-Insaan)</option>
+                <option value="77">77. سورة المُرۡسَلَاتِ (Al-Mursalaat)</option>
+                <option value="78">78. سورة النَّبَإِ (An-Naba)</option>
+                <option value="79">79. سورة النَّازِعَاتِ (An-Naazi'aat)</option>
+                <option value="80">80. سورة عَبَسَ (Abasa)</option>
+                <option value="81">81. سورة التَّكۡوِيرِ (At-Takwir)</option>
+                <option value="82">82. سورة الانفِطَارِ (Al-Infitaar)</option>
+                <option value="83">83. سورة المُطَفِّفِينَ (Al-Mutaffifin)</option>
+                <option value="84">84. سورة الانشِقَاقِ (Al-Inshiqaaq)</option>
+                <option value="85">85. سورة البُرُوجِ (Al-Burooj)</option>
+                <option value="86">86. سورة الطَّارِقِ (At-Taariq)</option>
+                <option value="87">87. سورة الأَعۡلَىٰ (Al-A'laa)</option>
+                <option value="88">88. سورة الغَاشِيَةِ (Al-Ghaashiya)</option>
+                <option value="89">89. سورة الفَجۡرِ (Al-Fajr)</option>
+                <option value="90">90. سورة البَلَدِ (Al-Balad)</option>
+                <option value="91">91. سورة الشَّمۡسِ (Ash-Shams)</option>
+                <option value="92">92. سورة اللَّيۡلِ (Al-Lail)</option>
+                <option value="93">93. سورة الضُّحَىٰ (Ad-Dhuhaa)</option>
+                <option value="94">94. سورة الشَّرۡحِ (Ash-Sharh)</option>
+                <option value="95">95. سورة التِّينِ (At-Tin)</option>
+                <option value="96">96. سورة العَلَقِ (Al-Alaq)</option>
+                <option value="97">97. سورة القَدۡرِ (Al-Qadr)</option>
+                <option value="98">98. سورة البَيِّنَةِ (Al-Bayyina)</option>
+                <option value="99">99. سورة الزَّلۡزَلَةِ (Az-Zalzala)</option>
+                <option value="100">100. سورة العَادِيَاتِ (Al-Aadiyaat)</option>
+                <option value="101">101. سورة القَارِعَةِ (Al-Qaari'a)</option>
+                <option value="102">102. سورة التَّكَاثُرِ (At-Takaathur)</option>
+                <option value="103">103. سورة العَصۡرِ (Al-Asr)</option>
+                <option value="104">104. سورة الهُمَزَةِ (Al-Humaza)</option>
+                <option value="105">105. سورة الفِيلِ (Al-Fil)</option>
+                <option value="106">106. سورة قُرَيۡشٍ (Quraish)</option>
+                <option value="107">107. سورة المَاعُونِ (Al-Maa'un)</option>
+                <option value="108">108. سورة الكَوۡثَرِ (Al-Kawthar)</option>
+                <option value="109">109. سورة الكَافِرُونَ (Al-Kaafiroon)</option>
+                <option value="110">110. سورة النَّصۡرِ (An-Nasr)</option>
+                <option value="111">111. سورة المَسَدِ (Al-Masad)</option>
+                <option value="112">112. سورة الإِخۡلَاصِ (Al-Ikhlaas)</option>
+                <option value="113">113. سورة الفَلَقِ (Al-Falaq)</option>
+                <option value="114">114. سورة النَّاسِ (An-Naas)</option>
               </optgroup>
             </select>
           </div>
@@ -7531,11 +7656,11 @@
   <script src="dalail_burda_tajweed_data.js"></script>
   <script src="authentic_duas_azkar_data.js"></script>
   <script src="asmaa_allah_data.js"></script>
-  <script src="hujra_lessons_data.js?v=20261126_sunni_v11"></script>
-  <script src="hujra_lessons_engine.js?v=20261126_sunni_v11"></script>
-  <script src="app_v4_master_overhaul.js?v=20261126_sunni_v11"></script>
-  <script src="murajaa_features_engine.js?v=20261126_sunni_v11"></script>
-  <script src="pwa_installer.js?v=20261126_sunni_v11"></script>
+  <script src="hujra_lessons_data.js?v=20261126_sunni_v12"></script>
+  <script src="hujra_lessons_engine.js?v=20261126_sunni_v12"></script>
+  <script src="app_v4_master_overhaul.js?v=20261126_sunni_v12"></script>
+  <script src="murajaa_features_engine.js?v=20261126_sunni_v12"></script>
+  <script src="pwa_installer.js?v=20261126_sunni_v12"></script>
   <script>
     window.toggleScreenFitMode = function() {
       const isFull = document.body.classList.contains('screen-fit-full');

@@ -1271,19 +1271,19 @@ window.closeTafsirSourcePickerModal = closeTafsirSourcePickerModal;
 window.tafsirApiCache = window.tafsirApiCache || {};
 
 const SUNNI_TAFSIR_INFO = {
-  none: { name: 'تەفسیر: هەڵبژاردن', lang: 'ku', scholar: 'سەرەتا تەفسیرێک هەڵبژێرە' },
-  ar_jalalayn: { name: 'تفسير الجلالين', lang: 'ar', scholar: 'الإمامان جلال الدين المحلي وجلال الدين السيوطي رحمهما الله (الأزهر الشريف)', color: '#3b82f6', icon: 'fa-solid fa-book-open' },
-  ar_ibnkathir: { name: 'تفسير ابن كثير (الأصل)', lang: 'ar', scholar: 'الحافظ عماد الدين ابن كثير رحمه الله - النسخة الأصلية لأهل السنة', color: '#2563eb', icon: 'fa-solid fa-scale-balanced' },
-  ar_qurtubi: { name: 'تفسير القرطبي', lang: 'ar', scholar: 'الجامع لأحكام القرآن - الإمام أبو عبد الله القرطبي رحمه الله', color: '#0ea5e9', icon: 'fa-solid fa-landmark' },
-  ar_muyassar: { name: 'التفسير الميسر (ئۆفلاین)', lang: 'ar', scholar: 'نخبة من كبار علماء أهل السنة · مجمع الملك فهد لطباعة المصحف', color: '#10b981', icon: 'fa-solid fa-bolt' },
-  fa_khorramdel: { name: 'تفسیر نور (خرمدل)', lang: 'fa', scholar: 'دکتر مصطفی خرمدل رحمه الله (تفسیر معتبر اهل سنت و جماعت)', color: '#f59e0b', icon: 'fa-solid fa-sun' },
-  fa_jalalayn: { name: 'تفسیر جلالین (فارسی)', lang: 'fa', scholar: 'ترجمه و توضیح مستند تفسیر جلالین به زبان فارسی اهل سنت', color: '#d97706', icon: 'fa-solid fa-feather-pointed' },
-  nami: { name: 'تەفسیری نامی (مودەڕڕیس)', lang: 'ku', scholar: 'حەزرەتی مامۆستا مەلا عەبدولکەریمی مودەڕڕیس رحمه الله (دەق و PDF)', color: '#a855f7', icon: 'fa-solid fa-feather-pointed' },
-  asan_pukhta: { name: 'تەفسیری ئاسان و پوختە (ئۆفلاین)', lang: 'ku', scholar: 'مامۆستایانی گەورەی ئەهلی سوننەت (٦٢٣٦ ئایەت بە تەواوی ئۆفلاین)', color: '#8b5cf6', icon: 'fa-solid fa-book' },
-  rebar: { name: 'تەفسیری ڕێبەر', lang: 'ku', scholar: 'پوختەی مانا و تەفسیری قورئانی پیرۆز بە زمانی کوردی', color: '#7c3aed', icon: 'fa-solid fa-compass' },
-  bubenheim: { name: 'Bubenheim & Elyas', lang: 'de', scholar: 'Frank Bubenheim & Dr. Nadeem Elyas (Medina)', color: '#10b981', icon: 'fa-solid fa-book-open' },
-  zaidan: { name: 'Amir Zaidan (At-Tafsīr)', lang: 'de', scholar: 'Ausführliche theologische Erläuterung & Terminologie', color: '#38bdf8', icon: 'fa-solid fa-scale-balanced' },
-  aburida: { name: 'Abu Rida (Köln)', lang: 'de', scholar: 'Abu Rida Muhammad ibn Ahmad ibn Rassoul (Islamische Bibliothek Köln)', color: '#f59e0b', icon: 'fa-solid fa-feather' },
+  none: { name: 'تەفسیر: هەڵبژاردن', lang: 'ku', scholar: '' },
+  ar_jalalayn: { name: 'تفسير الجلالين', lang: 'ar', scholar: 'الإمامان المحلي والسيوطي', color: '#3b82f6', icon: 'fa-solid fa-book-open' },
+  ar_ibnkathir: { name: 'تفسير ابن كثير', lang: 'ar', scholar: 'الحافظ ابن كثير', color: '#2563eb', icon: 'fa-solid fa-scale-balanced' },
+  ar_qurtubi: { name: 'تفسير القرطبي', lang: 'ar', scholar: 'الجامع لأحكام القرآن - الإمام القرطبي', color: '#0ea5e9', icon: 'fa-solid fa-landmark' },
+  ar_muyassar: { name: 'التفسير الميسر', lang: 'ar', scholar: 'مجمع الملك فهد لطباعة المصحف', color: '#10b981', icon: 'fa-solid fa-bolt' },
+  fa_khorramdel: { name: 'تفسیر نور (خرمدل)', lang: 'fa', scholar: 'دکتر مصطفی خرمدل', color: '#f59e0b', icon: 'fa-solid fa-sun' },
+  fa_jalalayn: { name: 'تفسیر جلالین (فارسی)', lang: 'fa', scholar: 'تفسیر جلالین به زبان فارسی', color: '#d97706', icon: 'fa-solid fa-feather-pointed' },
+  nami: { name: 'تەفسیری نامی (مودەڕڕیس)', lang: 'ku', scholar: 'مامۆستا مەلا عەبدولکەریمی مودەڕڕیس', color: '#a855f7', icon: 'fa-solid fa-feather-pointed' },
+  asan_pukhta: { name: 'تەفسیری ئاسان و پوختە', lang: 'ku', scholar: 'تەفسیری کوردی', color: '#8b5cf6', icon: 'fa-solid fa-book' },
+  rebar: { name: 'تەفسیری ڕێبەر', lang: 'ku', scholar: 'پوختەی مانا و تەفسیری قورئان', color: '#7c3aed', icon: 'fa-solid fa-compass' },
+  bubenheim: { name: 'Bubenheim & Elyas', lang: 'de', scholar: 'Frank Bubenheim & Dr. Nadeem Elyas', color: '#10b981', icon: 'fa-solid fa-book-open' },
+  zaidan: { name: 'Amir Zaidan (At-Tafsīr)', lang: 'de', scholar: 'Amir Zaidan', color: '#38bdf8', icon: 'fa-solid fa-scale-balanced' },
+  aburida: { name: 'Abu Rida (Köln)', lang: 'de', scholar: 'Abu Rida Muhammad ibn Ahmad ibn Rassoul', color: '#f59e0b', icon: 'fa-solid fa-feather' },
   all: { name: 'تەفسیری بەراوردکاری', lang: 'ku', scholar: 'پیشاندانی هەموو سەرچاوەکان' }
 };
 
@@ -1367,187 +1367,17 @@ async function renderTafsirStudio() {
   if (sSelect && sSelect.value) state.tafsirSurah = parseInt(sSelect.value, 10);
 
   const edition = state.tafsirEdition || 'none';
+  const info = SUNNI_TAFSIR_INFO[edition] || { name: 'تەفسیر: هەڵبژاردن', scholar: '', color: '#3b82f6', icon: 'fa-solid fa-book' };
 
-  // =========================================================================
-  // CASE 1: NO TAFSIR SELECTED ('none') -> RENDER CLEAN SUNNI TAFSIR HUB
-  // (As requested: do not show any tafsir automatically until user chooses one)
-  // =========================================================================
-  if (edition === 'none') {
+  if (edition !== 'none') {
     container.innerHTML = `
-      <div style="max-width: 680px; margin: 0 auto; padding: 18px 10px 40px; animation: fadeIn 0.25s ease;">
-        <!-- Header Banner -->
-        <div style="background: linear-gradient(145deg, rgba(16, 28, 42, 0.95), rgba(9, 15, 24, 0.98)); border: 1.5px solid rgba(59, 130, 246, 0.35); border-radius: 22px; padding: 20px 18px; text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,0.65); margin-bottom: 22px;">
-          <div class="neo3d-orb-icon" style="width: 52px; height: 52px; border-radius: 16px; font-size: 1.5rem; margin: 0 auto 12px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); box-shadow: 0 8px 22px rgba(59,130,246,0.4);">
-            <i class="fa-solid fa-book-quran"></i>
-          </div>
-          <h2 style="color: #fff; font-size: 1.25rem; font-weight: 900; margin-bottom: 6px;">تەفسیرەکانی ئەهلی سوننەت و جەماعەت</h2>
-          <div style="color: #60a5fa; font-size: 0.84rem; font-weight: 700; margin-bottom: 10px;">تفاسیر معتبر أهل السنة والجماعة والأزهر الشريف</div>
-          <p style="color: #94a3b8; font-size: 0.78rem; line-height: 1.6; margin: 0 auto; max-width: 520px;">
-            تکایە سەرەتا یەکێک لە تەفسیرە باوەڕپێکراوەکان هەڵبژێرە تا تەنها ئەو دەقە بە ڕوونی و بێ تێکەڵاوی پیشان بدرێت:<br>
-            <span style="color: #cbd5e1;">(لطفاً ابتدا یکی از تفاسیر معتبر اهل سنت را برای مطالعه انتخاب نمایید)</span>
-          </p>
-        </div>
-
-        <!-- 1. Arabic Sunni Section -->
-        <div style="margin-bottom: 20px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #60a5fa; font-weight: 800; font-size: 0.88rem;">
-            <i class="fa-solid fa-scroll"></i> <span>العربية (الأزهر الشريف وأهل السنة والجماعة)</span>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;">
-            <div onclick="selectTafsirEdition('ar_jalalayn')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 14px; transition: all 0.2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='rgba(59, 130, 246, 0.3)'">
-              <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8); flex-shrink: 0;"><i class="fa-solid fa-book-open"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">تفسير الجلالين</div>
-                  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">الإمامان المحلي والسيوطي (الأزهر)</div>
-                </div>
-              </div>
-            </div>
-
-            <div onclick="selectTafsirEdition('ar_ibnkathir')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 14px; transition: all 0.2s;" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='rgba(59, 130, 246, 0.3)'">
-              <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #2563eb, #1e40af); flex-shrink: 0;"><i class="fa-solid fa-scale-balanced"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">تفسير ابن كثير (الأصل)</div>
-                  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">النسخة الأصلية المعتمدة لأهل السنة</div>
-                </div>
-              </div>
-            </div>
-
-            <div onclick="selectTafsirEdition('ar_qurtubi')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 14px; transition: all 0.2s;" onmouseover="this.style.borderColor='#0ea5e9'" onmouseout="this.style.borderColor='rgba(59, 130, 246, 0.3)'">
-              <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #0ea5e9, #0369a1); flex-shrink: 0;"><i class="fa-solid fa-landmark"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">تفسير القرطبي</div>
-                  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">الجامع لأحكام القرآن للإمام القرطبي</div>
-                </div>
-              </div>
-            </div>
-
-            <div onclick="selectTafsirEdition('ar_muyassar')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: 16px; padding: 14px; transition: all 0.2s;" onmouseover="this.style.borderColor='#10b981'" onmouseout="this.style.borderColor='rgba(16, 185, 129, 0.3)'">
-              <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #10b981, #047857); flex-shrink: 0;"><i class="fa-solid fa-bolt"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">التفسير الميسر (ئۆفلاین 100%)</div>
-                  <div style="font-size: 0.72rem; color: #34d399; margin-top: 2px;">مجمع الملك فهد لطباعة المصحف</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2. Persian Sunni Section -->
-        <div style="margin-bottom: 20px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #fbbf24; font-weight: 800; font-size: 0.88rem;">
-            <i class="fa-solid fa-feather"></i> <span>فارسی (مفسران بزرگ اهل سنت و جماعت)</span>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;">
-            <div onclick="selectTafsirEdition('fa_khorramdel')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(245, 158, 11, 0.35); border-radius: 16px; padding: 14px; transition: all 0.2s;" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='rgba(245, 158, 11, 0.35)'">
-              <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #f59e0b, #b45309); flex-shrink: 0;"><i class="fa-solid fa-sun"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">تفسیر نور (دکتر مصطفی خرمدل)</div>
-                  <div style="font-size: 0.72rem; color: #fde68a; margin-top: 2px;">تفسیر نامدار و معتبر اهل سنت و جماعت</div>
-                </div>
-              </div>
-            </div>
-
-            <div onclick="selectTafsirEdition('fa_jalalayn')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(245, 158, 11, 0.35); border-radius: 16px; padding: 14px; transition: all 0.2s;" onmouseover="this.style.borderColor='#d97706'" onmouseout="this.style.borderColor='rgba(245, 158, 11, 0.35)'">
-              <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #d97706, #92400e); flex-shrink: 0;"><i class="fa-solid fa-feather-pointed"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">تفسیر جلالین (فارسی اهل سنت)</div>
-                  <div style="font-size: 0.72rem; color: #fde68a; margin-top: 2px;">ترجمه و توضیح مستند به زبان فارسی</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Kurdish Sunni Section -->
-        <div style="margin-bottom: 20px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #c084fc; font-weight: 800; font-size: 0.88rem;">
-            <i class="fa-solid fa-pen-nib"></i> <span>کوردی (تەفسیرەکانی ئەهلی سوننەت)</span>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;">
-            <div onclick="selectTafsirEdition('nami')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(168, 85, 247, 0.35); border-radius: 16px; padding: 14px; transition: all 0.2s;" onmouseover="this.style.borderColor='#a855f7'" onmouseout="this.style.borderColor='rgba(168, 85, 247, 0.35)'">
-              <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #a855f7, #6d28d9); flex-shrink: 0;"><i class="fa-solid fa-feather-pointed"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">تەفسیری نامی (دەق و کتێب)</div>
-                  <div style="font-size: 0.72rem; color: #d8b4fe; margin-top: 2px;">مامۆستا مەلا عەبدولکەریمی مودەڕڕیس</div>
-                </div>
-              </div>
-            </div>
-
-            <div onclick="selectTafsirEdition('asan_pukhta')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(168, 85, 247, 0.35); border-radius: 16px; padding: 14px; transition: all 0.2s;" onmouseover="this.style.borderColor='#8b5cf6'" onmouseout="this.style.borderColor='rgba(168, 85, 247, 0.35)'">
-              <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #8b5cf6, #5b21b6); flex-shrink: 0;"><i class="fa-solid fa-book"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">تەفسیری ئاسان و پوختە (ئۆفلاین 100%)</div>
-                  <div style="font-size: 0.72rem; color: #d8b4fe; margin-top: 2px;">تەفسیری هەموو ئایەتەکان بە کوردی</div>
-                </div>
-              </div>
-            </div>
-
-            <div onclick="selectTafsirEdition('rebar')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(168, 85, 247, 0.35); border-radius: 16px; padding: 14px; transition: all 0.2s;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='rgba(168, 85, 247, 0.35)'">
-              <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #7c3aed, #4c1d95); flex-shrink: 0;"><i class="fa-solid fa-compass"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">تەفسیری ڕێبەر</div>
-                  <div style="font-size: 0.72rem; color: #d8b4fe; margin-top: 2px;">پوختەی مانا و تەفسیری قورئان</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. German Authentic Section -->
-        <div>
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #34d399; font-weight: 800; font-size: 0.88rem;">
-            <i class="fa-solid fa-globe"></i> <span>Deutsche authentische Quellen</span>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;">
-            <div onclick="selectTafsirEdition('bubenheim')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: 16px; padding: 14px; transition: all 0.2s;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #10b981, #047857); flex-shrink: 0;"><i class="fa-solid fa-book-open"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">Bubenheim &amp; Elyas</div>
-                  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">König-Fahd-Komplex, Medina</div>
-                </div>
-              </div>
-            </div>
-
-            <div onclick="selectTafsirEdition('zaidan')" style="cursor: pointer; background: rgba(16, 28, 42, 0.85); border: 1.5px solid rgba(56, 189, 248, 0.3); border-radius: 16px; padding: 14px; transition: all 0.2s;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 11px; font-size: 1.05rem; background: linear-gradient(135deg, #38bdf8, #0284c7); flex-shrink: 0;"><i class="fa-solid fa-scale-balanced"></i></div>
-                <div>
-                  <div style="font-weight: 900; color: #fff; font-size: 0.94rem;">Amir Zaidan (At-Tafsīr)</div>
-                  <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">Theologische Erläuterung</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <div style="text-align: center; color: var(--gold-light); padding: 50px 20px;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.2rem; margin-bottom: 14px; color: ${info.color || '#10b981'};"></i>
+        <div style="font-size: 1.15rem; font-weight: 700;">${info.name} ئامادە دەکرێت...</div>
+        <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 6px;">${info.scholar || ''}</div>
       </div>
     `;
-    updateDockDisplay();
-    return;
   }
-
-  // =========================================================================
-  // CASE 2: SPECIFIC TAFSIR SELECTED -> RENDER ONLY THAT TAFSIR FOR VERSES
-  // =========================================================================
-  const info = SUNNI_TAFSIR_INFO[edition] || { name: edition, scholar: '', color: '#3b82f6', icon: 'fa-solid fa-book' };
-  
-  container.innerHTML = `
-    <div style="text-align: center; color: var(--gold-light); padding: 50px 20px;">
-      <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.2rem; margin-bottom: 14px; color: ${info.color || '#10b981'};"></i>
-      <div style="font-size: 1.15rem; font-weight: 700;">${info.name} ئامادە دەکرێت...</div>
-      <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 6px;">${info.scholar || ''}</div>
-    </div>
-  `;
 
   // Pre-fetch remote tafsir data if required
   let remoteSurahData = null;
@@ -1573,24 +1403,42 @@ async function renderTafsirStudio() {
 
   // Sticky Tafsir Info & Reset Bar
   const topBar = document.createElement('div');
-  topBar.style.cssText = `background: rgba(16, 28, 42, 0.95); border: 1.5px solid ${info.color || '#3b82f6'}55; border-radius: 16px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);`;
-  topBar.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 10px; min-width: 0; overflow: hidden;">
-      <div class="neo3d-orb-icon" style="width: 32px; height: 32px; border-radius: 9px; font-size: 0.9rem; background: ${info.color || '#3b82f6'}; flex-shrink: 0;"><i class="${info.icon || 'fa-solid fa-book'}"></i></div>
-      <div style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-        <div style="font-weight: 900; color: #fff; font-size: 0.92rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${info.name}</div>
-        <div style="font-size: 0.68rem; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${info.scholar || ''}</div>
+  if (edition === 'none') {
+    topBar.style.cssText = `background: rgba(16, 28, 42, 0.95); border: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);`;
+    topBar.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px; min-width: 0; overflow: hidden;">
+        <div class="neo3d-orb-icon" style="width: 32px; height: 32px; border-radius: 9px; font-size: 0.9rem; background: linear-gradient(135deg, #10b981, #047857); flex-shrink: 0;"><i class="fa-solid fa-quran"></i></div>
+        <div style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <div style="font-weight: 900; color: #fff; font-size: 0.92rem;">دەقی پیرۆزی قورئان</div>
+          <div style="font-size: 0.68rem; color: #94a3b8;">(بۆ خوێندنەوەی تەفسیر، تەفسیرێک هەڵبژێرە)</div>
+        </div>
       </div>
-    </div>
-    <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
-      <button onclick="openTafsirSourcePickerModal()" class="neo3d-pill-btn" style="padding: 5px 10px; font-size: 0.74rem;" title="گۆڕینی تەفسیر">
-        <i class="fa-solid fa-repeat"></i> گۆڕین
-      </button>
-      <button onclick="selectTafsirEdition('none')" class="neo3d-pill-btn" style="background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.38); color: #fca5a5; padding: 5px 10px; font-size: 0.74rem;" title="داخستن و گەڕانەوە">
-        <i class="fa-solid fa-xmark"></i> بستن
-      </button>
-    </div>
-  `;
+      <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+        <button onclick="openTafsirSourcePickerModal()" class="neo3d-pill-btn" style="padding: 6px 12px; font-size: 0.78rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff;" title="هەڵبژاردنی تەفسیر">
+          <i class="fa-solid fa-book-open"></i> هەڵبژاردنی تەفسیر
+        </button>
+      </div>
+    `;
+  } else {
+    topBar.style.cssText = `background: rgba(16, 28, 42, 0.95); border: 1.5px solid ${info.color || '#3b82f6'}55; border-radius: 16px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);`;
+    topBar.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px; min-width: 0; overflow: hidden;">
+        <div class="neo3d-orb-icon" style="width: 32px; height: 32px; border-radius: 9px; font-size: 0.9rem; background: ${info.color || '#3b82f6'}; flex-shrink: 0;"><i class="${info.icon || 'fa-solid fa-book'}"></i></div>
+        <div style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <div style="font-weight: 900; color: #fff; font-size: 0.92rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${info.name}</div>
+          <div style="font-size: 0.68rem; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${info.scholar || ''}</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+        <button onclick="openTafsirSourcePickerModal()" class="neo3d-pill-btn" style="padding: 5px 10px; font-size: 0.74rem;" title="گۆڕینی تەفسیر">
+          <i class="fa-solid fa-repeat"></i> گۆڕین
+        </button>
+        <button onclick="selectTafsirEdition('none')" class="neo3d-pill-btn" style="background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.38); color: #fca5a5; padding: 5px 10px; font-size: 0.74rem;" title="داخستن و گەڕانەوە">
+          <i class="fa-solid fa-xmark"></i> بستن
+        </button>
+      </div>
+    `;
+  }
   container.appendChild(topBar);
 
   toRender.forEach(v => {
@@ -1733,9 +1581,14 @@ async function renderTafsirStudio() {
             <div style="display: inline-flex; align-items: center; gap: 6px; font-weight: 800; color: #d8b4fe; font-size: 0.82rem; background: rgba(168,85,247,0.18); padding: 3px 9px; border-radius: 8px;">
               <i class="fa-solid fa-feather-pointed" style="color: #c084fc;"></i> <span>تەفسیری نامی (مەلا عەبدولکەریمی مودەڕڕیس)</span>
             </div>
-            <button onclick="openTafsirNamiPdfModalForSurah(${state.tafsirSurah})" class="neo3d-pill-btn" style="font-size: 0.72rem; padding: 3px 8px; border-radius: 8px;">
-              <i class="fa-solid fa-book-open"></i> کتێب (PDF)
-            </button>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <button onclick="playTafsirNamiSurahAudio(${state.tafsirSurah})" class="neo3d-pill-btn" style="font-size: 0.72rem; padding: 3px 8px; border-radius: 8px; background: rgba(168,85,247,0.22); color: #e9d5ff; border: 1px solid rgba(168,85,247,0.4);" title="گوێگرتن لە دەنگی تەفسیری نامی">
+                <i class="fa-solid fa-headphones"></i> دەنگ
+              </button>
+              <button onclick="openTafsirNamiPdfModalForSurah(${state.tafsirSurah})" class="neo3d-pill-btn" style="font-size: 0.72rem; padding: 3px 8px; border-radius: 8px;">
+                <i class="fa-solid fa-book-open"></i> کتێب (PDF)
+              </button>
+            </div>
           </div>
           <div style="font-family: var(--kurdish-font); font-size: 1.05rem; line-height: 2.1; color: #f8fafc; text-align: right;">
             ${detailedNami || kurdTxt || 'دەقی تەفسیری نامی ئامادە دەکرێت...'}
@@ -1790,6 +1643,8 @@ async function renderTafsirStudio() {
           </div>
         </div>
       `;
+    } else if (edition === 'none') {
+      tafsirBody = '';
     } else {
       // Default / fallback
       tafsirBody = `
@@ -2202,6 +2057,117 @@ function populateRepeatSurahDropdown() {
 }
 
 // ============================================================
+// TAFSIR NAMI YOUTUBE AUDIO ENGINE (م. مەلا عەبدولکەریم)
+// Maps 100 Surah audio lecture videos cleanly with play, pause & speed control
+// ============================================================
+let tafsirNamiYtPlayer = null;
+let tafsirNamiIsReady = false;
+let currentTafsirNamiSurah = 1;
+
+function initTafsirNamiIframe(videoId) {
+  let holder = document.getElementById('tafsirNamiYtHolder');
+  if (!holder) {
+    holder = document.createElement('div');
+    holder.id = 'tafsirNamiYtHolder';
+    holder.style.cssText = 'position:fixed; bottom:-999px; left:-999px; width:200px; height:200px; opacity:0; pointer-events:none; z-index:-1;';
+    const sub = document.createElement('div');
+    sub.id = 'tafsirNamiYtTarget';
+    holder.appendChild(sub);
+    document.body.appendChild(holder);
+  }
+
+  if (tafsirNamiYtPlayer && typeof tafsirNamiYtPlayer.loadVideoById === 'function') {
+    tafsirNamiYtPlayer.loadVideoById(videoId);
+    if (state.speed && typeof tafsirNamiYtPlayer.setPlaybackRate === 'function') {
+      tafsirNamiYtPlayer.setPlaybackRate(state.speed);
+    }
+    tafsirNamiYtPlayer.playVideo();
+    return;
+  }
+
+  if (!window.YT || !window.YT.Player) {
+    if (!document.getElementById('yt-iframe-api-script')) {
+      const tag = document.createElement('script');
+      tag.id = 'yt-iframe-api-script';
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+    const origReady = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = function() {
+      if (typeof origReady === 'function') origReady();
+      createTafsirNamiPlayer(videoId);
+    };
+  } else {
+    createTafsirNamiPlayer(videoId);
+  }
+}
+
+function createTafsirNamiPlayer(videoId) {
+  try {
+    tafsirNamiYtPlayer = new YT.Player('tafsirNamiYtTarget', {
+      height: '200',
+      width: '200',
+      videoId: videoId,
+      playerVars: {
+        autoplay: 1,
+        controls: 0,
+        playsinline: 1,
+        disablekb: 1
+      },
+      events: {
+        onReady: function(e) {
+          tafsirNamiIsReady = true;
+          if (state.speed && typeof e.target.setPlaybackRate === 'function') e.target.setPlaybackRate(state.speed);
+          e.target.playVideo();
+        },
+        onStateChange: function(e) {
+          if (e.data === 1) { // PLAYING
+            state.isPlaying = true;
+            updateDockDisplay();
+          } else if (e.data === 2 || e.data === 0) { // PAUSED or ENDED
+            state.isPlaying = false;
+            updateDockDisplay();
+          }
+        }
+      }
+    });
+  } catch(e) {
+    console.warn('Tafsir Nami YT init:', e);
+  }
+}
+
+function playTafsirNamiSurahAudio(surahNum) {
+  surahNum = parseInt(surahNum, 10) || (state.tafsirSurah || state.currentSurah || 1);
+  currentTafsirNamiSurah = surahNum;
+  
+  if (typeof audio !== 'undefined' && audio) {
+    try { audio.pause(); } catch(e){}
+  }
+
+  const map = window.TAFSIR_NAMI_AUDIO_MAP || {};
+  let videoId = map[surahNum];
+  if (!videoId) {
+    videoId = map[100] || '0yxNM_vT71w';
+  }
+
+  state.playbackSource = 'tafsirNami';
+  state.isPlaying = true;
+
+  const curSurahObj = (typeof ALL_114_SURAHS !== 'undefined') ? ALL_114_SURAHS.find(s => s.id === surahNum) : null;
+  const sName = curSurahObj ? (curSurahObj.arabic || curSurahObj.name) : `Sure ${surahNum}`;
+
+  const infoEl = document.getElementById('dockVerseInfo');
+  if (infoEl) infoEl.textContent = `🎙️ دەنگی نامی: سورة ${sName}`;
+  const icon = document.getElementById('dockPlayIcon');
+  if (icon) icon.className = 'fa-solid fa-pause';
+
+  showToast(`🎙️ دەنگی تەفسیری نامی: سورة ${sName} (مامۆستا مەلا عەبدولکەریم)`);
+  initTafsirNamiIframe(videoId);
+  updateDockDisplay();
+}
+window.playTafsirNamiSurahAudio = playTafsirNamiSurahAudio;
+
+// ============================================================
 // 11. UNIFIED BOTTOM AUDIO PLAYER & AUDIO EVENTS
 // ============================================================
 function playAyahAt(idx) {
@@ -2209,6 +2175,12 @@ function playAyahAt(idx) {
   state.playbackSource = 'mushaf';
   state.currentAyahIdx = idx;
   const v = state.currentVersesData[idx];
+
+  if (state.qari === 'Tafsir_Nami_Audio') {
+    playTafsirNamiSurahAudio(v.surahNum);
+    highlightActiveAyah();
+    return;
+  }
 
   state.isPlaying = true;
   const newUrl = getAyahAudioUrl(v.surahNum, v.num);
@@ -2332,6 +2304,12 @@ function playWordStudioAyah(surah, ayah, idx) {
   }
 
   state.isPlaying = true;
+  if (state.qari === 'Tafsir_Nami_Audio') {
+    playTafsirNamiSurahAudio(surah);
+    updateDockDisplay();
+    updateWordStudioCardsAudioState();
+    return;
+  }
   const newUrl = getAyahAudioUrl(surah, ayah);
   if (state.qari === 'Mansour_Al_Salimi') {
     if (audio.src !== newUrl) {
@@ -2406,6 +2384,20 @@ function toggleWordStudioAudioPlay() {
 window.toggleWordStudioAudioPlay = toggleWordStudioAudioPlay;
 
 function toggleMainAudioPlay() {
+  if (state.playbackSource === 'tafsirNami') {
+    if (tafsirNamiYtPlayer && typeof tafsirNamiYtPlayer.getPlayerState === 'function') {
+      const s = tafsirNamiYtPlayer.getPlayerState();
+      if (s === 1) {
+        tafsirNamiYtPlayer.pauseVideo();
+        state.isPlaying = false;
+      } else {
+        tafsirNamiYtPlayer.playVideo();
+        state.isPlaying = true;
+      }
+      updateDockDisplay();
+      return;
+    }
+  }
   if (state.activeTab === 'wordStudio') {
     toggleWordStudioAudioPlay();
   } else {
@@ -3521,7 +3513,7 @@ function onQariChanged(val) {
   try { localStorage.setItem('quran_qari', val); } catch (e) {}
 
   // Synchronize ALL reciter dropdowns across Section 1, Section 2, toolbar, bottom dock, and sidebar
-  ['dockQariSelect', 'mushafToolbarQariSelect', 'qariSelect', 'mushafPlayerQariSelect', 'wsPlayerQariSelect'].forEach(id => {
+  ['dockQariSelect', 'mushafToolbarQariSelect', 'qariSelect', 'mushafPlayerQariSelect', 'wsPlayerQariSelect', 'tafsirPlayerQariSelect', 'settingsOfflineQariSelect'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = val;
   });
@@ -3529,6 +3521,13 @@ function onQariChanged(val) {
   const refEl = document.getElementById('mushafPlayerQariSelect') || document.getElementById('mushafToolbarQariSelect') || document.getElementById('wsPlayerQariSelect') || document.getElementById('qariSelect');
   const qName = (refEl && refEl.selectedOptions[0]) ? refEl.selectedOptions[0].text : val;
   showToast(`🎙️ Rezitator ausgewählt: ${qName}`);
+
+  if (val === 'Tafsir_Nami_Audio') {
+    playTafsirNamiSurahAudio(state.currentSurah || state.tafsirSurah || 1);
+    return;
+  } else if (typeof tafsirNamiYtPlayer !== 'undefined' && tafsirNamiYtPlayer && typeof tafsirNamiYtPlayer.pauseVideo === 'function') {
+    try { tafsirNamiYtPlayer.pauseVideo(); } catch(e){}
+  }
 
   // If audio is playing, immediately replay the active verse with the newly chosen reciter
   if (state.isPlaying) {
@@ -3549,6 +3548,9 @@ function changeSpeed(val) {
     if (el) state.speed = parseFloat(el.value);
   }
   audio.playbackRate = state.speed;
+  if (typeof tafsirNamiYtPlayer !== 'undefined' && tafsirNamiYtPlayer && typeof tafsirNamiYtPlayer.setPlaybackRate === 'function') {
+    try { tafsirNamiYtPlayer.setPlaybackRate(state.speed); } catch(e){}
+  }
   ['dockSpeedSelect', 'audioSpeedSelect', 'mushafPlayerSpeedSelect', 'wsPlayerSpeedSelect'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = state.speed;
@@ -3731,6 +3733,9 @@ document.addEventListener('DOMContentLoaded', () => {
     speedSel.onchange = function() {
       state.speed = parseFloat(this.value);
       audio.playbackRate = state.speed;
+      if (typeof tafsirNamiYtPlayer !== 'undefined' && tafsirNamiYtPlayer && typeof tafsirNamiYtPlayer.setPlaybackRate === 'function') {
+        try { tafsirNamiYtPlayer.setPlaybackRate(state.speed); } catch(e){}
+      }
       showToast(`Geschwindigkeit: ${state.speed}×`);
     };
   }

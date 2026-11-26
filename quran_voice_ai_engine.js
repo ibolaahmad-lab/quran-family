@@ -466,6 +466,9 @@
     activeEngineId = engineId;
     localStorage.setItem(STORAGE_ENGINE_KEY, engineId);
     updateEngineBadgesUI();
+    if (window.Murajaa && typeof window.Murajaa.updateVoiceEngineBadge === 'function') {
+      window.Murajaa.updateVoiceEngineBadge();
+    }
     const lang = localStorage.getItem('quran_app_language') || window.currentAppLanguage || 'ku';
     const label = lang === 'ku' ? (ENGINES[engineId].name + ' دیاری کرا') : (ENGINES[engineId].name + ' ausgewählt');
     if (typeof window.showToast === 'function') {
@@ -759,18 +762,14 @@
             </div>
           </div>
 
-          <!-- Groq Custom API Key Option -->
-          <div style="margin-top: 8px; padding: 12px; border-radius: 14px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08);">
-            <div style="font-size: 0.76rem; font-weight: 800; color: #e2e8f0; margin-bottom: 6px;">
-              ${t.apiKeyTitle}
+          <!-- Preconfigured AI Key Status Badge (No key entry required) -->
+          <div style="margin-top: 8px; padding: 12px 14px; border-radius: 16px; background: rgba(16, 185, 129, 0.1); border: 1.2px solid rgba(16, 185, 129, 0.35); display: flex; align-items: center; gap: 10px;">
+            <div class="neo3d-orb-icon" style="width: 32px; height: 32px; border-radius: 9px; font-size: 0.95rem; background: linear-gradient(135deg, #10b981, #047857); flex-shrink: 0;">
+              <i class="fa-solid fa-shield-halved" style="color: #fff;"></i>
             </div>
-            <div style="display: flex; gap: 6px;">
-              <div style="margin-bottom: 6px;"><a href="https://console.groq.com/keys" target="_blank" style="color: #38bdf8; text-decoration: underline; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><span>🔗 وەرگرتنی خۆڕایی لە کۆنسۆڵی گرووک (console.groq.com/keys)</span> <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.65rem;"></i></a></div>
-              <input type="text" id="groqApiKeyInput" placeholder="${t.apiKeyPlaceholder}" value="${currentKey}" style="flex: 1; height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #fff; padding: 0 10px; font-size: 0.75rem; direction: ltr; font-family: monospace;">
-              <button onclick="QuranVoiceAI.saveGroqApiKey(document.getElementById('groqApiKeyInput').value)" class="neo3d-pill-btn" style="padding: 0 12px; height: 32px; background: #10b981; color: #fff; border: none; font-size: 0.74rem;">${t.apiKeyBtn}</button>
-            </div>
-            <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 5px;">
-              ${t.apiKeyNote}
+            <div style="flex: 1;">
+              <div style="font-weight: 800; color: #6ee7b7; font-size: 0.84rem;">هۆشی دەستکردی ویسپەر پێشوەختە چالاک کراوە</div>
+              <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">کلیلی خێرای فەرمی بە شێوەی خۆکار جێگیر کراوە و پێویست بە هیچ تەنزیمات یان داخڵکردنی کلیل ناکات.</div>
             </div>
           </div>
         </div>

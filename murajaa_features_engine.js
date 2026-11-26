@@ -732,21 +732,47 @@
     }
   }
 
+  function updateMurajaaVoiceEngineBadge() {
+    const pill = document.querySelector('.voice-engine-switch-pill');
+    if (!pill || !window.QuranVoiceAI) return;
+    const engine = window.QuranVoiceAI.getEngine ? window.QuranVoiceAI.getEngine() : 'groq_whisper';
+    const icon = pill.querySelector('.engine-badge-icon');
+    const title = pill.querySelector('.engine-badge-title');
+    if (engine === 'groq_whisper') {
+      if (icon) icon.textContent = '⚡';
+      if (title) title.textContent = 'Whisper';
+    } else if (engine === 'local_whisper') {
+      if (icon) icon.textContent = '🧠';
+      if (title) title.textContent = 'Offline';
+    } else {
+      if (icon) icon.textContent = '🌐';
+      if (title) title.textContent = 'Native';
+    }
+  }
+  window.Murajaa.updateVoiceEngineBadge = updateMurajaaVoiceEngineBadge;
+
   function startSpeechRecognition() {
     murajaaState.isListening = true;
     updateMicBtnState(true);
     updateMurajaaStatusPill(false);
+    updateMurajaaVoiceEngineBadge();
 
-    if (window.QuranVoiceAI && window.QuranVoiceAI.getEngine() !== 'google_speech') {
+    if (window.QuranVoiceAI && typeof window.QuranVoiceAI.startListening === 'function') {
       window.QuranVoiceAI.startListening({
         onStart: () => {
           updateMicBtnState(true);
+          resetSpeechStreamTracking();
         },
         onTranscript: (cleanText, isFinal) => {
           processIncomingRecitation(cleanText);
         },
         onError: (err) => {
           console.warn('[Murajaa Voice AI error]:', err);
+          if (err === 'not-allowed') {
+            murajaaState.isListening = false;
+            updateMicBtnState(false);
+            alert(t('mic_not_supported'));
+          }
         },
         onEnd: () => {
           if (murajaaState.isListening) {
