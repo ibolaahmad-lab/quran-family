@@ -264,6 +264,46 @@ const I18N_TRANSLATIONS = {
     tarteel_target: "Target",
 
   },
+    ar: {
+    settings: "الإعدادات",
+    smart_audio: "الصوت الذكي",
+    drawer_cat_studios_title: "استوديوهات القرآن",
+    drawer_cat_studios_sub: "المصحف · كلمة بكلمة · التفسير",
+    drawer_item_mushaf_title: "المصحف الشريف والقراءة",
+    drawer_item_mushaf_desc: "٦٠٤ صفحة · الرسم العثماني ومصحف المدينة",
+    drawer_item_wordstudio_title: "استوديو كلمة بكلمة",
+    drawer_item_wordstudio_desc: "تحليل الكلمات · الآيات كاملة · الحفظ التدريجي",
+    drawer_item_tafsir_title: "التفاسير والترجمات",
+    drawer_item_tafsir_desc: "ابن كثير · الجلالين · السعدي · الميسر",
+    drawer_cat_tracking_title: "المتابعة والاختبار",
+    drawer_cat_tracking_sub: "الترتيل الذكي · اختبار الحفظ وتسميعه",
+    drawer_item_recite_title: "الترتيل الذكي الصوتي",
+    drawer_item_recite_desc: "تسميع بالمايكروفون للآيات المتتالية",
+    drawer_item_quiz_title: "اختبار وتسميع الحفظ",
+    drawer_item_quiz_desc: "بالمايكروفون والخيارات المتعددة",
+    drawer_cat_duas_title: "دلائل الخيرات وقصيدة البردة",
+    drawer_cat_duas_sub: "الأوراد الشريفة · دلائل الخيرات · البردة المباركة",
+    drawer_item_dalail_title: "دلائل الخيرات",
+    drawer_item_dalail_desc: "أحزاب الأسبوع المباركة مع الصوت",
+    drawer_item_burda_title: "قصيدة البردة الشريفة",
+    drawer_item_burda_desc: "أبيات البردة المباركة مع الصوت",
+    drawer_cat_tools_title: "أدوات المسلم والحفظ",
+    drawer_cat_tools_sub: "خطة الختمة · القاموس · أوقات الصلاة",
+    drawer_item_khatm_title: "خطة الختمة القرآنية",
+    drawer_item_khatm_desc: "متابعة الصفحات والأجزاء حتى الختام",
+    drawer_item_dictionary_title: "معجم كلمات القرآن",
+    drawer_item_dictionary_desc: "الجذور الثلاثية ودلالات الألفاظ",
+    drawer_item_prayer_title: "أوقات الصلاة الدقيقة",
+    drawer_item_prayer_desc: "مواقيت الصلوات الخمس بحساب دقيق",
+    drawer_cat_settings_title: "الإعدادات والمظهر",
+    drawer_cat_settings_sub: "اللغات · الوضع الليلي · الثيمات",
+    drawer_item_themes_title: "المظهر واللغة",
+    drawer_item_themes_desc: "تبديل المظهر واللغات والصوت",
+    drawer_item_offline_title: "تحميل التلاوة (أوفلاين)",
+    drawer_item_offline_desc: "استماع للقارئ بدون إنترنت",
+    app_title: "القرآن الكريم (Quran Ultimate)",
+    quick_search: "بحث في القرآن"
+  },
   ku: {
     settings: "ڕێکخستنەکان",
     smart_audio: "دەنگی زیرەک",
@@ -416,7 +456,7 @@ function setAppLanguage(lang) {
   });
 
   // Highlight active lang pill in settings modal if present
-  ['de', 'en', 'ku'].forEach(l => {
+  ['de', 'en', 'ku', 'ar'].forEach(l => {
     const btn = document.getElementById('langCardBtn_' + l);
     if (btn) btn.classList.toggle('active', l === lang);
   });

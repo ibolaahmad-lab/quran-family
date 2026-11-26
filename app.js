@@ -189,10 +189,22 @@ try {
   }
 } catch (e) {}
 
-// Clean Arabic Text Provider & Pure Mushaf Formatter (No letter-splitting intra-word spans)
+// Authentic Tajweed Markup Provider (Madd, Ghunnah, Qalqalah - zero intra-word break)
 function applyTajweedMarkup(text) {
   if (!text) return '';
-  return cleanArabicText(text);
+  const clean = cleanArabicText(text);
+  if (!state.tajweedEnabled) return clean;
+
+  // 1. Madd: letters with Quranic maddah sign (\u0653)
+  let res = clean.replace(/([^\s\u0640]?[\u0653])/g, '<span class="tj-madd">$1</span>');
+
+  // 2. Ghunnah: Noon or Meem with Shaddah (\u0651)
+  res = res.replace(/([نم][\u064b-\u0650\u0652]*\u0651[\u064b-\u0650\u0652]*)/g, '<span class="tj-ghunnah">$1</span>');
+
+  // 3. Qalqalah: قطبجد with Sukun (\u0652 or \u06e1)
+  res = res.replace(/([قطبجد][\u0652\u06e1])/g, '<span class="tj-qalqalah">$1</span>');
+
+  return res;
 }
 window.applyTajweedMarkup = applyTajweedMarkup;
 
@@ -203,11 +215,20 @@ function toggleTajweed() {
     btn.classList.toggle('active', state.tajweedEnabled);
     btn.style.background = state.tajweedEnabled ? 'linear-gradient(135deg, #10b981, #059669)' : '';
     btn.style.borderColor = state.tajweedEnabled ? '#34d399' : '';
-    btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> Tajweed: ${state.tajweedEnabled ? 'AN' : 'AUS'}`;
+    const span = btn.querySelector('span');
+    if (span) span.textContent = state.tajweedEnabled ? 'تەجوید (چالاکە)' : 'تەجوید';
   }
-  if (state.activeTab === 'mushaf') renderInteractiveMushaf();
-  if (state.activeTab === 'repetition') renderRepetitionDisplay();
-  showToast(state.tajweedEnabled ? '🎨 Tajweed-Farbregeln aktiviert' : '📖 Reine Uthmān-Kalligraphie aktiviert');
+  const tbBtn = document.getElementById('mushafToolbarTajweedBtn');
+  if (tbBtn) {
+    tbBtn.classList.toggle('active', state.tajweedEnabled);
+    tbBtn.style.background = state.tajweedEnabled ? 'linear-gradient(135deg, #10b981, #059669)' : 'rgba(16,185,129,0.08)';
+    tbBtn.style.color = state.tajweedEnabled ? '#ffffff' : '#6ee7b7';
+    tbBtn.style.borderColor = state.tajweedEnabled ? '#34d399' : 'rgba(16,185,129,0.35)';
+  }
+  if (state.activeTab === 'mushaf') {
+    renderInteractiveMushaf();
+  }
+  showToast(state.tajweedEnabled ? '🎨 ڕەنگەکانی تەجوید لە مەسحەفدا چالاککران' : '📖 دەقی سادەی عوسمانی چالاککرا');
 }
 window.toggleTajweed = toggleTajweed;
 
@@ -2136,8 +2157,49 @@ function createTafsirNamiPlayer(videoId) {
   }
 }
 
+function pauseTafsirNamiAudio() {
+  if (tafsirNamiYtPlayer) {
+    try {
+      if (typeof tafsirNamiYtPlayer.pauseVideo === 'function') {
+        tafsirNamiYtPlayer.pauseVideo();
+      }
+    } catch(e) { console.warn('Tafsir Nami pause error', e); }
+  }
+  state.isPlaying = false;
+  updateDockDisplay();
+  if (typeof Murajaa !== 'undefined' && typeof Murajaa.updateMurajaaAudioButton === 'function') {
+    Murajaa.updateMurajaaAudioButton();
+  }
+}
+window.pauseTafsirNamiAudio = pauseTafsirNamiAudio;
+
+function stopTafsirNamiAudio() {
+  if (tafsirNamiYtPlayer) {
+    try {
+      if (typeof tafsirNamiYtPlayer.stopVideo === 'function') {
+        tafsirNamiYtPlayer.stopVideo();
+      } else if (typeof tafsirNamiYtPlayer.pauseVideo === 'function') {
+        tafsirNamiYtPlayer.pauseVideo();
+      }
+    } catch(e) { console.warn('Tafsir Nami stop error', e); }
+  }
+  state.isPlaying = false;
+  updateDockDisplay();
+  if (typeof Murajaa !== 'undefined' && typeof Murajaa.updateMurajaaAudioButton === 'function') {
+    Murajaa.updateMurajaaAudioButton();
+  }
+}
+window.stopTafsirNamiAudio = stopTafsirNamiAudio;
+
 function playTafsirNamiSurahAudio(surahNum) {
   surahNum = parseInt(surahNum, 10) || (state.tafsirSurah || state.currentSurah || 1);
+  
+  // Toggle Pause if already playing this Surah
+  if (state.playbackSource === 'tafsirNami' && currentTafsirNamiSurah === surahNum && state.isPlaying) {
+    pauseTafsirNamiAudio();
+    showToast('⏸️ دەنگی تەفسیری نامی وەستێنرا');
+    return;
+  }
   currentTafsirNamiSurah = surahNum;
   
   if (typeof audio !== 'undefined' && audio) {
@@ -2164,6 +2226,9 @@ function playTafsirNamiSurahAudio(surahNum) {
   showToast(`🎙️ دەنگی تەفسیری نامی: سورة ${sName} (مامۆستا مەلا عەبدولکەریم)`);
   initTafsirNamiIframe(videoId);
   updateDockDisplay();
+  if (typeof Murajaa !== 'undefined' && typeof Murajaa.updateMurajaaAudioButton === 'function') {
+    Murajaa.updateMurajaaAudioButton();
+  }
 }
 window.playTafsirNamiSurahAudio = playTafsirNamiSurahAudio;
 
@@ -2353,6 +2418,23 @@ function repeatWordStudioAyah(surah, ayah, idx, times) {
 window.repeatWordStudioAyah = repeatWordStudioAyah;
 
 function toggleMushafAudioPlay() {
+  if (state.playbackSource === 'tafsirNami') {
+    if (state.isPlaying) {
+      pauseTafsirNamiAudio();
+    } else {
+      if (tafsirNamiYtPlayer && typeof tafsirNamiYtPlayer.playVideo === 'function') {
+        tafsirNamiYtPlayer.playVideo();
+        state.isPlaying = true;
+        updateDockDisplay();
+      } else {
+        playTafsirNamiSurahAudio(state.currentSurah || 1);
+      }
+    }
+    if (typeof Murajaa !== 'undefined' && typeof Murajaa.updateMurajaaAudioButton === 'function') {
+      Murajaa.updateMurajaaAudioButton();
+    }
+    return;
+  }
   if (state.isPlaying && state.playbackSource === 'mushaf') {
     audio.pause();
     state.isPlaying = false;
@@ -2361,6 +2443,9 @@ function toggleMushafAudioPlay() {
     playAyahAt(state.currentAyahIdx);
   }
   updateDockDisplay();
+  if (typeof Murajaa !== 'undefined' && typeof Murajaa.updateMurajaaAudioButton === 'function') {
+    Murajaa.updateMurajaaAudioButton();
+  }
 }
 window.toggleMushafAudioPlay = toggleMushafAudioPlay;
 
@@ -2385,18 +2470,21 @@ window.toggleWordStudioAudioPlay = toggleWordStudioAudioPlay;
 
 function toggleMainAudioPlay() {
   if (state.playbackSource === 'tafsirNami') {
-    if (tafsirNamiYtPlayer && typeof tafsirNamiYtPlayer.getPlayerState === 'function') {
-      const s = tafsirNamiYtPlayer.getPlayerState();
-      if (s === 1) {
-        tafsirNamiYtPlayer.pauseVideo();
-        state.isPlaying = false;
-      } else {
+    if (state.isPlaying) {
+      pauseTafsirNamiAudio();
+    } else {
+      if (tafsirNamiYtPlayer && typeof tafsirNamiYtPlayer.playVideo === 'function') {
         tafsirNamiYtPlayer.playVideo();
         state.isPlaying = true;
+        updateDockDisplay();
+      } else {
+        playTafsirNamiSurahAudio(state.currentSurah || state.tafsirSurah || 1);
       }
-      updateDockDisplay();
-      return;
     }
+    if (typeof Murajaa !== 'undefined' && typeof Murajaa.updateMurajaaAudioButton === 'function') {
+      Murajaa.updateMurajaaAudioButton();
+    }
+    return;
   }
   if (state.activeTab === 'wordStudio') {
     toggleWordStudioAudioPlay();
@@ -4891,7 +4979,7 @@ window.onSelectSurahFromPicker = onSelectSurahFromPicker;
 
 function updateSurahTriggerLabels(s) {
   const lblText = `${s.id}. ${s.name} (${s.arabic})`;
-  ['mushafSurahTriggerLabel', 'wsSurahTriggerLabel', 'tafsirSurahTriggerLabel', 'repeatSurahTriggerLabel', 'mqSurahTriggerLabel', 'reciteSurahTriggerLabel', 'tarteelSurahTriggerLabel'].forEach(id => {
+  ['mushafSurahTriggerLabel', 'wsSurahTriggerLabel', 'tafsirSurahTriggerLabel', 'repeatSurahTriggerLabel', 'mqSurahTriggerLabel', 'reciteSurahTriggerLabel', 'tarteelSurahTriggerLabel', 'murajaaSurahTriggerLabel'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = lblText;
   });

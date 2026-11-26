@@ -196,25 +196,12 @@
           <button onclick="QuranHujra.closeModal()" class="neo3d-close-btn" style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.08); border: none; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- Scholar Hero Card -->
-        <div style="margin: 12px 2px 8px; padding: 14px; border-radius: 20px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 95, 70, 0.25)); border: 1.2px solid rgba(16, 185, 129, 0.3); display: flex; gap: 12px; align-items: center;">
-          <img src="${s.avatar || DEFAULT_AVATAR}" onerror="this.src='${DEFAULT_AVATAR}'" style="width: 58px; height: 58px; border-radius: 16px; object-fit: cover; border: 2px solid #10b981;" />
-          <div style="flex: 1;">
-            <div style="font-weight: 900; color: #fff; font-size: 1rem;">${s.name}</div>
-            <div style="font-size: 0.72rem; color: #34d399; margin-top: 2px;">${s.titleKu}</div>
-            <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-              ${s.youtubeChannel ? `
-                <a href="${s.youtubeChannel}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="neo3d-pill-btn" style="padding: 3px 10px; font-size: 0.7rem; color: #fca5a5; background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                  <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> کەناڵی یوتیوب
-                </a>
-              ` : ''}
-              ${s.telegramChannel ? `
-                <a href="${s.telegramChannel}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="neo3d-pill-btn" style="padding: 3px 10px; font-size: 0.7rem; color: #93c5fd; background: rgba(59,130,246,0.18); border-color: rgba(59,130,246,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                  <i class="fa-brands fa-telegram" style="color: #38bdf8;"></i> کەناڵی تێلێگرام
-                </a>
-              ` : ''}
-              <span class="neo3d-pill-btn" style="padding: 3px 9px; font-size: 0.68rem; color: #34d399; border-color: rgba(16,185,129,0.3);"><i class="fa-solid fa-headphones"></i> پەخشی دەنگی</span>
-            </div>
+        <!-- Scholar compact header without redundant photo/bio -->
+        <div style="margin: 8px 2px 4px; padding: 4px 6px; display: flex; align-items: center; justify-content: space-between; border-radius: 12px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2);">
+          <span style="font-size: 0.76rem; color: #34d399; font-weight: 700;"><i class="fa-solid fa-graduation-cap"></i> ${s.name} (${s.titleKu})</span>
+          <div style="display: flex; gap: 6px;">
+            ${s.youtubeChannel ? `<a href="${s.youtubeChannel}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="neo3d-pill-btn" style="padding: 2px 8px; font-size: 0.66rem; color: #fca5a5; background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.4); text-decoration: none;"><i class="fa-brands fa-youtube" style="color: #ef4444;"></i></a>` : ""}
+            ${s.telegramChannel ? `<a href="${s.telegramChannel}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="neo3d-pill-btn" style="padding: 2px 8px; font-size: 0.66rem; color: #93c5fd; background: rgba(59,130,246,0.18); border-color: rgba(59,130,246,0.4); text-decoration: none;"><i class="fa-brands fa-telegram" style="color: #38bdf8;"></i></a>` : ""}
           </div>
         </div>
 

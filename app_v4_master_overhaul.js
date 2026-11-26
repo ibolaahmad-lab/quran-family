@@ -704,9 +704,23 @@
         desc: 'دەنگی قورئانخوێنەکە دادەگرێت بۆ ئەوەی بەبێ ئینتەرنێت لە هەموو بەشەکاندا کار بکات.',
         btn: 'داگرتن بۆ بەکارهێنانی ئۆفلاین',
         ready: 'ئامادەیە'
+      },
+      ar: {
+        langHdr: '١. لغة التطبيق / Sprache / Language',
+        themeHdr: '٢. التصاميم والمظاهر ثلاثية الأبعاد',
+        offHdr: '٣. تحميل صوت القارئ بدون إنترنت (أوفلاين)',
+        qariLbl: 'اختر القارئ:',
+        scopeLbl: 'اختر الحزمة أو السورة:',
+        optCur: '📖 حفظ السورة المفتوحة حالياً بدون إنترنت',
+        optEss: '🌟 السور المباركة الأساسية (الفاتحة، الكهف، يس، الرحمن، الملك)',
+        optJuz: '🎓 جزء عمّ (السور ٧٨ إلى ١١٤) للحفظ والصلاة',
+        optAll: '🕋 القرآن الكريم كاملاً (١١٤ سورة)',
+        desc: 'يقوم بتحميل تلاوة القارئ لتعمل بدون اتصال بالإنترنت في المصحف، دراسة الكلمات، الترتيل والاختبار.',
+        btn: 'تحميل الآن للاستخدام بدون إنترنت',
+        ready: 'جاهز'
       }
     };
-    const t = map[lang] || map.de;
+    const t = map[lang] || map.ku;
     const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     setTxt('settingsLangHeaderTitle', t.langHdr);
     setTxt('settingsThemeHeaderTitle', t.themeHdr);
@@ -720,8 +734,123 @@
     setTxt('offlineDownloadStatusText', t.desc);
     setTxt('settingsOfflineBtnText', t.btn);
     populateOfflineSurahsDropdown();
+    translateMushafDesignModal(lang);
   }
   window.translateSettingsModalUI = translateSettingsModalUI;
+
+  function translateMushafDesignModal(langCode) {
+    const lang = langCode || window.currentAppLanguage || 'ku';
+    const dMap = {
+      ku: {
+        title: 'دیزاین و خەتی قورئان',
+        sub: 'شێوازی خەت، ڕەنگی کاغەز و تەجوید',
+        fontLbl: '١. شێوازی خەتی قورئان (کالیگرافی):',
+        sizeLbl: '٢. قەبارەی خەت:',
+        inkLbl: '٣. ئەستووری مەرەکەب (خەت):',
+        paperLbl: '٤. ڕەنگی کاغەزی مەسحەف:',
+        btnTajweed: 'تەجوید',
+        btnHide: 'شاردنەوەی وشەکان',
+        inkStd: 'ئاسایی',
+        inkMed: 'مامناوەند',
+        inkThk: 'تۆخ',
+        optCream: '١. عاجی (مەسحەفی ئەسڵی مەدینە)',
+        optSepia: '٢. پەڕتووکی کەونارا',
+        optWhite: '٣. سپی ڕووناک',
+        optDark: '٤. دۆخی شەوانە (تاریک)',
+        optEmerald: '٥. سەوزی زەمروود'
+      },
+      ar: {
+        title: 'تصميم الخط والمصحف الشريف',
+        sub: 'نوع الخط، لون الصفحة وقواعد التجويد',
+        fontLbl: '١. نوع الخط القرآني (الرسم العثماني):',
+        sizeLbl: '٢. حجم الخط:',
+        inkLbl: '٣. سماكة الحبر (سماكة الحروف):',
+        paperLbl: '٤. لون خلفية صفحة المصحف:',
+        btnTajweed: 'التجويد',
+        btnHide: 'إخفاء الكلمات',
+        inkStd: 'قياسي',
+        inkMed: 'متوسط',
+        inkThk: 'عريض',
+        optCream: '١. عاجي (مصحف المدينة الأصلي)',
+        optSepia: '٢. ورق مخطوطة قديم',
+        optWhite: '٣. أبيض ناصع',
+        optDark: '٤. الوضع الليلي (داكن)',
+        optEmerald: '٥. زمردي هادئ'
+      },
+      de: {
+        title: 'Koran-Design & Kalligraphie',
+        sub: 'Schriftart, Papier & Tajweed',
+        fontLbl: '1. Koran-Schriftart (Kalligraphie):',
+        sizeLbl: '2. Schriftgröße:',
+        inkLbl: '3. Tintenstärke (Buchstaben-Dicke):',
+        paperLbl: '4. Hintergrund-Papier:',
+        btnTajweed: 'Tajweed',
+        btnHide: 'Verdecken',
+        inkStd: 'Standard',
+        inkMed: 'Mittel',
+        inkThk: 'Kräftig',
+        optCream: '1. Elfenbein (Original Medina-Koran)',
+        optSepia: '2. Pergament (Klassisch)',
+        optWhite: '3. Weiß (High-Contrast)',
+        optDark: '4. Nachtmodus (Dunkel)',
+        optEmerald: '5. Smaragd (Grün)'
+      },
+      en: {
+        title: 'Quran Design & Typography',
+        sub: 'Font Style, Paper & Tajweed',
+        fontLbl: '1. Quran Calligraphy Font:',
+        sizeLbl: '2. Font Size:',
+        inkLbl: '3. Ink Weight (Thickness):',
+        paperLbl: '4. Background Paper:',
+        btnTajweed: 'Tajweed',
+        btnHide: 'Hide Words',
+        inkStd: 'Standard',
+        inkMed: 'Medium',
+        inkThk: 'Bold',
+        optCream: '1. Ivory (Original Medina Mushaf)',
+        optSepia: '2. Parchment (Antique)',
+        optWhite: '3. Crisp White',
+        optDark: '4. Night Mode (Dark)',
+        optEmerald: '5. Emerald Green'
+      }
+    };
+    const dt = dMap[lang] || dMap.ku;
+    const modal = document.getElementById('mushafDesignModal');
+    if (!modal) return;
+
+    const titleEl = modal.querySelector('div[style*="font-weight: 900;"]');
+    if (titleEl && !titleEl.id) titleEl.textContent = dt.title;
+    const subEl = modal.querySelector('div[style*="color: #fbbf24;"]');
+    if (subEl) subEl.textContent = dt.sub;
+
+    const labels = modal.querySelectorAll('label');
+    if (labels[0]) labels[0].innerHTML = '<i class="fa-solid fa-pen-nib" style="color: #fbbf24; font-size: 0.72rem;"></i> ' + dt.fontLbl;
+    if (labels[1]) labels[1].innerHTML = '<i class="fa-solid fa-text-height" style="color: #fbbf24; font-size: 0.72rem;"></i> ' + dt.sizeLbl;
+    if (labels[2]) labels[2].innerHTML = '<i class="fa-solid fa-paintbrush" style="color: #fbbf24; font-size: 0.72rem;"></i> ' + dt.inkLbl;
+    if (labels[3]) labels[3].innerHTML = '<i class="fa-solid fa-palette" style="color: #fbbf24; font-size: 0.72rem;"></i> ' + dt.paperLbl;
+
+    const stdBtn = document.getElementById('designInkBtn_standard');
+    if (stdBtn) stdBtn.textContent = dt.inkStd;
+    const medBtn = document.getElementById('designInkBtn_medium');
+    if (medBtn) medBtn.textContent = dt.inkMed;
+    const thkBtn = document.getElementById('designInkBtn_thick');
+    if (thkBtn) thkBtn.textContent = dt.inkThk;
+
+    const palSelect = document.getElementById('mushafPaletteSelect');
+    if (palSelect && palSelect.options.length >= 5) {
+      palSelect.options[0].text = dt.optCream;
+      palSelect.options[1].text = dt.optSepia;
+      palSelect.options[2].text = dt.optWhite;
+      palSelect.options[3].text = dt.optDark;
+      palSelect.options[4].text = dt.optEmerald;
+    }
+
+    const tjSpan = document.querySelector('#tajweedToggleBtn span');
+    if (tjSpan) tjSpan.textContent = dt.btnTajweed;
+    const thSpan = document.querySelector('#tarteelHifzBtn span');
+    if (thSpan) thSpan.textContent = dt.btnHide;
+  }
+  window.translateMushafDesignModal = translateMushafDesignModal;
 
   function populateOfflineSurahsDropdown() {
     const grp = document.getElementById('settingsScopeAllSurahsGroup');
@@ -744,7 +873,7 @@
       setAppLanguage(langCode);
     }
     window.currentAppLanguage = langCode;
-    ['de', 'en', 'ku'].forEach(l => {
+    ['de', 'en', 'ku', 'ar'].forEach(l => {
       const btn = document.getElementById('langCardBtn_' + l);
       if (btn) btn.classList.toggle('active', l === langCode);
     });

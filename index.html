@@ -5439,6 +5439,7 @@
               <option value="Yasser_Ad-Dussary_128kbps">🎙️ Al-Dussary</option>
               <option value="Abdurrahmaan_As-Sudais_192kbps">🎙️ As-Sudais</option>
               <option value="Ghamadi_40kbps">🎙️ Al-Ghamadi</option>
+              <option value="Mansour_Al_Salimi">🎙️ منصور السالمي (Ganze Sure)</option>
             </select>
 
             <!-- 3. Markieren Button (Relocated to Row 2 next to Qari) -->
@@ -5449,8 +5450,8 @@
 
           <!-- Row 3: Tajweed, Design, Khatm & Vollbild (Balanced 4-item row) -->
           <div id="mushafToolbarRow3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) 34px; gap: 5px; width: 100%; align-items: center; box-sizing: border-box;">
-            <button type="button" class="neo3d-pill-btn" onclick="switchMainTab('tajweed')" style="min-width: 0; justify-content: center; padding: 4px 2px; font-size: 0.69rem; border-radius: 9px; height: 30px; color: #6ee7b7; border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.08); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="Tajweed">
-              <i class="fa-solid fa-graduation-cap" style="font-size: 0.72rem; flex-shrink: 0;"></i> <span>Tajweed</span>
+            <button type="button" id="mushafToolbarTajweedBtn" class="neo3d-pill-btn" onclick="toggleTajweed()" style="min-width: 0; justify-content: center; padding: 4px 2px; font-size: 0.69rem; border-radius: 9px; height: 30px; color: #6ee7b7; border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.08); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="چالاککردنی ڕەنگەکانی تەجوید لە مەسحەفدا">
+              <i class="fa-solid fa-graduation-cap" style="font-size: 0.72rem; flex-shrink: 0;"></i> <span id="mushafToolbarTajweedLabel">تەجوید</span>
             </button>
             <button type="button" class="neo3d-pill-btn" onclick="openMushafDesignSheet()" style="min-width: 0; justify-content: center; padding: 4px 2px; font-size: 0.69rem; border-radius: 9px; height: 30px; color: #fef08a; border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.08); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="Design &amp; Schriftgröße">
               <i class="fa-solid fa-palette" style="color: #fbbf24; font-size: 0.72rem; flex-shrink: 0;"></i> <span>Design</span>
@@ -5618,7 +5619,6 @@
             <div style="display: flex; align-items: center; width: 100%;">
               <select id="wsPlayerQariSelect" onchange="onQariChanged(this.value)" style="width: 100%; height: 34px; padding: 4px 10px; font-size: 0.78rem; font-weight: 700; background: rgba(0,0,0,0.42); color: #fef08a; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;">
                 <option value="Alafasy_128kbps" selected>🎙️ مشاري العفاسي (Mishary Alafasy)</option>
-                <option value="Tafsir_Nami_Audio">🎙️ دەنگی تەفسیری نامی (م. مەلا عەبدولکەریم)</option>
                 <option value="Husary_128kbps">🎙️ محمود خليل الحصري (Al-Hussary)</option>
                 <option value="Abdul_Basit_Murattal_192kbps">🎙️ عبد الباسط عبد الصمد</option>
                 <option value="Minshawy_Murattal_128kbps">🎙️ محمد صديق المنشاوي</option>
@@ -5969,15 +5969,9 @@
             </button>
 
             <!-- Compact Nami Book Pill Button -->
-            <button type="button" onclick="openTafsirNamiPdfModalForSurah(state.tafsirSurah || 1)" class="neo3d-pill-btn" style="padding: 7px 10px; font-size: 0.78rem; background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7; flex-shrink: 0;" title="پەڕتووکی تەفسیری نامی (PDF)">
+            <button type="button" onclick="openTafsirNamiPdfModalForSurah(state.tafsirSurah || 1)" class="neo3d-pill-btn" style="padding: 7px 12px; font-size: 0.78rem; background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7; flex-shrink: 0;" title="پەڕتووکی تەفسیری نامی (PDF)">
               <i class="fa-solid fa-book-open-reader" style="color: #34d399;"></i>
-              <span>کتێب</span>
-            </button>
-
-            <!-- Tafsir Nami Audio Pill Button -->
-            <button type="button" onclick="playTafsirNamiSurahAudio(state.tafsirSurah || 1)" class="neo3d-pill-btn" style="padding: 7px 10px; font-size: 0.78rem; background: rgba(168, 85, 247, 0.2); border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe; flex-shrink: 0;" title="گوێگرتن لە دەنگی تەفسیری نامی بۆ ئەم سورەتە">
-              <i class="fa-solid fa-headphones" style="color: #c084fc;"></i>
-              <span>دەنگی نامی</span>
+              <span>کتێبی تەفسیری نامی</span>
             </button>
           </div>
         </div>
@@ -7136,18 +7130,22 @@
             <i class="fa-solid fa-globe" style="color: #38bdf8;"></i>
             <span id="settingsLangHeaderTitle">1. Sprache / Language / زمان</span>
           </div>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-            <button id="langCardBtn_de" onclick="selectLanguageCard('de')" class="neo3d-tab-pill active">
-              <span style="font-size: 1.2rem;">🇩🇪</span>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+            <button id="langCardBtn_ku" onclick="selectLanguageCard('ku')" class="neo3d-tab-pill active">
+              <span style="font-size: 1.15rem;">☀️</span>
+              <span>کوردی</span>
+            </button>
+            <button id="langCardBtn_ar" onclick="selectLanguageCard('ar')" class="neo3d-tab-pill">
+              <span style="font-size: 1.15rem;">🕋</span>
+              <span>العربية</span>
+            </button>
+            <button id="langCardBtn_de" onclick="selectLanguageCard('de')" class="neo3d-tab-pill">
+              <span style="font-size: 1.15rem;">🇩🇪</span>
               <span>Deutsch</span>
             </button>
             <button id="langCardBtn_en" onclick="selectLanguageCard('en')" class="neo3d-tab-pill">
-              <span style="font-size: 1.2rem;">🇬🇧</span>
+              <span style="font-size: 1.15rem;">🇬🇧</span>
               <span>English</span>
-            </button>
-            <button id="langCardBtn_ku" onclick="selectLanguageCard('ku')" class="neo3d-tab-pill">
-              <span style="font-size: 1.2rem;">☀️</span>
-              <span>کوردی</span>
             </button>
           </div>
         </div>

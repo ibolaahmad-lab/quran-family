@@ -915,7 +915,32 @@
           </div>
         </div>
 
-        <!-- Row 2: Secondary Bar (Reveal / Hide All in Tasmi Mode + Live Status) -->
+        <!-- Row 2: Compact Murajaa Audio & Surah Control Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; flex-wrap: nowrap; background: rgba(0,0,0,0.42); padding: 5px 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+          <!-- Surah Selector Button -->
+          <button type="button" onclick="openSurahPickerFor('mushaf')" class="murajaa-action-btn" style="flex: 1; min-width: 0; justify-content: space-between; padding: 4px 8px; font-size: 0.75rem; border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.1); color: #fef08a;" title="هەڵبژاردنی سورەت">
+            <span style="display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <i class="fa-solid fa-book-open" style="color: #fbbf24; font-size: 0.75rem;"></i>
+              <span id="murajaaSurahTriggerLabel" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800;">${sMeta ? (sMeta.id + '. ' + (sMeta.transliteration || sMeta.name || '') + ' (' + (sMeta.arabic || '') + ')') : 'سورەت'}</span>
+            </span>
+            <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem; color: #94a3b8; flex-shrink: 0;"></i>
+          </button>
+
+          <!-- Compact Page Stepper -->
+          <div style="display: flex; align-items: center; gap: 2px; flex-shrink: 0; background: rgba(255,255,255,0.05); padding: 2px 4px; border-radius: 8px;">
+            <button onclick="jumpToPage(${pageNum - 1})" class="murajaa-mini-btn" style="width: 22px; height: 24px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="لاپەڕەی پێشوو">◄</button>
+            <span style="font-size: 0.72rem; font-weight: 800; color: #38bdf8; padding: 0 4px; white-space: nowrap;">ل ${pageNum}</span>
+            <button onclick="jumpToPage(${pageNum + 1})" class="murajaa-mini-btn" style="width: 22px; height: 24px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;" title="لاپەڕەی دواتر">►</button>
+          </div>
+
+          <!-- Compact Audio Play/Pause Button -->
+          <button type="button" id="murajaaAudioPlayBtn" onclick="Murajaa.toggleAudioPlay()" class="murajaa-action-btn ${(window.state && window.state.isPlaying) ? 'audio-active' : ''}" style="flex-shrink: 0; padding: 4px 10px; font-size: 0.75rem; background: ${(window.state && window.state.isPlaying) ? 'linear-gradient(135deg, #10b981, #059669)' : 'rgba(16, 185, 129, 0.16)'}; border-color: rgba(16, 185, 129, 0.45); color: ${(window.state && window.state.isPlaying) ? '#ffffff' : '#6ee7b7'};" title="پەخشی دەنگ">
+            <i class="fa-solid ${(window.state && window.state.isPlaying) ? 'fa-pause' : 'fa-play'}" id="murajaaAudioPlayIcon" style="color: ${(window.state && window.state.isPlaying) ? '#ffffff' : '#34d399'}; font-size: 0.75rem;"></i>
+            <span id="murajaaAudioPlayLabel" style="margin-left: 3px; font-weight: 700;">${(window.state && window.state.isPlaying) ? 'وەستان' : 'پەخش'}</span>
+          </button>
+        </div>
+
+        <!-- Row 3: Secondary Bar (Reveal / Hide All in Tasmi Mode + Live Status) -->
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.78rem;">
           <div id="murajaaLiveStatus" style="font-weight: 700; color: #fbbf24; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
             <span style="opacity: 0.7;">${t('title')}</span>
@@ -1049,6 +1074,38 @@
 
     stage.innerHTML = html;
   }
+  
+  // Audio playback bridge for Murajaa Mushaf
+  function toggleAudioPlay() {
+    if (typeof window.toggleMushafAudioPlay === 'function') {
+      window.toggleMushafAudioPlay();
+    } else if (typeof window.toggleMainAudioPlay === 'function') {
+      window.toggleMainAudioPlay();
+    }
+    updateMurajaaAudioButton();
+  }
+  window.Murajaa.toggleAudioPlay = toggleAudioPlay;
+
+  function updateMurajaaAudioButton() {
+    const btn = document.getElementById('murajaaAudioPlayBtn');
+    const icon = document.getElementById('murajaaAudioPlayIcon');
+    const lbl = document.getElementById('murajaaAudioPlayLabel');
+    const isPlaying = !!(window.state && window.state.isPlaying);
+    if (btn) {
+      btn.style.background = isPlaying ? 'linear-gradient(135deg, #10b981, #059669)' : 'rgba(16, 185, 129, 0.15)';
+      btn.style.color = isPlaying ? '#ffffff' : '#6ee7b7';
+      btn.classList.toggle('audio-active', isPlaying);
+    }
+    if (icon) {
+      icon.className = isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+      icon.style.color = isPlaying ? '#ffffff' : '#34d399';
+    }
+    if (lbl) {
+      lbl.textContent = isPlaying ? 'وەستان' : 'پەخش';
+    }
+  }
+  window.Murajaa.updateMurajaaAudioButton = updateMurajaaAudioButton;
+
   window.Murajaa.renderMurajaaMushaf = renderMurajaaMushaf;
 
   function setViewMode(mode) {
