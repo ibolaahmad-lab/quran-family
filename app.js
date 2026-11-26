@@ -4574,8 +4574,9 @@ window.renderWordStudio = function() {
   updateWordStudioPageInput();
 };
 
+const origRenderTafsirStudio = window.renderTafsirStudio;
 window.renderTafsirStudio = async function() {
-  if (typeof renderTafsirStudio === 'function') await renderTafsirStudio();
+  if (typeof origRenderTafsirStudio === 'function') await origRenderTafsirStudio();
   updateTafsirPageInput();
 };
 

@@ -1,5 +1,5 @@
 // Service Worker for Quran Karim PWA - Sunni Tafsir Edition
-const CACHE_NAME = 'quran-karim-cache-v20261126_sunni_v12';
+const CACHE_NAME = 'quran-karim-cache-v20261126_sunni_v13';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
