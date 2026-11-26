@@ -189,24 +189,10 @@ try {
   }
 } catch (e) {}
 
-// Clean Arabic Text Provider & Dynamic Tajweed Colorizer
+// Clean Arabic Text Provider & Pure Mushaf Formatter (No letter-splitting intra-word spans)
 function applyTajweedMarkup(text) {
   if (!text) return '';
-  let str = cleanArabicText(text);
-
-  // 1. Madd (Red/Rose #f43f5e) - Any letter with Maddah wave \u0653 or prolonged madd sign
-  str = str.replace(/([\u0621-\u064A\u0671\u0670]?[\u064B-\u0652]?\u0653[\u064B-\u0652]?)/g, '<span class="tajweed-madd">$1</span>');
-
-  // 2. Qalqalah (Cyan/Sky Blue #0284c7) - [قطبدج] with Sukoon \u0652 or \u06DF
-  str = str.replace(/([\u0642\u0637\u0628\u062c\u062f][\u0652\u06DF])/g, '<span class="tajweed-qalqalah">$1</span>');
-
-  // 3. Iqlab (Violet #a855f7) - Letters followed by small meem \u06E2
-  str = str.replace(/([\u0621-\u064A]?[\u06E2])/g, '<span class="tajweed-iqlab">$1</span>');
-
-  // 4. Ghunnah (Emerald Green #10b981) - Noon (ن) and Meem (م) with Shaddah (\u0651)
-  str = str.replace(/([\u0646\u0645][\u064B-\u0650\u0652-\u065F]?\u0651[\u064B-\u0650\u0652-\u065F]?)/g, '<span class="tajweed-ghunnah">$1</span>');
-
-  return str;
+  return cleanArabicText(text);
 }
 window.applyTajweedMarkup = applyTajweedMarkup;
 
