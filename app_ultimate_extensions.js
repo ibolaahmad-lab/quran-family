@@ -2040,6 +2040,7 @@ window.evaluateProgressiveWords = function(spokenText, targetAyahText) {
 // Mode Toggle Handler: 1. Einzelvers vs 2. Fortlaufend
 function setTarteelReciteMode(mode) {
   tarteelState.reciteMode = mode;
+  try { localStorage.setItem('tarteel_recite_mode', mode); } catch (e) {}
 
   const singleBtn = document.getElementById('tarteelModeSingleBtn');
   const contBtn = document.getElementById('tarteelModeContBtn');
@@ -2061,7 +2062,6 @@ function setTarteelReciteMode(mode) {
       badge.style.background = 'rgba(16,185,129,0.3)';
     }
     updateTarteelStatusText(getTarteelText('singleModeDesc', tarteelState.targetAyah));
-    if (typeof showToast === 'function') showToast(getTarteelText('singleActiveToast'));
   } else {
     if (contBtn) {
       contBtn.style.background = 'linear-gradient(135deg, #10b981, #047857)';
@@ -2078,7 +2078,6 @@ function setTarteelReciteMode(mode) {
       badge.style.background = 'rgba(56,189,248,0.3)';
     }
     updateTarteelStatusText(getTarteelText('contModeDesc', tarteelState.targetAyah));
-    if (typeof showToast === 'function') showToast(getTarteelText('contActiveToast'));
   }
 }
 window.setTarteelReciteMode = setTarteelReciteMode;
@@ -2115,12 +2114,16 @@ function stepTarteelTargetVerse(delta) {
   if (newIdx >= 0 && newIdx < verses.length) {
     tarteelState.targetAyah = verses[newIdx].num;
     tarteelState.surah = verses[newIdx].surahNum;
-    tarteelState.ignoreSpeechBeforeTime = Date.now() + 400;
     if (delta < 0 && tarteelState.hideMode) {
       const prevKey = `${verses[curIdx].surahNum}:${verses[curIdx].num}`;
       delete tarteelState.revealed[prevKey];
       delete tarteelState.revealedWords[prevKey];
+      const newKey = `${verses[newIdx].surahNum}:${verses[newIdx].num}`;
+      delete tarteelState.revealed[newKey];
+      delete tarteelState.revealedWords[newKey];
     }
+    tarteelAlignedKey = '';
+    if (typeof syncTarteelAlignerToTarget === 'function') syncTarteelAlignerToTarget(false);
     renderTarteelMushafPage();
     updateTarteelStatusText(getTarteelText(tarteelState.reciteMode === 'single' ? 'singleModeDesc' : 'contModeDesc', tarteelState.targetAyah));
   } else if (delta > 0 && tarteelState.page < 604) {
@@ -2142,8 +2145,8 @@ function rewindTarteelPage() {
     tarteelState.surah = verses[0].surahNum;
     tarteelState.targetAyah = verses[0].num;
   }
-  tarteelState.sessionResultIndex = tarteelState.speechRecognizerLatestResultIndex || 0;
-  tarteelState.ignoreSpeechBeforeTime = Date.now() + 400;
+  tarteelAlignedKey = '';
+  if (typeof syncTarteelAlignerToTarget === 'function') syncTarteelAlignerToTarget(true);
   renderTarteelMushafPage();
   updateTarteelStatusText(getTarteelText(tarteelState.reciteMode === 'single' ? 'singleModeDesc' : 'contModeDesc', tarteelState.targetAyah));
   if (typeof showToast === 'function') showToast(getTarteelText('rewindToast'));
@@ -2170,8 +2173,8 @@ function showOnlyTargetTarteelAyah() {
   tarteelState.revealedWords = {};
   const targetKey = `${tarteelState.surah}:${tarteelState.targetAyah}`;
   tarteelState.revealed[targetKey] = true;
+  tarteelAlignedKey = '';
   renderTarteelMushafPage();
-  if (typeof showToast === 'function') showToast('👁️ Nur Zielvers aufgedeckt');
 }
 window.showOnlyTargetTarteelAyah = showOnlyTargetTarteelAyah;
 window.toggleTarteelHideMode = showOnlyTargetTarteelAyah;
@@ -2190,7 +2193,8 @@ function changeTarteelPage(pNum) {
   }
   tarteelState.revealed = {};
   tarteelState.revealedWords = {};
-  tarteelState.ignoreSpeechBeforeTime = Date.now() + 400;
+  tarteelAlignedKey = '';
+  if (typeof syncTarteelAlignerToTarget === 'function') syncTarteelAlignerToTarget(true);
   renderTarteelMushafPage();
   updateTarteelStatusText(getTarteelText(tarteelState.reciteMode === 'single' ? 'singleModeDesc' : 'contModeDesc', tarteelState.targetAyah));
 }
@@ -2308,6 +2312,43 @@ function renderTarteelMistakesList() {
   container.innerHTML = html;
 }
 
+// Master Stateful Quran Aligner Instance for Tarteel Studio
+var tarteelAligner = null;
+var tarteelAlignedKey = '';
+
+function getCleanTarteelVerseParts(v) {
+  if (window.QuranVoiceAI && typeof window.QuranVoiceAI.extractCleanVerseWords === 'function') {
+    return window.QuranVoiceAI.extractCleanVerseWords(v);
+  }
+  let rawAr = (v && v.ar) ? String(v.ar) : '';
+  if (v && v.num === 1 && v.surahNum !== 1 && v.surahNum !== 9) {
+    rawAr = rawAr.replace(/^بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ\s*/, '')
+                 .replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
+                 .trim();
+  }
+  const words = rawAr.split(/\s+/).filter(Boolean);
+  return { displayWords: words, normWords: words.map(w => normalizeArabicForMatch(w)).filter(Boolean) };
+}
+
+function syncTarteelAlignerToTarget(forceReset) {
+  if (!window.QuranVoiceAI || typeof window.QuranVoiceAI.createRecitationAligner !== 'function') return null;
+  if (!tarteelAligner) {
+    tarteelAligner = window.QuranVoiceAI.createRecitationAligner();
+  }
+  const verses = getTarteelVersesForPage(tarteelState.page);
+  const targetV = (verses && verses.find(v => v.num === tarteelState.targetAyah && v.surahNum === tarteelState.surah)) || (verses && verses[0]);
+  if (!targetV) return tarteelAligner;
+
+  const key = `${tarteelState.page}:${targetV.surahNum}:${targetV.num}`;
+  const currentRev = forceReset ? 0 : (tarteelState.revealedWords[`${targetV.surahNum}:${targetV.num}`] || 0);
+  if (forceReset || tarteelAlignedKey !== key) {
+    const { normWords } = getCleanTarteelVerseParts(targetV);
+    tarteelAligner.setTargetWords(normWords, currentRev);
+    tarteelAlignedKey = key;
+  }
+  return tarteelAligner;
+}
+
 // Master Speech Recognition Controller with Smart Next-Ayah Mic Tap
 function toggleTarteelRecitation() {
   if (tarteelState.isRecording) {
@@ -2323,76 +2364,99 @@ function toggleTarteelRecitation() {
       } else if (tarteelState.page < 604) {
         changeTarteelPage(tarteelState.page + 1);
       }
-      tarteelState.sessionResultIndex = tarteelState.speechRecognizerLatestResultIndex || 0;
+      syncTarteelAlignerToTarget(true);
       renderTarteelMushafPage();
     }
     startTarteelRecitation();
   }
 }
-
-
 window.toggleTarteelRecitation = toggleTarteelRecitation;
 
-// Unified Progressive Speech Stream Handler (Used by Google Speech, Groq Whisper & Offline WASM)
-function handleTarteelSpokenStream(fullSessionSpoken, latestChunk, latestResultCount) {
-  if (!tarteelState.isRecording || tarteelState.isPacingPause) return;
-  if (Date.now() < tarteelState.ignoreSpeechBeforeTime) return;
-
-  if (latestResultCount) {
-    tarteelState.speechRecognizerLatestResultIndex = latestResultCount;
-  }
+// Unified Stateful Delta-Token Stream Handler (Groq Whisper, Tarteel Offline WASM & Google Live)
+function feedTarteelDeltaTokens(deltaTokens, rawDisplayText) {
+  if (!tarteelState.isRecording) return;
+  if (!deltaTokens || deltaTokens.length === 0) return;
 
   const liveText = document.getElementById('tarteelSpeechLiveText');
   const scoreBadge = document.getElementById('tarteelMatchScoreBadge');
 
-  if (liveText) liveText.textContent = latestChunk || fullSessionSpoken;
-
-  // Target Ayah
-  const verses = getTarteelVersesForPage(tarteelState.page);
-  const targetV = verses.find(v => v.num === tarteelState.targetAyah && v.surahNum === tarteelState.surah) || verses[0];
-  if (!targetV) return;
-
-  const targetKey = `${targetV.surahNum}:${targetV.num}`;
-  const rawWords = (targetV.ar || '').split(/\s+/).filter(w => w.length > 0);
-  const totalWords = rawWords.length;
-  const currentRevealed = tarteelState.revealedWords[targetKey] || 0;
-
-  const progress = evaluateAyahWordStream(fullSessionSpoken, latestChunk, rawWords, currentRevealed);
-
-  // Progressive Live Word-by-Word Fill:
-  if (progress.matchedWords > currentRevealed) {
-    const prevCount = currentRevealed;
-    tarteelState.revealedWords[targetKey] = progress.matchedWords;
-    playTarteelTone('wordSuccess');
-    updateProgressiveWordDOM(targetV.surahNum, targetV.num, prevCount, progress.matchedWords);
+  if (liveText && rawDisplayText) {
+    liveText.textContent = rawDisplayText;
   }
 
-  if (scoreBadge) {
-    scoreBadge.textContent = getTarteelText('wordProgressBadge', progress.matchedWords, progress.totalWords);
-    scoreBadge.style.background = progress.isComplete ? 'rgba(16,185,129,0.35)' : 'rgba(56,189,248,0.25)';
-    scoreBadge.style.color = progress.isComplete ? '#34d399' : '#38bdf8';
-  }
+  let tokensQueue = deltaTokens.slice();
+  let safetyGuard = 0;
 
-  if (progress.isComplete) {
-    // ALL WORDS IN AYAH SUCCESSFULLY COMPLETED!
-    if (latestResultCount) {
-      tarteelState.sessionResultIndex = latestResultCount;
+  while (tokensQueue.length > 0 && safetyGuard++ < 12) {
+    const verses = getTarteelVersesForPage(tarteelState.page);
+    const targetV = (verses && verses.find(v => v.num === tarteelState.targetAyah && v.surahNum === tarteelState.surah)) || (verses && verses[0]);
+    if (!targetV) break;
+
+    const targetKey = `${targetV.surahNum}:${targetV.num}`;
+    const currentRevealed = tarteelState.revealedWords[targetKey] || 0;
+    const aligner = syncTarteelAlignerToTarget(false);
+    if (!aligner) break;
+
+    const allowOpeningBasmalah = (targetV.num === 1 && targetV.surahNum !== 1 && targetV.surahNum !== 9);
+    const res = aligner.feedTokens(tokensQueue, { allowOpeningBasmalah });
+
+    // Friendly confirmation when user recites Basmalah / Isti'adhah before Ayah 1 (e.g. Surah Al-Baqarah before الم)
+    if ((res.sawBasmalah || res.sawIstiadhah) && res.matchedWords === 0 && !res.isComplete) {
+      if (liveText) {
+        liveText.textContent = res.sawBasmalah
+          ? 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ✓'
+          : 'أَعُوذُ بِٱللَّهِ مِنَ ٱلشَّيْطَانِ ٱلرَّجِيمِ ✓';
+      }
+      const bRow = document.getElementById('tarteelBismillahRow');
+      if (bRow && res.sawBasmalah) {
+        bRow.style.color = '#10b981';
+        bRow.style.transition = 'color 0.3s ease';
+      }
     }
-    onAyahSuccessfullyRecognized(targetV, fullSessionSpoken || latestChunk);
+
+    if (res.matchedWords > currentRevealed) {
+      tarteelState.revealedWords[targetKey] = res.matchedWords;
+      playTarteelTone('wordSuccess');
+      updateProgressiveWordDOM(targetV.surahNum, targetV.num, currentRevealed, res.matchedWords);
+    }
+
+    if (scoreBadge) {
+      scoreBadge.textContent = getTarteelText('wordProgressBadge', res.matchedWords, res.totalWords);
+      scoreBadge.style.background = res.isComplete ? 'rgba(16,185,129,0.35)' : (res.didBacktrack ? 'rgba(56,189,248,0.35)' : 'rgba(56,189,248,0.25)');
+      scoreBadge.style.color = res.isComplete ? '#34d399' : '#38bdf8';
+    }
+
+    if (res.isComplete) {
+      const carryTokens = res.remainingTokens || [];
+      onAyahSuccessfullyRecognized(targetV, rawDisplayText || tokensQueue.join(' '));
+      if (tarteelState.reciteMode === 'single' || !tarteelState.isRecording) {
+        break;
+      }
+      tokensQueue = carryTokens;
+    } else {
+      break;
+    }
   }
+}
+window.feedTarteelDeltaTokens = feedTarteelDeltaTokens;
+
+function handleTarteelSpokenStream(fullSessionSpoken, latestChunk) {
+  const txt = latestChunk || fullSessionSpoken || '';
+  if (!txt || !window.QuranVoiceAI) return;
+  const toks = window.QuranVoiceAI.tokenizeQuranText(txt);
+  feedTarteelDeltaTokens(toks, txt);
 }
 window.handleTarteelSpokenStream = handleTarteelSpokenStream;
 window.processTarteelSpokenText = function(text) {
-  handleTarteelSpokenStream(text, text, (tarteelState.speechRecognizerLatestResultIndex || 0) + 1);
+  handleTarteelSpokenStream(text, text);
 };
 
 function startTarteelRecitation() {
   tarteelState.isRecording = true;
+  tarteelState.isPacingPause = false;
   tarteelState.timerSeconds = 0;
-  tarteelState.ignoreSpeechBeforeTime = Date.now() + 250;
-  tarteelState.accumulatedSpokenText = '';
-  tarteelState.lastChunkSpoken = '';
-  tarteelState.sessionResultIndex = 0;
+  tarteelState.ignoreSpeechBeforeTime = 0;
+  syncTarteelAlignerToTarget(false);
 
   const fab = document.getElementById('tarteelEmeraldFab');
   const fabIcon = document.getElementById('tarteelEmeraldFabIcon');
@@ -2413,7 +2477,6 @@ function startTarteelRecitation() {
     scoreBadge.style.color = '#34d399';
   }
 
-  // Timer
   if (tarteelState.timerInterval) clearInterval(tarteelState.timerInterval);
   tarteelState.timerInterval = setInterval(() => {
     tarteelState.timerSeconds++;
@@ -2422,131 +2485,63 @@ function startTarteelRecitation() {
     if (timerDigits) timerDigits.textContent = `${m}:${s}`;
   }, 1000);
 
-  // Multi-Engine Quran Voice AI Integration (Groq Whisper / Offline WASM / Native Google)
-  if (window.QuranVoiceAI && window.QuranVoiceAI.getEngine() !== 'google_speech') {
+  updateTarteelStatusText(getTarteelText(tarteelState.reciteMode === 'single' ? 'singleModeDesc' : 'contModeDesc', tarteelState.targetAyah));
+
+  if (window.QuranVoiceAI && typeof window.QuranVoiceAI.startListening === 'function') {
     window.QuranVoiceAI.startListening({
       onStart: () => {},
-      onTranscript: (cleanText) => {
-        handleTarteelSpokenStream(cleanText, cleanText, (tarteelState.speechRecognizerLatestResultIndex || 0) + 1);
+      pickBestAlternative: (alts) => {
+        if (!alts || alts.length <= 1 || !tarteelAligner) return alts ? alts[0] : '';
+        const verses = getTarteelVersesForPage(tarteelState.page);
+        const targetV = (verses && verses.find(v => v.num === tarteelState.targetAyah && v.surahNum === tarteelState.surah)) || (verses && verses[0]);
+        if (!targetV) return alts[0];
+        const { normWords } = getCleanTarteelVerseParts(targetV);
+        const st = tarteelAligner.getState();
+        const expectedWord = normWords[st.cursor];
+        if (!expectedWord) return alts[0];
+        for (let i = 0; i < alts.length; i++) {
+          const toks = window.QuranVoiceAI.tokenizeQuranText(alts[i]);
+          if (toks.some(tk => window.QuranVoiceAI.doQuranWordsMatch(tk, expectedWord))) {
+            return alts[i];
+          }
+        }
+        return alts[0];
+      },
+      onDeltaTokens: (deltaTokens, isFinal, rawText) => {
+        feedTarteelDeltaTokens(deltaTokens, rawText);
       },
       onError: (err) => {
         console.warn('Tarteel Voice AI error:', err);
-      },
-      onEnd: () => {
-        if (tarteelState.isRecording) {
-          setTimeout(() => {
-            if (tarteelState.isRecording) startTarteelRecitation();
-          }, 100);
-        }
-      }
-    });
-    return;
-  }
-
-  // Initialize Speech Recognition Engine (ar-SA with continuous recognition)
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (SpeechRecognition) {
-    try {
-      if (tarteelState.speechRecognizer) {
-        try { tarteelState.speechRecognizer.abort(); } catch(e){}
-        tarteelState.speechRecognizer = null;
-      }
-
-      tarteelState.speechRecognizer = new SpeechRecognition();
-      tarteelState.speechRecognizer.lang = 'ar-SA';
-      tarteelState.speechRecognizer.continuous = true;
-      tarteelState.speechRecognizer.interimResults = true;
-      tarteelState.speechRecognizer.maxAlternatives = 5;
-
-      tarteelState.speechRecognizer.onresult = function(event) {
-        if (!tarteelState.isRecording || tarteelState.isPacingPause) return;
-        if (Date.now() < tarteelState.ignoreSpeechBeforeTime) return;
-
-        let currentTurnSpoken = '';
-        for (let i = tarteelState.sessionResultIndex || 0; i < event.results.length; i++) {
-          currentTurnSpoken += ' ' + event.results[i][0].transcript;
-        }
-        currentTurnSpoken = currentTurnSpoken.trim();
-
-        const lastResult = event.results[event.results.length - 1];
-        const latestChunk = (lastResult && lastResult[0]) ? lastResult[0].transcript.trim() : '';
-
-        // Accumulate across breath pauses so reciter is never stuck mid-ayah
-        const fullSessionSpoken = ((tarteelState.accumulatedSpokenText || '') + ' ' + currentTurnSpoken).trim();
-        tarteelState.lastChunkSpoken = currentTurnSpoken;
-
-        handleTarteelSpokenStream(fullSessionSpoken, latestChunk, event.results.length);
-      };
-
-      tarteelState.speechRecognizer.onerror = function(err) {
-        console.warn('Speech recognition event:', err.error);
-        if (err.error === 'no-speech') {
-          return; // Normal silence pause, keep listening
-        }
-        if (err.error === 'network') {
-          if (typeof showToast === 'function') showToast(getTarteelText('networkNotice'));
-          return;
-        }
-        if (err.error === 'not-allowed' || err.error === 'service-not-allowed') {
+        if (err === 'not-allowed') {
           if (typeof showToast === 'function') showToast(getTarteelText('micDeniedError'));
           stopTarteelRecitation();
-          return;
         }
-      };
-
-      tarteelState.speechRecognizer.onend = function() {
-        if (tarteelState.lastChunkSpoken) {
-          tarteelState.accumulatedSpokenText = ((tarteelState.accumulatedSpokenText || '') + ' ' + tarteelState.lastChunkSpoken).trim();
-          tarteelState.lastChunkSpoken = '';
-        }
-        tarteelState.sessionResultIndex = 0; // Fresh start for next recognition stream
-
-        if (tarteelState.isRecording && !tarteelState.isPacingPause) {
-          setTimeout(() => {
-            if (tarteelState.isRecording && !tarteelState.isPacingPause && tarteelState.speechRecognizer) {
-              try { tarteelState.speechRecognizer.start(); } catch(e){}
-            }
-          }, 60);
-        }
-      };
-
-      tarteelState.speechRecognizer.start();
-    } catch(e) {
-      console.warn('SpeechRecognition start notice:', e);
-    }
+      },
+      onEnd: () => {}
+    });
   }
-
-  updateTarteelStatusText(getTarteelText(tarteelState.reciteMode === 'single' ? 'singleModeDesc' : 'contModeDesc', tarteelState.targetAyah));
 }
 window.startTarteelRecitation = startTarteelRecitation;
 
-
-// Success Handler: Single Mode vs Continuous Mode with Respectful Pacing
+// Instant Zero-Gap Ayah Completion & Auto-Advance Handler
 function onAyahSuccessfullyRecognized(targetV, spoken) {
   const key = `${targetV.surahNum}:${targetV.num}`;
+  const { displayWords } = getCleanTarteelVerseParts(targetV);
   tarteelState.revealed[key] = true;
-  tarteelState.revealedWords[key] = (targetV.ar || '').split(/\s+/).filter(w => w.length > 0).length;
-
-  // Clear accumulated spoken text for the newly completed ayah
-  tarteelState.accumulatedSpokenText = '';
-  tarteelState.lastChunkSpoken = '';
-  tarteelState.sessionResultIndex = 0;
+  tarteelState.revealedWords[key] = displayWords.length;
 
   if (tarteelState.settings.soundOnMistake) {
     playTarteelTone('success');
   }
 
   if (navigator.vibrate) {
-    try { navigator.vibrate([40, 30, 40]); } catch(e){}
+    try { navigator.vibrate([35, 25, 35]); } catch(e){}
   }
 
   const verses = getTarteelVersesForPage(tarteelState.page);
   const curIdx = verses.findIndex(v => v.num === targetV.num && v.surahNum === targetV.surahNum);
 
-  renderTarteelMushafPage();
-
   if (tarteelState.reciteMode === 'single') {
-    // Mode 1: Single Ayah (Einzelvers) - Auto-advance targetAyah to next verse
     stopTarteelRecitation();
     if (curIdx >= 0 && curIdx < verses.length - 1) {
       tarteelState.targetAyah = verses[curIdx + 1].num;
@@ -2554,44 +2549,31 @@ function onAyahSuccessfullyRecognized(targetV, spoken) {
     } else if (tarteelState.page < 604) {
       changeTarteelPage(tarteelState.page + 1);
     }
+    syncTarteelAlignerToTarget(true);
     renderTarteelMushafPage();
     updateTarteelStatusText(getTarteelText('matchSuccess', targetV.num) + ' · ' + getTarteelText('singleModeDesc', tarteelState.targetAyah), true);
     if (typeof showToast === 'function') {
       showToast(getTarteelText('matchSuccess', targetV.num));
     }
   } else {
-    // Mode 2: Continuous (Fortlaufend)
-    // Respectful Tajweed pacing pause (1.2 seconds) before moving to next ayah
-    updateTarteelStatusText(getTarteelText('matchSuccess', targetV.num) + ' · ' + getTarteelText('shortPause'), true);
-    tarteelState.isPacingPause = true;
-
-    setTimeout(() => {
-      tarteelState.isPacingPause = false;
-      if (!tarteelState.isRecording) return;
-
-      tarteelState.ignoreSpeechBeforeTime = Date.now() + 350;
-      tarteelState.sessionResultIndex = 0;
-      tarteelState.accumulatedSpokenText = '';
-      tarteelState.lastChunkSpoken = '';
-
-      if (curIdx >= 0 && curIdx < verses.length - 1) {
-        tarteelState.targetAyah = verses[curIdx + 1].num;
-        tarteelState.surah = verses[curIdx + 1].surahNum;
-        renderTarteelMushafPage();
-        updateTarteelStatusText(getTarteelText('contModeDesc', tarteelState.targetAyah));
-      } else if (tarteelState.page < 604) {
-        playTarteelTone('pageComplete');
-        updateTarteelStatusText(getTarteelText('pageComplete', tarteelState.page), true);
-        if (typeof showToast === 'function') {
-          showToast(getTarteelText('pageComplete', tarteelState.page));
-        }
-        setTimeout(() => {
-          changeTarteelPage(tarteelState.page + 1);
-        }, 700);
-      } else {
-        renderTarteelMushafPage();
+    // Mode 2: Continuous (Default!) -> Advance targetAyah IMMEDIATELY with ZERO deaf pause so next ayah words are never dropped!
+    if (curIdx >= 0 && curIdx < verses.length - 1) {
+      tarteelState.targetAyah = verses[curIdx + 1].num;
+      tarteelState.surah = verses[curIdx + 1].surahNum;
+      syncTarteelAlignerToTarget(true);
+      renderTarteelMushafPage();
+      updateTarteelStatusText(getTarteelText('matchSuccess', targetV.num) + ' · ' + getTarteelText('contModeDesc', tarteelState.targetAyah), true);
+    } else if (tarteelState.page < 604) {
+      playTarteelTone('pageComplete');
+      updateTarteelStatusText(getTarteelText('pageComplete', tarteelState.page), true);
+      if (typeof showToast === 'function') {
+        showToast(getTarteelText('pageComplete', tarteelState.page));
       }
-    }, 1200);
+      changeTarteelPage(tarteelState.page + 1);
+      syncTarteelAlignerToTarget(true);
+    } else {
+      renderTarteelMushafPage();
+    }
   }
 }
 
@@ -2613,9 +2595,6 @@ function onAyahRecitationMistake(targetV, spoken, accuracyPct) {
 function stopTarteelRecitation() {
   tarteelState.isRecording = false;
   tarteelState.isPacingPause = false;
-  tarteelState.accumulatedSpokenText = '';
-  tarteelState.lastChunkSpoken = '';
-  tarteelState.sessionResultIndex = 0;
 
   const fab = document.getElementById('tarteelEmeraldFab');
   const fabIcon = document.getElementById('tarteelEmeraldFabIcon');
@@ -2641,18 +2620,6 @@ function stopTarteelRecitation() {
     try { tarteelState.speechRecognizer.stop(); } catch(e){}
     tarteelState.speechRecognizer = null;
   }
-  if (tarteelState.audioStream) {
-    try { tarteelState.audioStream.getTracks().forEach(t => t.stop()); } catch(e){}
-    tarteelState.audioStream = null;
-  }
-  if (tarteelState.audioContext) {
-    try { tarteelState.audioContext.close(); } catch(e){}
-    tarteelState.audioContext = null;
-  }
-  if (tarteelState.audioAnimFrame) {
-    cancelAnimationFrame(tarteelState.audioAnimFrame);
-    tarteelState.audioAnimFrame = null;
-  }
 }
 window.stopTarteelRecitation = stopTarteelRecitation;
 
@@ -2666,8 +2633,12 @@ function initTarteelStudio() {
     tarteelState.surah = verses[0].surahNum;
     tarteelState.targetAyah = verses[0].num;
   }
+  if (!tarteelState.reciteMode) {
+    tarteelState.reciteMode = 'continuous';
+  }
+  syncTarteelAlignerToTarget(false);
   renderTarteelMushafPage();
-  setTarteelReciteMode(tarteelState.reciteMode || 'single');
+  setTarteelReciteMode(tarteelState.reciteMode || 'continuous');
 }
 window.initTarteelStudio = initTarteelStudio;
 
@@ -2721,7 +2692,7 @@ function renderTarteelMushafPage() {
 
   const verses = getTarteelVersesForPage(tarteelState.page);
   if (!verses || verses.length === 0) {
-    stage.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 40px;">Seite wird geladen...</div>';
+    stage.innerHTML = '<div style="text-align: center; color: #94a3b8; padding: 40px;">...</div>';
     return;
   }
 
@@ -2747,6 +2718,7 @@ function renderTarteelMushafPage() {
 
   if (bismillahRow) {
     bismillahRow.style.display = (isSurahStart && curSurahId !== 9 && curSurahId !== 1) ? 'block' : 'none';
+    bismillahRow.style.color = '';
   }
 
   if (eyeIcon) {
@@ -2758,21 +2730,14 @@ function renderTarteelMushafPage() {
     const key = `${v.surahNum}:${v.num}`;
     const isFullyRevealed = (!tarteelState.hideMode) || (!!tarteelState.revealed[key]);
     const isTarget = (v.num === tarteelState.targetAyah && v.surahNum === tarteelState.surah);
-    
-    // For Surahs other than Al-Fatiha and At-Tawbah, strip Bismillah from verse 1 text since it is rendered in bismillahRow
-    let rawVerseAr = v.ar || '';
-    if (v.num === 1 && v.surahNum !== 1 && v.surahNum !== 9) {
-      rawVerseAr = rawVerseAr.replace(/^بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ\s*/, '')
-                             .replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
-                             .trim();
-    }
-    const rawWords = rawVerseAr.split(/\s+/).filter(w => w.length > 0);
+
+    // Identical word extraction used by both DOM and Alignment Engine!
+    const { displayWords } = getCleanTarteelVerseParts(v);
     const rosetteAr = (typeof toArDigits === 'function') ? toArDigits(v.num) : v.num;
     const revealedCount = tarteelState.revealedWords[key] || 0;
 
     if (isFullyRevealed) {
-      // Clean, pure Uthmani script without intra-word Tajweed spans that break Arabic letter connectivity
-      const cleanAr = (typeof cleanArabicText === 'function') ? cleanArabicText(rawVerseAr) : rawVerseAr;
+      const cleanAr = (typeof cleanArabicText === 'function') ? cleanArabicText(displayWords.join(' ')) : displayWords.join(' ');
       html += `
         <span class="tarteel-verse-inline ${isTarget ? 'active-target' : ''}" onclick="selectTarteelTargetAyah(${v.surahNum}, ${v.num})" title="Vers ${v.num}" style="${isTarget ? 'color: #059669; font-weight: 900;' : ''}">
           ${cleanAr}
@@ -2780,9 +2745,8 @@ function renderTarteelMushafPage() {
         </span>
       `;
     } else {
-      // Hifz Test Mode: Progressive Word-by-Word Live Reveal!
       let wordsHtml = '';
-      rawWords.forEach((w, wIdx) => {
+      displayWords.forEach((w, wIdx) => {
         const isWordRevealed = (wIdx < revealedCount);
         const cleanW = (typeof cleanArabicText === 'function') ? cleanArabicText(w) : w;
         const dashWidth = Math.max(22, Math.min(65, w.length * 9));
@@ -2797,7 +2761,7 @@ function renderTarteelMushafPage() {
       });
 
       html += `
-        <span class="tarteel-verse-blank ${isTarget ? 'active-target' : ''}" onclick="selectTarteelTargetAyah(${v.surahNum}, ${v.num})" title="Vers ${v.num}: Tippe zum AuswÃ¤hlen">
+        <span class="tarteel-verse-blank ${isTarget ? 'active-target' : ''}" onclick="selectTarteelTargetAyah(${v.surahNum}, ${v.num})" title="Vers ${v.num}">
           ${wordsHtml}
           <span class="tarteel-rosette-icon" style="color: ${isTarget ? '#059669' : '#64748b'}; font-weight: 800;">۝${rosetteAr}</span>
         </span>
@@ -2812,8 +2776,7 @@ window.renderTarteelMushafPage = renderTarteelMushafPage;
 function selectTarteelTargetAyah(surahNum, ayahNum) {
   tarteelState.surah = surahNum;
   tarteelState.targetAyah = ayahNum;
-  tarteelState.ignoreSpeechBeforeTime = Date.now() + 350;
-  tarteelState.sessionResultIndex = tarteelState.speechRecognizerLatestResultIndex || 0;
+  syncTarteelAlignerToTarget(false);
 
   renderTarteelMushafPage();
   updateTarteelStatusText(getTarteelText(tarteelState.reciteMode === 'single' ? 'singleModeDesc' : 'contModeDesc', ayahNum));
@@ -2828,7 +2791,8 @@ function selectTarteelSurah(surahId) {
   tarteelState.targetAyah = 1;
   tarteelState.revealed = {};
   tarteelState.revealedWords = {};
-  tarteelState.ignoreSpeechBeforeTime = Date.now() + 400;
+  tarteelAlignedKey = '';
+  syncTarteelAlignerToTarget(true);
 
   const trigLbl = document.getElementById('tarteelSurahTriggerLabel');
   if (trigLbl) {

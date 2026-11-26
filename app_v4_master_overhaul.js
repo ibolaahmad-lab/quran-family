@@ -1744,6 +1744,9 @@
 
   function stopSheikhQuizMicResources() {
     sheikhQuizState.isListening = false;
+    if (window.QuranVoiceAI && typeof window.QuranVoiceAI.stopListening === 'function') {
+      try { window.QuranVoiceAI.stopListening(); } catch (e) {}
+    }
     if (sheikhQuizState.recognition) {
       try { sheikhQuizState.recognition.stop(); } catch (e) {}
       sheikhQuizState.recognition = null;
@@ -1767,7 +1770,6 @@
     const liveText = document.getElementById('sqLiveSpokenText');
     const liveIndicator = document.getElementById('sqLiveReciteIndicator');
     const isKu = (window.quran_app_language === 'ku');
-    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (sheikhQuizState.isListening) {
       stopSheikhQuizMicResources();
@@ -1777,12 +1779,7 @@
       return;
     }
 
-    if (!SpeechRec) {
-      const msg = isKu
-        ? '⚠️ وێبگەڕەکەت پشتگیری وەرگری دەنگ ناکات (تکایە لە Google Chrome یان Edge تاقی بکەوە).'
-        : '⚠️ Dein Browser unterstützt keine Spracherkennung (Bitte Google Chrome oder Edge nutzen).';
-      if (statusEl) statusEl.innerHTML = `<b style="color:#fca5a5;">${msg}</b>`;
-      if (typeof showToast === 'function') showToast(msg);
+    if (!window.QuranVoiceAI) {
       return;
     }
 
@@ -1804,63 +1801,28 @@
       statusEl.innerHTML = `🎙️ <b style="color:#34d399;">${isKu ? 'مایکرۆفۆن چالاکە! ئێستا ئایەتی ' + sheikhQuizState.continuationAyah + ' بە عەرەبی بخوێنەوە...' : 'Mikrofon aktiv! Rezitiere jetzt Vers ' + sheikhQuizState.continuationAyah + ' auf Arabisch...'}</b>`;
     }
 
-    try {
-      const rec = new SpeechRec();
-      rec.lang = 'ar-SA';
-      rec.continuous = true;
-      rec.interimResults = true;
+    const verseObj = {
+      ar: sheikhQuizState.nextObj ? sheikhQuizState.nextObj.ar : '',
+      num: sheikhQuizState.continuationAyah || 1,
+      surahNum: sheikhQuizState.currentSurah || 1
+    };
+    const { normWords } = window.QuranVoiceAI.extractCleanVerseWords(verseObj);
+    const quizAligner = window.QuranVoiceAI.createRecitationAligner();
+    quizAligner.setTargetWords(normWords, 0);
+    let shownWords = [];
 
-      rec.onresult = function (e) {
+    window.QuranVoiceAI.startListening({
+      onStart: () => {},
+      onDeltaTokens: (deltaTokens, isFinal, rawText) => {
         if (!sheikhQuizState.isListening) return;
+        shownWords = shownWords.concat(deltaTokens);
+        if (liveText) liveText.textContent = rawText || shownWords.slice(-14).join(' ');
 
-        let transcript = '';
-        for (let i = 0; i < e.results.length; i++) {
-          transcript += e.results[i][0].transcript + ' ';
-        }
-        transcript = transcript.trim();
+        const res = quizAligner.feedTokens(deltaTokens, {
+          allowOpeningBasmalah: (verseObj.num === 1 && verseObj.surahNum !== 1 && verseObj.surahNum !== 9)
+        });
 
-        if (liveText && transcript) {
-          liveText.textContent = transcript;
-        }
-
-        const cleanSpoken = typeof window.cleanArabicForMatch === 'function' 
-          ? window.cleanArabicForMatch(transcript) 
-          : transcript.replace(/[^\u0600-\u06FF\s]/g, '').trim();
-
-        let cleanTarget = typeof window.cleanArabicForMatch === 'function'
-          ? window.cleanArabicForMatch(sheikhQuizState.nextObj?.ar || '')
-          : (sheikhQuizState.nextObj?.ar || '').replace(/[^\u0600-\u06FF\s]/g, '').trim();
-
-        if (sheikhQuizState.continuationAyah === 1 && sheikhQuizState.currentSurah !== 1) {
-          cleanTarget = cleanTarget.replace(/^بسم الله الرحمن الرحيم\s*/, '').trim();
-        }
-
-        const spokenWords = cleanSpoken.split(/\s+/).filter(Boolean);
-        const targetWords = cleanTarget.split(/\s+/).filter(Boolean);
-
-        if (targetWords.length === 0) return;
-
-        let matchedCount = 0;
-        let sIdx = 0;
-        for (let tIdx = 0; tIdx < targetWords.length; tIdx++) {
-          const tWord = targetWords[tIdx];
-          for (let look = sIdx; look < Math.min(sIdx + 3, spokenWords.length); look++) {
-            const sw = spokenWords[look];
-            const isMatch = (typeof window.isArabicWordMatch === 'function') 
-              ? window.isArabicWordMatch(tWord, sw)
-              : (tWord === sw || (typeof levenshteinDist === 'function' && levenshteinDist(tWord, sw) <= 1));
-            if (isMatch) {
-              matchedCount++;
-              sIdx = look + 1;
-              break;
-            }
-          }
-        }
-
-        const accuracy = Math.round((matchedCount / targetWords.length) * 100);
-        const isPass = (accuracy >= 60) || (targetWords.length <= 3 && matchedCount >= Math.min(2, targetWords.length));
-
-        if (isPass) {
+        if (res.isComplete) {
           stopSheikhQuizMicResources();
           sheikhQuizState.isRevealed = true;
           const targetBox = document.getElementById('sqTargetContainer');
@@ -1881,38 +1843,22 @@
             showToast(isKu ? `🎉 ما شاء الله! ئایەتی ${sheikhQuizState.continuationAyah} دروستە (+١ خاڵ)` : `🎉 Richtig! Vers ${sheikhQuizState.continuationAyah} gemeistert!`);
           }
           if (navigator.vibrate) try { navigator.vibrate([40, 30, 60]); } catch (e) {}
-        } else if (spokenWords.length >= 2) {
-          if (statusEl) {
-            statusEl.innerHTML = isKu
-              ? `🎙️ لە گوێگرتندایە... (<span style="color:#fef08a;">${spokenWords.length}</span> وشە بیسترا – بەردەوام بە لە خوێندنەوە)`
-              : `🎙️ Höre zu... (<span style="color:#fef08a;">${spokenWords.length}</span> Wörter erkannt – bitte Vers zu Ende rezitieren)`;
-          }
+        } else if (statusEl) {
+          statusEl.innerHTML = isKu
+            ? `🎙️ لە گوێگرتندایە... (<span style="color:#34d399;">${res.matchedWords} / ${res.totalWords}</span> وشە ناسرایەوە)`
+            : `🎙️ Höre zu... (<span style="color:#34d399;">${res.matchedWords} / ${res.totalWords}</span> Wörter erkannt)`;
         }
-      };
-
-      rec.onerror = function (err) {
-        console.warn('SpeechRec error:', err);
-        if (err.error === 'not-allowed') {
+      },
+      onError: (err) => {
+        if (err === 'not-allowed') {
           stopSheikhQuizMicResources();
           const pMsg = isKu
             ? '⚠️ تکایە ڕێگەپێدانی مایکرۆفۆن لە وێبگەڕەکەت بدە.'
             : '⚠️ Bitte erlaube den Mikrofonzugriff im Browser.';
           if (statusEl) statusEl.innerHTML = `<b style="color:#fca5a5;">${pMsg}</b>`;
         }
-      };
-
-      rec.onend = function () {
-        if (sheikhQuizState.isListening) {
-          try { rec.start(); } catch (e) {}
-        }
-      };
-
-      sheikhQuizState.recognition = rec;
-      rec.start();
-    } catch (e) {
-      console.warn('SpeechRec exception:', e);
-      stopSheikhQuizMicResources();
-    }
+      }
+    });
   };
 
   // ============================================================

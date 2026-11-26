@@ -480,115 +480,216 @@
   // =========================================================================
   let streamFinalIndex = -1;
   let streamInterimWordCount = 0;
+  let murajaaMuqProgress = 0;
+
+  const MURAJAA_MUQ_SEQ = {
+    'الم': ['الف', 'لام', 'ميم'],
+    'المص': ['الف', 'لام', 'ميم', 'صاد'],
+    'الر': ['الف', 'لام', 'را'],
+    'المر': ['الف', 'لام', 'ميم', 'را'],
+    'كهيعص': ['كاف', 'ها', 'يا', 'عين', 'صاد'],
+    'طسم': ['طا', 'سين', 'ميم'],
+    'طس': ['طا', 'سين'],
+    'طه': ['طا', 'ها'],
+    'يس': ['يا', 'سين'],
+    'حم': ['حا', 'ميم'],
+    'عسق': ['عين', 'سين', 'قاف']
+  };
 
   function resetSpeechStreamTracking() {
     streamFinalIndex = -1;
     streamInterimWordCount = 0;
+    murajaaMuqProgress = 0;
   }
   window.Murajaa.resetSpeechStreamTracking = resetSpeechStreamTracking;
 
-  function processTokenDelta(deltaTokens, speechResult) {
-    if (!deltaTokens || deltaTokens.length === 0) return;
+  function wordsMatchStrict(sp, tg) {
+    if (window.QuranVoiceAI && typeof window.QuranVoiceAI.doQuranWordsMatch === 'function') {
+      return window.QuranVoiceAI.doQuranWordsMatch(sp, tg);
+    }
+    return sp === tg;
+  }
+
+  function normWordStrict(w) {
+    if (window.QuranVoiceAI && typeof window.QuranVoiceAI.normalizeQuranWord === 'function') {
+      return window.QuranVoiceAI.normalizeQuranWord(w);
+    }
+    return normalizeArabic(w);
+  }
+
+  function processTokenDelta(rawDeltaTokens) {
+    if (!rawDeltaTokens || rawDeltaTokens.length === 0) return;
     const targets = murajaaState.targetTokens;
     if (!targets || targets.length === 0) return;
 
-    const backtrackWindow = 10;
-    const forwardWindow = 5;
+    let tokens = rawDeltaTokens.map(normWordStrict).filter(Boolean);
+    if (tokens.length === 0) return;
+
     let didBacktrack = false;
+    let sawBasmalahOnly = false;
+    let sIdx = 0;
 
-    for (let sIdx = 0; sIdx < deltaTokens.length; sIdx++) {
-      const spToken = deltaTokens[sIdx];
-      let matchedIndex = -1;
-      let advanceBy = 1;
+    while (sIdx < tokens.length && murajaaState.currentWordIndex < targets.length) {
       const cur = murajaaState.currentWordIndex;
+      const curMeta = murajaaState.wordsMeta[cur];
+      const curTarget = targets[cur];
+      const sw = tokens[sIdx];
 
-      // 1. Immediate Target: Check expected current word
-      if (cur < targets.length) {
-        const curTarget = targets[cur];
-        // Special instant pass for Page 2 Ayah 1 (الم) if user recited Bismillah or Alif Lam Mim
-        const isMuqattaatMatch = (curTarget === 'الم' || toQuranPhoneticKey(curTarget) === 'ALIF_LAM_MIM') &&
-          (spToken === 'الم' || spToken === 'الف' || spToken === 'لام' || spToken === 'ميم' ||
-           spToken === 'بسم' || spToken === 'الله' || spToken === 'الرحمن' || spToken === 'الرحيم' ||
-           spToken.includes('الف') || spToken.includes('لام') || spToken.includes('ميم') ||
-           toQuranPhoneticKey(spToken) === 'ALIF_LAM_MIM');
+      // 0. Strip Isti'adhah anywhere, and strip Basmalah at start of any Surah (except Surah 1 & 9) without fake-filling המ/Ayah 1!
+      const isSurahBasmalahBoundary = curMeta && curMeta.ayah === 1 && curMeta.surah !== 1 && curMeta.surah !== 9 &&
+        (cur === 0 || (murajaaState.wordsMeta[cur - 1] && murajaaState.wordsMeta[cur - 1].surah !== curMeta.surah));
 
-        if (isMuqattaatMatch || stringSimilarity(spToken, curTarget) >= 0.46) {
-          matchedIndex = cur;
-        } else if (cur < targets.length - 1) {
-          // Check compound match: spToken matches target[cur] + target[cur+1]
-          const combined = targets[cur] + targets[cur + 1];
-          if (stringSimilarity(spToken, combined) >= 0.58) {
-            matchedIndex = cur;
-            advanceBy = 2; // Matches two target words!
+      if (sw === 'اعوذ' || ((sw === 'بالله' || sw === 'من' || sw === 'الشيطان' || sw === 'الرجيم') && tokens.includes('الشيطان'))) {
+        sIdx++;
+        sawBasmalahOnly = true;
+        continue;
+      }
+      if (isSurahBasmalahBoundary && (sw === 'بسم' || ((sw === 'الله' || sw === 'الرحمن' || sw === 'الرحيم') && curTarget !== sw))) {
+        sIdx++;
+        sawBasmalahOnly = true;
+        continue;
+      }
+
+      sawBasmalahOnly = false;
+
+      // 1. Check Muqatta'at sequence (whole 'الم' OR split 'الف' -> 'لام' -> 'ميم')
+      const muqSeq = MURAJAA_MUQ_SEQ[curTarget];
+      if (muqSeq) {
+        if (wordsMatchStrict(sw, curTarget)) {
+          markMurajaaRange(cur, 1, false);
+          murajaaMuqProgress = 0;
+          sIdx++;
+          continue;
+        }
+        if (wordsMatchStrict(sw, muqSeq[murajaaMuqProgress])) {
+          murajaaMuqProgress++;
+          sIdx++;
+          if (murajaaMuqProgress >= muqSeq.length) {
+            markMurajaaRange(cur, 1, false);
+            murajaaMuqProgress = 0;
           }
+          continue;
+        } else if (wordsMatchStrict(sw, muqSeq[0])) {
+          murajaaMuqProgress = 1;
+          sIdx++;
+          continue;
         }
       }
 
-      // 2. Check alternatives from SpeechRecognitionResult if primary didn't match
-      if (matchedIndex === -1 && speechResult && speechResult.length > 1) {
-        for (let alt = 1; alt < Math.min(4, speechResult.length); alt++) {
-          const altTokens = tokenizeArabic(speechResult[alt].transcript);
-          const altToken = altTokens[sIdx];
-          if (altToken && cur < targets.length && stringSimilarity(altToken, targets[cur]) >= 0.52) {
-            matchedIndex = cur;
-            break;
-          }
+      // 2. Direct strict 1-to-1 match
+      if (wordsMatchStrict(sw, curTarget)) {
+        markMurajaaRange(cur, 1, false);
+        murajaaMuqProgress = 0;
+        sIdx++;
+        continue;
+      }
+
+      // 3. Compound 2 spoken words -> 1 Uthmani word (e.g. 'يا' + 'ايها' -> 'يايها')
+      if (sIdx + 1 < tokens.length) {
+        const joinedSpoken = normWordStrict(sw + tokens[sIdx + 1]);
+        if (wordsMatchStrict(joinedSpoken, curTarget)) {
+          markMurajaaRange(cur, 1, false);
+          murajaaMuqProgress = 0;
+          sIdx += 2;
+          continue;
         }
       }
 
-      // 3. Forward Lookahead (1 to 5 words ahead): e.g. skipped short particle or recited rapidly
-      if (matchedIndex === -1) {
-        const lookaheadEnd = Math.min(targets.length - 1, cur + forwardWindow);
-        for (let j = cur + 1; j <= lookaheadEnd; j++) {
-          if (stringSimilarity(spToken, targets[j]) >= 0.58) {
-            matchedIndex = j;
-            break;
-          }
+      // 4. Compound 1 spoken word -> 2 target words (e.g. 'الا' -> 'ان' + 'لا')
+      if (cur + 1 < targets.length) {
+        const joinedTarget = normWordStrict(curTarget + targets[cur + 1]);
+        if (wordsMatchStrict(sw, joinedTarget)) {
+          markMurajaaRange(cur, 2, false);
+          murajaaMuqProgress = 0;
+          sIdx++;
+          continue;
         }
       }
 
-      // 4. Backtrack Window: reciter paused and repeated earlier phrase (وقف و ابتدا)
-      if (matchedIndex === -1) {
-        const lookbackStart = Math.max(0, cur - backtrackWindow);
-        for (let b = cur - 1; b >= lookbackStart; b--) {
-          if (stringSimilarity(spToken, targets[b]) >= 0.65) {
-            matchedIndex = b;
-            didBacktrack = true;
-            break;
-          }
-        }
+      // 5. Immediate single-word repetition (reciter repeated previous word)
+      if (cur > 0 && wordsMatchStrict(sw, targets[cur - 1])) {
+        highlightWord(cur - 1, true);
+        sIdx++;
+        continue;
       }
 
-      // 5. Apply match
-      if (matchedIndex !== -1) {
-        murajaaState.currentWordIndex = matchedIndex + advanceBy;
-        for (let a = 0; a < advanceBy; a++) {
-          const idx = matchedIndex + a;
-          murajaaState.spokenIndices.add(idx);
-          if (murajaaState.viewMode === 'tasmi') {
-            murajaaState.revealedIndices.add(idx);
-          }
-          highlightWord(idx, didBacktrack);
-        }
-
-        // Auto page-turn when all words on current page are finished
-        if (murajaaState.currentWordIndex >= targets.length && (window.state && window.state.currentPage < 604)) {
-          setTimeout(() => {
-            if (murajaaState.isListening && window.state) {
-              window.jumpToPage(window.state.currentPage + 1);
+      // 6. Backtrack Window (Waqf & Ibtida': reciter paused, went back 2..12 words, and re-recited)
+      if (cur > 1) {
+        const lookbackStart = Math.max(0, cur - 12);
+        let btPos = -1;
+        for (let b = cur - 2; b >= lookbackStart; b--) {
+          if (wordsMatchStrict(sw, targets[b])) {
+            const nextConfirms = (sIdx + 1 < tokens.length && b + 1 < targets.length && wordsMatchStrict(tokens[sIdx + 1], targets[b + 1]));
+            if (targets[b].length >= 4 || nextConfirms || b === 0) {
+              btPos = b;
+              break;
             }
-          }, 800);
+          }
+        }
+        if (btPos !== -1) {
+          murajaaState.currentWordIndex = btPos + 1;
+          highlightWord(btPos, true);
+          didBacktrack = true;
+          murajaaMuqProgress = 0;
+          sIdx++;
+          continue;
         }
       }
+
+      // 7. Safe 1-particle bridge ONLY if two consecutive spoken words strictly match cur+1 and cur+2
+      if (
+        cur + 2 < targets.length &&
+        sIdx + 1 < tokens.length &&
+        curTarget.length <= 3 &&
+        wordsMatchStrict(sw, targets[cur + 1]) &&
+        wordsMatchStrict(tokens[sIdx + 1], targets[cur + 2])
+      ) {
+        markMurajaaRange(cur, 3, false);
+        sIdx += 2;
+        continue;
+      }
+
+      // Mismatch -> DO NOT auto-fill or jump ahead!
+      sIdx++;
+    }
+
+    if (sawBasmalahOnly) {
+      const pill = document.getElementById('murajaaLiveStatus');
+      if (pill) {
+        pill.innerHTML = '<span style="color: #10b981;">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ✓</span>';
+      }
+      return;
     }
 
     updateMurajaaStatusPill(didBacktrack);
+
+    if (murajaaState.currentWordIndex >= targets.length && (window.state && window.state.currentPage < 604)) {
+      setTimeout(() => {
+        if (murajaaState.isListening && window.state) {
+          window.jumpToPage(window.state.currentPage + 1);
+        }
+      }, 650);
+    }
+  }
+
+  function markMurajaaRange(startIdx, count, isBacktrack) {
+    murajaaState.currentWordIndex = startIdx + count;
+    for (let a = 0; a < count; a++) {
+      const idx = startIdx + a;
+      murajaaState.spokenIndices.add(idx);
+      if (murajaaState.viewMode === 'tasmi') {
+        murajaaState.revealedIndices.add(idx);
+      }
+      highlightWord(idx, isBacktrack);
+    }
   }
 
   function processIncomingRecitation(transcript) {
     if (!transcript) return;
-    const tokens = tokenizeArabic(transcript);
-    processTokenDelta(tokens, null);
+    const tokens = (window.QuranVoiceAI && typeof window.QuranVoiceAI.tokenizeQuranText === 'function')
+      ? window.QuranVoiceAI.tokenizeQuranText(transcript)
+      : tokenizeArabic(transcript);
+    processTokenDelta(tokens);
   }
   window.Murajaa.processIncomingRecitation = processIncomingRecitation;
 
@@ -763,8 +864,20 @@
           updateMicBtnState(true);
           resetSpeechStreamTracking();
         },
-        onTranscript: (cleanText, isFinal) => {
-          processIncomingRecitation(cleanText);
+        pickBestAlternative: (alts) => {
+          if (!alts || alts.length <= 1) return alts ? alts[0] : '';
+          const expected = murajaaState.targetTokens[murajaaState.currentWordIndex];
+          if (!expected) return alts[0];
+          for (let i = 0; i < alts.length; i++) {
+            const toks = window.QuranVoiceAI.tokenizeQuranText(alts[i]);
+            if (toks.some(tk => window.QuranVoiceAI.doQuranWordsMatch(tk, expected))) {
+              return alts[i];
+            }
+          }
+          return alts[0];
+        },
+        onDeltaTokens: (deltaTokens) => {
+          processTokenDelta(deltaTokens);
         },
         onError: (err) => {
           console.warn('[Murajaa Voice AI error]:', err);
@@ -775,11 +888,7 @@
           }
         },
         onEnd: () => {
-          if (murajaaState.isListening) {
-            setTimeout(() => {
-              if (murajaaState.isListening) startSpeechRecognition();
-            }, 100);
-          } else {
+          if (!murajaaState.isListening) {
             updateMicBtnState(false);
           }
         }
@@ -972,30 +1081,23 @@
         inFlowingText = true;
       }
 
-      let verseRaw = (typeof window.cleanArabicText === 'function') ? window.cleanArabicText(v.ar) : v.ar;
-      // Strip Bismillah from Ayah 1 of all surahs except Surah 1 (Al-Fatiha)
-      if (v.num === 1 && v.surahNum !== 1) {
-        verseRaw = verseRaw.replace(/^[\u0628\u0650][\u0633\u0652][\u0645\u0650]\s*[\u0671\u0644\u0644\u0651\u064E\u0647\u0650]\s*[\u0671\u0644\u0631\u0651\u064E\u062D\u0652\u0645\u064E\u0670\u0646\u0650]\s*[\u0671\u0644\u0631\u0651\u064E\u062D\u0650\u064A\u0645\u0650]\s*/, '')
-                           .replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '')
-                           .replace(/^بسم الله الرحمن الرحيم\s*/, '')
-                           .trim();
+      let words = [];
+      let normList = [];
+      if (window.QuranVoiceAI && typeof window.QuranVoiceAI.extractCleanVerseWords === 'function') {
+        const extracted = window.QuranVoiceAI.extractCleanVerseWords(v);
+        words = extracted.displayWords.map(dw => (typeof window.cleanArabicText === 'function' ? window.cleanArabicText(dw) : dw));
+        normList = extracted.normWords;
+      } else {
+        let verseRaw = (typeof window.cleanArabicText === 'function') ? window.cleanArabicText(v.ar) : v.ar;
+        if (v.num === 1 && v.surahNum !== 1 && v.surahNum !== 9) {
+          verseRaw = verseRaw.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, '').trim();
+        }
+        words = verseRaw.split(/\s+/).filter(Boolean);
+        normList = words.map(normWordStrict);
       }
 
-      const rawTokens = verseRaw.split(/\s+/).filter(Boolean);
-      const words = [];
-      rawTokens.forEach(tok => {
-        // If token consists only of Quranic stop signs, waqf marks, or punctuation
-        if (!/[\u0620-\u064A\u0671-\u06D3]/.test(tok)) {
-          if (words.length > 0) {
-            words[words.length - 1] += '\u00A0' + tok;
-          }
-        } else {
-          words.push(tok);
-        }
-      });
-
-      words.forEach(w => {
-        const normW = normalizeArabic(w);
+      words.forEach((w, localWIdx) => {
+        const normW = normList[localWIdx] || normWordStrict(w);
         murajaaState.targetTokens.push(normW);
 
         const wordMeta = {

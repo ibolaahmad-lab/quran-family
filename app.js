@@ -1,7 +1,11 @@
-// Clear any outdated WebView caches
+// Clear only outdated app caches while preserving Offline Quran AI model ('transformers-cache')
 try {
   if (window.caches) {
-    caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+    caches.keys().then(keys => keys.forEach(k => {
+      if (k !== 'transformers-cache' && !k.includes('v20261126_sunni_v16') && !k.includes('quran-audio')) {
+        caches.delete(k);
+      }
+    }));
   }
 } catch (e) {}
 ﻿/**

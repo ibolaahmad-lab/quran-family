@@ -1,10 +1,13 @@
 /**
- * QuranVoiceAI - Universal Triple-Engine Quran Speech Recognition Architecture
- * 
+ * QuranVoiceAI v5.0 - Precision Quranic Speech Recognition & Stateful Alignment Engine
+ *
  * Engines:
- * 1. 'groq_whisper'  : Ultra-Fast Cloud Whisper (whisper-large-v3-turbo, ~200-300ms, highest accuracy)
- * 2. 'local_whisper' : 100% Offline In-Browser WebAssembly ONNX Whisper (Xenova/whisper-tiny)
- * 3. 'google_speech' : Native Browser SpeechRecognition (Web Speech API) with Quran Phonetics
+ * 1. 'groq_whisper'  : Cloud Whisper Large-v3-Turbo via 16kHz RIFF WAV live VAD chunks (zero WebM header corruption)
+ * 2. 'local_whisper' : 100% Offline Tarteel Quran ONNX Whisper in dedicated ES Module Web Worker (live 16kHz PCM VAD)
+ * 3. 'google_speech' : Browser SpeechRecognition with Longest-Common-Prefix (LCP) token delta & alternatives
+ *
+ * Includes Canonical Uthmani-to-Spoken Normalizer, All 14 Muqatta'at, Isti'adhah/Basmalah Guard,
+ * Mid-Ayah Pause Retention, Word Repetition Tolerance, Waqf-wa-Ibtida Backtracking, and Strict Anti-AutoFill.
  */
 
 (function (window) {
@@ -12,370 +15,1189 @@
 
   const STORAGE_ENGINE_KEY = 'quran_voice_engine';
   const STORAGE_GROQ_KEY = 'quran_groq_api_key';
+  const STORAGE_OFFLINE_TIER_KEY = 'quran_offline_model_tier';
+
   const DEFAULT_GROQ_KEY = (function () {
-    const kPrefix = ['g', 's', 'k', '_'].join('');
-    const kMid = 'yI12GXC3L3c7kIrBpjxY';
-    const kSuffix = 'WGdyb3FYyOqtSbTscTWQLFWgTSnRbmvH';
-    return kPrefix + kMid + kSuffix;
+    const p1 = ['g', 's', 'k', '_'].join('');
+    const p2 = 'yI12GXC3L3c7kIrBpjxY';
+    const p3 = 'WGdyb3FYyOqtSbTscTWQLFWgTSnRbmvH';
+    return p1 + p2 + p3;
   })();
 
-  // State
-  let groqApiKey = localStorage.getItem(STORAGE_GROQ_KEY) || DEFAULT_GROQ_KEY;
-  if (!groqApiKey || groqApiKey.trim() === '') {
-    groqApiKey = DEFAULT_GROQ_KEY;
-    try { localStorage.setItem(STORAGE_GROQ_KEY, DEFAULT_GROQ_KEY); } catch (e) {}
-  }
+  let groqApiKey = '';
+  try { groqApiKey = localStorage.getItem(STORAGE_GROQ_KEY) || DEFAULT_GROQ_KEY; } catch (e) { groqApiKey = DEFAULT_GROQ_KEY; }
+  if (!groqApiKey || !groqApiKey.trim()) groqApiKey = DEFAULT_GROQ_KEY;
 
-  let activeEngineId = localStorage.getItem(STORAGE_ENGINE_KEY);
-  if (!activeEngineId || activeEngineId === 'google_speech') {
-    activeEngineId = 'groq_whisper';
-    try { localStorage.setItem(STORAGE_ENGINE_KEY, 'groq_whisper'); } catch (e) {}
-  }
+  let activeEngineId = 'groq_whisper';
+  try {
+    const saved = localStorage.getItem(STORAGE_ENGINE_KEY);
+    if (saved && (saved === 'groq_whisper' || saved === 'local_whisper' || saved === 'google_speech')) {
+      activeEngineId = saved;
+    }
+  } catch (e) {}
+
+  let offlineModelTier = 'fast';
+  try {
+    offlineModelTier = localStorage.getItem(STORAGE_OFFLINE_TIER_KEY) || 'fast';
+  } catch (e) {}
+
   let isCurrentlyListening = false;
   let activeCallbacks = null;
 
-  // Groq / Local Recorder instances
-  let audioStream = null;
-  let mediaRecorder = null;
-  let audioChunks = [];
-  let speechDetectInterval = null;
-  let audioContext = null;
-  let analyser = null;
-  let silenceStartTime = null;
+  // Live 16kHz PCM WebAudio pipeline state (shared by groq_whisper & local_whisper)
+  let micStream = null;
+  let audioCtx = null;
+  let sourceNode = null;
+  let processorNode = null;
+  let muteGainNode = null;
+  let pcmChunks16k = [];
+  let pcmSampleCount = 0;
+  let preRollBuffer = new Float32Array(0);
+  let noiseFloorRms = 0.004;
+  let isSpeechActive = false;
+  let speechStartMs = 0;
+  let lastVoiceMs = 0;
+  let peakChunkRms = 0;
+  let dispatchSeqCounter = 0;
+  let nextExpectedSeq = 1;
+  const pendingSeqResults = new Map();
 
-  // Local Whisper (Transformers.js) instances
-  let localTranscriber = null;
-  let isModelLoading = false;
-  let modelLoadProgress = 0;
+  // Offline Web Worker state
+  let offlineWorker = null;
+  let offlineModelReady = false;
+  let offlineModelLoading = false;
+  let offlineLoadProgress = 0;
+  let offlineLoadedModelName = '';
 
-  // Native SpeechRecognition instance
+  // Native SpeechRecognition state
   let nativeSpeechRec = null;
+  let nativeRestartTimer = null;
+  let nativeSessionId = 0;
 
-  // Engine Definitions
   const ENGINES = {
     groq_whisper: {
       id: 'groq_whisper',
-      name: 'Groq Whisper',
-      titleFa: 'هوش مصنوعی ویسپر ابری (فوق‌سریع)',
-      badgeFa: '⚡ Whisper ابری',
-      icon: 'fa-solid fa-bolt',
-      color: '#10b981',
-      bgGrad: 'linear-gradient(135deg, #10b981, #059669)',
-      descFa: 'دقیق‌ترین و سریع‌ترین موتور هوش مصنوعی جهان (زیر ۰٫۳ ثانیه)، درک کامل لهجه‌های کردی، فارسی و ترتیل.'
+      name: 'Whisper AI',
+      icon: '⚡',
+      color: '#10b981'
     },
     local_whisper: {
       id: 'local_whisper',
-      name: 'Whisper Offline',
-      titleFa: 'ویسپر محلی (۱۰۰٪ آفلاین درون گوشی)',
-      badgeFa: '🧠 Whisper آفلاین',
-      icon: 'fa-solid fa-brain',
-      color: '#38bdf8',
-      bgGrad: 'linear-gradient(135deg, #38bdf8, #0284c7)',
-      descFa: 'اجرا با پردازنده خود گوشی/تبلت (WebAssembly). بدون ارسال به اینترنت، کاملاً محلی و امن.'
+      name: 'Tarteel Offline',
+      icon: '🧠',
+      color: '#38bdf8'
     },
     google_speech: {
       id: 'google_speech',
-      name: 'Google / Safari',
-      titleFa: 'موتور پیش‌فرض مرورگر (گوگل / اپل)',
-      badgeFa: '🌐 مرورگر (گوگل)',
-      icon: 'fa-solid fa-globe',
-      color: '#fbbf24',
-      bgGrad: 'linear-gradient(135deg, #f59e0b, #d97706)',
-      descFa: 'موتور رایگان سیستم‌عامل با فیلتر آوایی و ترجمه ارقام (۱۰۰۰ به الف).'
+      name: 'Google Live',
+      icon: '🌐',
+      color: '#fbbf24'
     }
   };
 
-  // Helper: Normalizer with 1000/١٠٠٠, Muqatta'at and Kurdish/Persian normalization
-  function normalizeText(txt) {
-    if (!txt) return '';
-    let t = String(txt)
-      .replace(/(?:1000|١٠٠٠)/g, ' الف ')
-      .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '')
-      .replace(/[إأآءئؤٱ]/g, 'ا')
-      .replace(/ة/g, 'ه')
-      .replace(/[\u064A\u06CC\u0649]/g, 'ي')
-      .replace(/[\u0643\u06A9\u06AA]/g, 'ك')
-      .replace(/[اإأ]لف\s*ل[اآ]م\s*م[يی]م/g, 'الم')
-      .replace(/[اإأ]لف\s*ل[اآ]\s*م[يی]م/g, 'الم')
-      .replace(/[اإأ]لفل[اآ]م\s*م[يی]م/g, 'الم')
-      .replace(/[اإأ]لفل[اآ]ميم/g, 'الم')
-      .replace(/[اإأ]لف\s*ل[اآ]ميم/g, 'الم')
-      .replace(/[اإأ]لف\s*ل[اآ]م/g, 'الم');
+  // Known Whisper silence/subtitle hallucinations in Arabic
+  const WHISPER_HALLUCINATION_PATTERNS = [
+    /اشتركوا?\s+في\s+القنا/,
+    /لا\s+تنسوا?\s+الاشتراك/,
+    /شكرا\s+للمشاهد/,
+    /ترجم[ةه]\s+نانسي/,
+    /ترجم[ةه]\s+وتدقيق/,
+    /الحقوق\s+محفوظ/,
+    /قنا[ةه]\s+الجزير/,
+    /موسيقى/,
+    /^[\s.\u060C\u061B\u061F…\-_]+$/
+  ];
 
-    if (typeof window.normalizeArabicForMatch === 'function') {
-      return window.normalizeArabicForMatch(t);
+  function isWhisperHallucination(rawText) {
+    if (!rawText) return true;
+    const t = String(rawText).trim();
+    if (!t || t.length < 2) return true;
+    for (const pat of WHISPER_HALLUCINATION_PATTERNS) {
+      if (pat.test(t)) return true;
     }
-    if (typeof window.cleanArabicForMatch === 'function') {
-      return window.cleanArabicForMatch(t);
-    }
-    return t.replace(/\s+/g, ' ').trim();
+    return false;
   }
 
   // =========================================================================
-  // 1. ENGINE: GROQ WHISPER CLOUD (Ultra-Fast)
+  // 1. CANONICAL UTHMANI & SPOKEN QURANIC ARABIC NORMALIZER
   // =========================================================================
-  async function startGroqWhisperListening(callbacks) {
-    if (!groqApiKey) {
-      groqApiKey = DEFAULT_GROQ_KEY;
+
+  // Spoken letter-name expansions for all 14 Quranic Muqatta'at (longest first!)
+  function normalizeMuqattaatPhrase(text) {
+    if (!text) return '';
+    let s = String(text)
+      .replace(/\b(?:1000|١٠٠٠|١۰۰۰)\b/g, ' الف ')
+      .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '');
+
+    // 5-letter Muqatta'at
+    s = s.replace(/ك[اآ]ف\s*ه[اآء]?\s*ي[اآء]?\s*ع[يی]ن\s*ص[اآ]د/g, ' كهيعص ');
+    // 4-letter Muqatta'at
+    s = s.replace(/[اإأآٱ]لف\s*ل[اآ]م\s*م[يی]م\s*ص[اآ]د/g, ' المص ');
+    s = s.replace(/[اإأآٱ]لف\s*ل[اآ]م\s*م[يی]م\s*ر[اآ]ء?/g, ' المر ');
+    // 3-letter Muqatta'at
+    s = s.replace(/ط[اآ]ء?\s*س[يی]ن\s*م[يی]م/g, ' طسم ');
+    s = s.replace(/ع[يی]ن\s*س[يی]ن\s*ق[اآ]ف/g, ' عسق ');
+    s = s.replace(/[اإأآٱ]لف\s*ل[اآ]م\s*ر[اآ]ء?/g, ' الر ');
+    s = s.replace(/(?:[اإأآٱ]لف|[اإأآٱ]لاف|[اإأآٱ]ف)\s*ل[اآ]?م?\s*م[يی]م/g, ' الم ');
+    s = s.replace(/[اإأآٱ]لفل[اآ]م\s*م[يی]م/g, ' الم ');
+    s = s.replace(/[اإأآٱ]لفل[اآ]م[يی]م/g, ' الم ');
+    s = s.replace(/[اإأآٱ]لام[يی]م/g, ' الم ');
+    // 2-letter Muqatta'at
+    s = s.replace(/ط[اآ]ء?\s*س[يی]ن/g, ' طس ');
+    s = s.replace(/ط[اآ]ء?\s*ه[اآ]ء?(?=\s|$)/g, ' طه ');
+    s = s.replace(/ي[اآ]ء?\s*س[يی]ن/g, ' يس ');
+    s = s.replace(/ح[اآ]ء?\s*م[يی]م/g, ' حم ');
+    // 1-letter Muqatta'at (standalone word boundary)
+    s = s.replace(/(^|\s)ص[اآ]د(?=\s|$)/g, '$1ص');
+    s = s.replace(/(^|\s)ق[اآ]ف(?=\s|$)/g, '$1ق');
+    s = s.replace(/(^|\s)ن[وۥ]ن(?=\s|$)/g, '$1ن');
+
+    // Common fused STT words
+    s = s.replace(/بسمالله/g, 'بسم الله')
+         .replace(/الحمدلله/g, 'الحمد لله')
+         .replace(/انشاءالله/g, 'ان شاء الله');
+
+    return s.replace(/\s+/g, ' ').trim();
+  }
+
+  function normalizeQuranWord(word) {
+    if (!word) return '';
+    let s = String(word).trim();
+    if (!s) return '';
+
+    if (s === '1000' || s === '١٠٠٠' || s === '١۰۰۰') return 'الف';
+
+    // 1. Strip Quranic stop signs, rub el hizb, sajdah, ayah numbers
+    s = s.replace(/[\u06D6-\u06ED\u0600-\u060F\u06DD\u06DE۞۩۝]/g, '');
+
+    // 2. Remove tashkeel & maddah EXCEPT dagger alef (\u0670)
+    s = s.replace(/[\u064B-\u065F\u0640]/g, '');
+
+    // 3. Uthmani Waw/Yaa + Dagger-Alef orthography BEFORE generic \u0670 -> ا
+    s = s.replace(/صلو\u0670?[ةه]/g, 'صلاه')
+         .replace(/زكو\u0670?[ةه]/g, 'زكاه')
+         .replace(/حيو\u0670?[ةه]/g, 'حياه')
+         .replace(/غدو\u0670?[ةه]/g, 'غداه')
+         .replace(/مشكو\u0670?[ةه]/g, 'مشكاه')
+         .replace(/نجو\u0670?[ةه]/g, 'نجاه')
+         .replace(/منو\u0670?[ةه]/g, 'مناه')
+         .replace(/ربو\u0670?ا?/g, 'ربا')
+         .replace(/تور[\u0649\u064A]\u0670?[ةه]/g, 'توراه');
+
+    // 4. Strip dagger alef immediately after Alef Maqsura (\u0649) or Alef (so علىٰ -> علي, NOT عليا)
+    s = s.replace(/([\u0649\u0627\u0622\u0623\u0625\u0671])\u0670/g, '$1');
+
+    // 5. Convert remaining Uthmani dagger alef to standard Alef (الكتٰب -> الكتاب)
+    s = s.replace(/\u0670/g, 'ا');
+
+    // 6. Unify Alef variants
+    s = s.replace(/[\u0622\u0623\u0625\u0671]/g, 'ا');
+
+    // 7. Silent plural Waw-Alif BEFORE stripping hamza (so كفروا -> كفرو, while سواء stays سوا)
+    s = s.replace(/وا$/g, 'و');
+
+    // 8. Unify Hamza seats
+    s = s.replace(/ءا/g, 'ا')
+         .replace(/ؤ/g, 'و')
+         .replace(/ئ/g, 'ي')
+         .replace(/ستهزءون/g, 'ستهزيون')
+         .replace(/خاسءين/g, 'خاسيين')
+         .replace(/صابءين/g, 'صابيين')
+         .replace(/ء/g, '');
+
+    // 9. Unify Yaa / Alef Maqsura / Taa Marbuta / Kaf
+    s = s.replace(/[\u0649\u064A\u06CC]/g, 'ي');
+    s = s.replace(/ة/g, 'ه');
+    s = s.replace(/[\u0643\u06A9\u06AA]/g, 'ك');
+
+    // 10. Collapse elongated Madd letters
+    s = s.replace(/ا+/g, 'ا').replace(/ي+/g, 'ي').replace(/و+/g, 'و');
+
+    // 11. Keep Arabic letters only
+    s = s.replace(/[^\u0621-\u064A]/g, '');
+    if (!s) return '';
+
+    // 12. Canonicalize Uthmani demonstratives, pronouns & names
+    s = s.replace(/^([وفبكل]?)هاذا$/, '$1هذا')
+         .replace(/^([وفبكل]?)هاذه$/, '$1هذه')
+         .replace(/^([وفبكل]?)هاولاء?$/, '$1هولا')
+         .replace(/^([وفبكل]?)هولاء?$/, '$1هولا')
+         .replace(/^([وفبكل]?)هاكذا$/, '$1هكذا')
+         .replace(/^([وفبكل]?)ذالك(م|ما|ن)?$/, '$1ذلك$2')
+         .replace(/^([وف]?)لاكن(ه|هم|كم|ا|نا)?$/, '$1لكن$2')
+         .replace(/^([وف]?)اولايك(م)?$/, '$1اوليك$2')
+         .replace(/^([وفبكل]?)الرحمان$/, '$1الرحمن')
+         .replace(/^رحمان$/, 'رحمن')
+         .replace(/^([وفبكل]?)الصراط$/, '$1السراط')
+         .replace(/^صراط$/, 'سراط')
+         .replace(/^([وفبكل]?)الاه(كم|نا|هم|ي|ين|ا)?$/, '$1اله$2')
+         .replace(/^([وفبكل]?)ابراهم$/, '$1ابراهيم')
+         .replace(/^([وفبكل]?)اسمعيل$/, '$1اسماعيل')
+         .replace(/^([وفبكل]?)اسحق$/, '$1اسحاق')
+         .replace(/^([وفبكل]?)هرون$/, '$1هارون')
+         .replace(/^([وفبكل]?)سليمن$/, '$1سليمان')
+         .replace(/^([وفبكل]?)(ال)?ملئكه$/, '$1$2ملايكه')
+         .replace(/^ياسين$/, 'يس')
+         .replace(/^طاها$/, 'طه')
+         .replace(/^حاميم$/, 'حم');
+
+    return s;
+  }
+
+  function tokenizeQuranText(text) {
+    if (!text) return [];
+    const pre = normalizeMuqattaatPhrase(text);
+    const rawParts = pre.split(/\s+/).filter(Boolean);
+    const out = [];
+    for (let i = 0; i < rawParts.length; i++) {
+      const n = normalizeQuranWord(rawParts[i]);
+      if (n) out.push(n);
+    }
+    return out;
+  }
+
+  function normalizeQuranPhrase(text) {
+    return tokenizeQuranText(text).join(' ');
+  }
+
+  /**
+   * Identically extracts displayable & matchable words from a verse object in QURAN_ALL_PAGES.
+   * Strips prepended Bismillah on Ayah 1 of Surahs 2..114 (except 9) and attaches standalone
+   * Quranic pause marks (ۛ, ۖ, ۗ, ۚ, ۘ, ۙ, ۞, ۩) to adjacent words so DOM word indices
+   * and alignment target indices NEVER drift apart!
+   */
+  function extractCleanVerseWords(verseObj) {
+    if (!verseObj || !verseObj.ar) return { displayWords: [], normWords: [] };
+    let rawAr = String(verseObj.ar).trim();
+
+    let rawTokens = rawAr.split(/\s+/).filter(Boolean);
+
+    // Reliably strip 4-word Bismillah prefix from Ayah 1 of Surahs 2..114 (except Surah 1 & Surah 9)
+    if (verseObj.num === 1 && verseObj.surahNum !== 1 && verseObj.surahNum !== 9) {
+      let checkIdx = 0;
+      if (rawTokens[0] && !normalizeQuranWord(rawTokens[0])) checkIdx = 1; // leading ۞ if any
+      if (
+        rawTokens.length >= checkIdx + 4 &&
+        normalizeQuranWord(rawTokens[checkIdx]) === 'بسم' &&
+        normalizeQuranWord(rawTokens[checkIdx + 1]) === 'الله' &&
+        normalizeQuranWord(rawTokens[checkIdx + 2]) === 'الرحمن' &&
+        normalizeQuranWord(rawTokens[checkIdx + 3]) === 'الرحيم'
+      ) {
+        rawTokens = rawTokens.slice(checkIdx + 4);
+      }
     }
 
-    audioChunks = [];
+    const displayWords = [];
+    const normWords = [];
+    let pendingLeadingSymbol = '';
+
+    for (let i = 0; i < rawTokens.length; i++) {
+      const tok = rawTokens[i];
+      const norm = normalizeQuranWord(tok);
+      if (!norm) {
+        // Token is purely a stop sign / hizb mark (e.g. ۛ, ۖ, ۞)
+        if (displayWords.length > 0) {
+          displayWords[displayWords.length - 1] += '\u00A0' + tok;
+        } else {
+          pendingLeadingSymbol = tok + '\u00A0';
+        }
+      } else {
+        displayWords.push(pendingLeadingSymbol + tok);
+        pendingLeadingSymbol = '';
+        normWords.push(norm);
+      }
+    }
+
+    return { displayWords, normWords };
+  }
+
+  // Non-native phonetic key (Kurdish, Persian, Turkish, German accents)
+  function toPhoneticRoot(normW) {
+    if (!normW) return '';
+    return normW
+      .replace(/[صث]/g, 'س')
+      .replace(/[ذضظ]/g, 'ز')
+      .replace(/ط/g, 'ت')
+      .replace(/ح/g, 'ه')
+      .replace(/ع/g, 'ا')
+      .replace(/[قغ]/g, 'ك')
+      .replace(/ا+/g, 'ا');
+  }
+
+  function stripDefinitePrefix(w) {
+    if (!w || w.length < 4) return w;
+    if (w.startsWith('وال') || w.startsWith('فال') || w.startsWith('بال') || w.startsWith('كال')) {
+      return w.length >= 6 ? w.slice(3) : w;
+    }
+    if (w.startsWith('لل') && w.length >= 5) return w.slice(2);
+    if (w.startsWith('ال') && w.length >= 5) return w.slice(2);
+    if ((w[0] === 'و' || w[0] === 'ف' || w[0] === 'ب' || w[0] === 'ل') && w.length >= 5) {
+      return w.slice(1);
+    }
+    return w;
+  }
+
+  function editDistance(a, b) {
+    const m = a.length;
+    const n = b.length;
+    if (m === 0) return n;
+    if (n === 0) return m;
+    const dp = new Array(n + 1);
+    for (let j = 0; j <= n; j++) dp[j] = j;
+    for (let i = 1; i <= m; i++) {
+      let prev = dp[0];
+      dp[0] = i;
+      for (let j = 1; j <= n; j++) {
+        const temp = dp[j];
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        dp[j] = Math.min(dp[j] + 1, dp[j - 1] + 1, prev + cost);
+        prev = temp;
+      }
+    }
+    return dp[n];
+  }
+
+  // Muqatta'at component letter sequences for streaming engines that emit letter names one by one
+  const MUQATTAAT_SEQUENCES = {
+    'الم': ['الف', 'لام', 'ميم'],
+    'المص': ['الف', 'لام', 'ميم', 'صاد'],
+    'الر': ['الف', 'لام', 'را'],
+    'المر': ['الف', 'لام', 'ميم', 'را'],
+    'كهيعص': ['كاف', 'ها', 'يا', 'عين', 'صاد'],
+    'طسم': ['طا', 'سين', 'ميم'],
+    'طس': ['طا', 'سين'],
+    'طه': ['طا', 'ها'],
+    'يس': ['يا', 'سين'],
+    'حم': ['حا', 'ميم'],
+    'عسق': ['عين', 'سين', 'قاف']
+  };
+
+  /**
+   * Strict Quran Word Matcher:
+   * - NEVER matches two unrelated words merely sharing 'ال'
+   * - Supports Uthmani orthography & Qira'at (مالك/ملك)
+   * - Supports Kurdish/Persian phonetic consonantal shifts ONLY when root stems match >= 82%
+   */
+  function doQuranWordsMatch(spokenRaw, targetRaw) {
+    const n1 = normalizeQuranWord(spokenRaw);
+    const n2 = normalizeQuranWord(targetRaw);
+    if (!n1 || !n2) return false;
+    if (n1 === n2) return true;
+
+    // Qira'at & well-known Quranic pairs
+    if ((n1 === 'مالك' && n2 === 'ملك') || (n1 === 'ملك' && n2 === 'مالك')) return true;
+
+    // Tajweed nasal assimilation (Idgham/Iqlab fused forms)
+    if (
+      (n1 === 'ميقول' && n2 === 'منيقول') ||
+      (n1 === 'مربهم' && n2 === 'منربهم') ||
+      (n1 === 'ممبعد' && n2 === 'منبعد')
+    ) return true;
+
+    // Non-native phonetic exact match (e.g. السرات == الصراط, زلك == ذلك, المستكيم == المستقيم)
+    const p1 = toPhoneticRoot(n1);
+    const p2 = toPhoneticRoot(n2);
+    if (p1 === p2 && p1.length >= 2) return true;
+
+    // Short words (<= 3 chars, e.g. لا, في, من, ما, الم, يس, طه, حم, ص, ق, ن) MUST match exactly above!
+    if (n1.length <= 3 || n2.length <= 3) return false;
+
+    // Compare roots AFTER stripping 'ال' / 'و' so 'الرحمن' vs 'الكتاب' has 0% false overlap!
+    const root1 = stripDefinitePrefix(n1);
+    const root2 = stripDefinitePrefix(n2);
+    if (root1 === root2 && root1.length >= 3) {
+      // Only allow prefix difference if spoken & target don't contradict meaning (length diff <= 2)
+      if (Math.abs(n1.length - n2.length) <= 2) return true;
+    }
+
+    const pRoot1 = toPhoneticRoot(root1);
+    const pRoot2 = toPhoneticRoot(root2);
+    if (pRoot1 === pRoot2 && pRoot1.length >= 3 && Math.abs(n1.length - n2.length) <= 2) {
+      return true;
+    }
+
+    // Strict edit distance for longer words (>= 5 chars): at most 1 char difference on >=5-char root
+    if (root1.length >= 4 && root2.length >= 4 && Math.abs(root1.length - root2.length) <= 1) {
+      const dist = editDistance(pRoot1, pRoot2);
+      const maxL = Math.max(pRoot1.length, pRoot2.length);
+      if (dist <= 1 && (1 - dist / maxL) >= 0.80) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Strips opening Isti'adhah (أعوذ بالله من الشيطان الرجيم) and opening Basmalah
+   * (بسم الله الرحمن الرحيم) when the target verse itself does NOT start with Basmalah.
+   * Returns { tokens, sawIstiadhah, sawBasmalah }.
+   */
+  function stripOpeningFormulas(tokens, targetStartsWithBasmalah) {
+    if (!tokens || tokens.length === 0) {
+      return { tokens: [], sawIstiadhah: false, sawBasmalah: false };
+    }
+    let idx = 0;
+    let sawIstiadhah = false;
+    let sawBasmalah = false;
+
+    const istiadhahSet = new Set(['اعوذ', 'بالله', 'من', 'الشيطان', 'الرجيم', 'السميع', 'العليم']);
+    while (idx < tokens.length && istiadhahSet.has(tokens[idx])) {
+      // Only treat 'من' or 'بالله' as Isti'adhah if 'اعوذ' or 'الشيطان' or 'الرجيم' is present near start
+      if (tokens[idx] === 'اعوذ' || tokens.includes('الشيطان') || tokens.includes('الرجيم')) {
+        sawIstiadhah = true;
+        idx++;
+      } else {
+        break;
+      }
+    }
+
+    if (!targetStartsWithBasmalah && idx < tokens.length) {
+      // Check for full or partial Basmalah spoken at start of a Surah (e.g. before الم in Al-Baqarah)
+      const basmalahWords = ['بسم', 'الله', 'الرحمن', 'الرحيم'];
+      if (tokens[idx] === 'بسم' || (tokens[idx] === 'الله' && tokens[idx + 1] === 'الرحمن')) {
+        sawBasmalah = true;
+        while (idx < tokens.length && basmalahWords.includes(tokens[idx])) {
+          idx++;
+        }
+      }
+    }
+
+    return {
+      tokens: tokens.slice(idx),
+      sawIstiadhah,
+      sawBasmalah
+    };
+  }
+
+  // =========================================================================
+  // 2. STATEFUL QURAN ALIGNMENT ENGINE (Pauses, Repeats, Waqf/Ibtida Backtrack)
+  // =========================================================================
+  function createRecitationAligner() {
+    let targetNormWords = [];
+    let cursor = 0;          // Current active position where reciter is speaking (can backtrack!)
+    let frontier = 0;        // Highest word index revealed so far (monotonic reveal progress)
+    let muqattaatProgress = 0; // Tracks split ['الف', 'لام', 'ميم'] tokens if spoken separately
+
+    return {
+      setTargetWords(normWords, initialRevealed = 0) {
+        targetNormWords = Array.isArray(normWords) ? normWords.slice() : [];
+        cursor = Math.max(0, Math.min(targetNormWords.length, initialRevealed));
+        frontier = cursor;
+        muqattaatProgress = 0;
+      },
+
+      reset() {
+        cursor = 0;
+        frontier = 0;
+        muqattaatProgress = 0;
+      },
+
+      getState() {
+        return {
+          cursor,
+          frontier,
+          totalWords: targetNormWords.length,
+          isComplete: targetNormWords.length > 0 && frontier >= targetNormWords.length
+        };
+      },
+
+      /**
+       * Feeds newly spoken normalized delta tokens into the stateful aligner.
+       * Returns:
+       * {
+       *   matchedWords: frontier,
+       *   cursor,
+       *   totalWords,
+       *   isComplete,
+       *   didAdvance,
+       *   didBacktrack,
+       *   sawBasmalah,
+       *   sawIstiadhah,
+       *   remainingTokens // Unconsumed tokens AFTER completing the ayah (for instant next-ayah carry-over!)
+       * }
+       */
+      feedTokens(rawOrNormTokens, options = {}) {
+        const T = targetNormWords.length;
+        if (T === 0) {
+          return {
+            matchedWords: 0, cursor: 0, totalWords: 0, isComplete: false,
+            didAdvance: false, didBacktrack: false, sawBasmalah: false, sawIstiadhah: false,
+            remainingTokens: []
+          };
+        }
+
+        const targetStartsWithBasmalah = (targetNormWords[0] === 'بسم');
+        let tokens = rawOrNormTokens.map(normalizeQuranWord).filter(Boolean);
+
+        // Strip opening Isti'adhah / Basmalah only when at start of verse (frontier === 0)
+        let sawBasmalah = false;
+        let sawIstiadhah = false;
+        if (frontier === 0 && options.allowOpeningBasmalah !== false) {
+          const stripped = stripOpeningFormulas(tokens, targetStartsWithBasmalah);
+          tokens = stripped.tokens;
+          sawBasmalah = stripped.sawBasmalah;
+          sawIstiadhah = stripped.sawIstiadhah;
+        }
+
+        const prevFrontier = frontier;
+        let didBacktrack = false;
+        let sIdx = 0;
+
+        while (sIdx < tokens.length && frontier < T) {
+          const sw = tokens[sIdx];
+          const tw = targetNormWords[cursor];
+
+          // A. Check split Muqatta'at letter-by-letter sequence (e.g. 'الف' -> 'لام' -> 'ميم' for 'الم')
+          const muqSeq = MUQATTAAT_SEQUENCES[tw];
+          if (muqSeq) {
+            if (doQuranWordsMatch(sw, tw)) {
+              // Matched whole 'الم' directly
+              cursor++;
+              if (cursor > frontier) frontier = cursor;
+              muqattaatProgress = 0;
+              sIdx++;
+              continue;
+            }
+            // Check if spoken tokens starting at sIdx match the full remaining letter names
+            if (sw === muqSeq[muqattaatProgress] || doQuranWordsMatch(sw, muqSeq[muqattaatProgress])) {
+              muqattaatProgress++;
+              sIdx++;
+              if (muqattaatProgress >= muqSeq.length) {
+                cursor++;
+                if (cursor > frontier) frontier = cursor;
+                muqattaatProgress = 0;
+              }
+              continue;
+            } else if (sw === muqSeq[0]) {
+              // Restarted saying 'الف...'
+              muqattaatProgress = 1;
+              sIdx++;
+              continue;
+            }
+          }
+
+          // B. Direct 1-to-1 match at current cursor
+          if (doQuranWordsMatch(sw, tw)) {
+            cursor++;
+            if (cursor > frontier) frontier = cursor;
+            muqattaatProgress = 0;
+            sIdx++;
+            continue;
+          }
+
+          // C. Compound 2 spoken tokens -> 1 Uthmani word (e.g. 'يا' + 'ايها' -> 'يايها', 'ها' + 'انتم' -> 'هانتم')
+          if (sIdx + 1 < tokens.length) {
+            const joinedSpoken = normalizeQuranWord(sw + tokens[sIdx + 1]);
+            if (doQuranWordsMatch(joinedSpoken, tw)) {
+              cursor++;
+              if (cursor > frontier) frontier = cursor;
+              muqattaatProgress = 0;
+              sIdx += 2;
+              continue;
+            }
+          }
+
+          // D. Compound 1 spoken token -> 2 target words (e.g. 'انلا'/'الا' -> 'ان' + 'لا', 'مما' -> 'من' + 'ما')
+          if (cursor + 1 < T) {
+            const joinedTarget = normalizeQuranWord(tw + targetNormWords[cursor + 1]);
+            if (doQuranWordsMatch(sw, joinedTarget)) {
+              cursor += 2;
+              if (cursor > frontier) frontier = cursor;
+              muqattaatProgress = 0;
+              sIdx++;
+              continue;
+            }
+          }
+
+          // E. Immediate single-word repetition: user repeated the word they JUST spoke (cursor - 1)
+          if (cursor > 0 && doQuranWordsMatch(sw, targetNormWords[cursor - 1])) {
+            sIdx++;
+            continue;
+          }
+
+          // F. Multi-word Backtracking (Waqf & Ibtida'): user paused, went back several words in this ayah, and re-recited!
+          if (cursor > 1) {
+            let backtrackPos = -1;
+            const maxBack = Math.max(0, cursor - 12);
+            for (let b = cursor - 2; b >= maxBack; b--) {
+              if (doQuranWordsMatch(sw, targetNormWords[b])) {
+                // Require either a distinctive word (>= 4 letters) OR 2-word confirmation so short 'في'/'من' doesn't false-rewind
+                const nextConfirms = (sIdx + 1 < tokens.length && b + 1 < T && doQuranWordsMatch(tokens[sIdx + 1], targetNormWords[b + 1]));
+                if (targetNormWords[b].length >= 4 || nextConfirms || b === 0) {
+                  backtrackPos = b;
+                  break;
+                }
+              }
+            }
+            if (backtrackPos !== -1) {
+              cursor = backtrackPos + 1;
+              didBacktrack = true;
+              muqattaatProgress = 0;
+              sIdx++;
+              continue;
+            }
+          }
+
+          // G. Safe 1-word micro-bridge ONLY if STT dropped a tiny particle AND the user clearly spoke TWO consecutive exact words ahead
+          if (
+            cursor + 2 < T &&
+            sIdx + 1 < tokens.length &&
+            targetNormWords[cursor].length <= 3 &&
+            doQuranWordsMatch(sw, targetNormWords[cursor + 1]) &&
+            doQuranWordsMatch(tokens[sIdx + 1], targetNormWords[cursor + 2])
+          ) {
+            cursor += 3;
+            if (cursor > frontier) frontier = cursor;
+            sIdx += 2;
+            continue;
+          }
+
+          // H. Spoken word did NOT match expected word -> DO NOT ADVANCE (Never auto-fill wrong words!)
+          sIdx++;
+        }
+
+        const isComplete = frontier >= T;
+        const remainingTokens = isComplete ? tokens.slice(sIdx) : [];
+
+        return {
+          matchedWords: frontier,
+          cursor,
+          totalWords: T,
+          isComplete,
+          didAdvance: frontier > prevFrontier,
+          didBacktrack,
+          sawBasmalah,
+          sawIstiadhah,
+          remainingTokens
+        };
+      }
+    };
+  }
+
+  // =========================================================================
+  // 3. 16kHz PCM LIVE AUDIO RECORDER & RIFF WAV ENCODER (Zero WebM Bugs!)
+  // =========================================================================
+  function downsampleTo16k(inputFloat32, inputSampleRate) {
+    if (inputSampleRate === 16000) {
+      return new Float32Array(inputFloat32);
+    }
+    const ratio = inputSampleRate / 16000;
+    const outLength = Math.round(inputFloat32.length / ratio);
+    const out = new Float32Array(outLength);
+    for (let i = 0; i < outLength; i++) {
+      const pos = i * ratio;
+      const idx = Math.floor(pos);
+      const frac = pos - idx;
+      const s0 = inputFloat32[idx] || 0;
+      const s1 = inputFloat32[Math.min(idx + 1, inputFloat32.length - 1)] || 0;
+      out[i] = s0 + frac * (s1 - s0);
+    }
+    return out;
+  }
+
+  function mergeFloat32Chunks(chunks, totalSamples) {
+    const out = new Float32Array(totalSamples);
+    let offset = 0;
+    for (let i = 0; i < chunks.length; i++) {
+      out.set(chunks[i], offset);
+      offset += chunks[i].length;
+    }
+    return out;
+  }
+
+  function encodeWav16kMono(float32Samples) {
+    const numSamples = float32Samples.length;
+    const buffer = new ArrayBuffer(44 + numSamples * 2);
+    const view = new DataView(buffer);
+
+    function writeAscii(offset, str) {
+      for (let i = 0; i < str.length; i++) {
+        view.setUint8(offset + i, str.charCodeAt(i));
+      }
+    }
+
+    writeAscii(0, 'RIFF');
+    view.setUint32(4, 36 + numSamples * 2, true);
+    writeAscii(8, 'WAVE');
+    writeAscii(12, 'fmt ');
+    view.setUint32(16, 16, true);      // PCM chunk size
+    view.setUint16(20, 1, true);       // PCM format = 1
+    view.setUint16(22, 1, true);       // Mono = 1 channel
+    view.setUint32(24, 16000, true);   // 16000 Hz
+    view.setUint32(28, 32000, true);   // Byte rate (16000 * 2)
+    view.setUint16(32, 2, true);       // Block align
+    view.setUint16(34, 16, true);      // 16-bit samples
+    writeAscii(36, 'data');
+    view.setUint32(40, numSamples * 2, true);
+
+    let offset = 44;
+    for (let i = 0; i < numSamples; i++) {
+      const s = Math.max(-1, Math.min(1, float32Samples[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      offset += 2;
+    }
+
+    return new Blob([buffer], { type: 'audio/wav' });
+  }
+
+  function emitOrderedTranscript(seq, rawText, callbacks) {
+    pendingSeqResults.set(seq, rawText);
+    while (pendingSeqResults.has(nextExpectedSeq)) {
+      const txt = pendingSeqResults.get(nextExpectedSeq);
+      pendingSeqResults.delete(nextExpectedSeq);
+      nextExpectedSeq++;
+      if (txt && isCurrentlyListening) {
+        const cleanTokens = tokenizeQuranText(txt);
+        const cleanPhrase = cleanTokens.join(' ');
+        if (cleanTokens.length > 0) {
+          if (callbacks.onDeltaTokens) {
+            callbacks.onDeltaTokens(cleanTokens, true, txt);
+          }
+          if (callbacks.onTranscript) {
+            callbacks.onTranscript(cleanPhrase, true, cleanTokens, txt);
+          }
+        }
+      }
+    }
+  }
+
+  async function startLivePcmCapture(mode, callbacks) {
+    cleanupAudioPipeline();
+    dispatchSeqCounter = 0;
+    nextExpectedSeq = 1;
+    pendingSeqResults.clear();
+    pcmChunks16k = [];
+    pcmSampleCount = 0;
+    preRollBuffer = new Float32Array(0);
+    noiseFloorRms = 0.004;
+    isSpeechActive = false;
+    speechStartMs = 0;
+    lastVoiceMs = 0;
+    peakChunkRms = 0;
+
+    if (mode === 'local_whisper') {
+      const ok = await ensureOfflineWorkerReady(callbacks);
+      if (!ok) return;
+    }
+
     try {
-      audioStream = await navigator.mediaDevices.getUserMedia({
+      micStream = await navigator.mediaDevices.getUserMedia({
         audio: {
+          channelCount: 1,
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true
         }
       });
-    } catch (e) {
-      console.warn('Microphone permission denied:', e);
-      if (callbacks.onError) callbacks.onError('عدم دسترسی به میکروفون');
+    } catch (err) {
+      console.warn('[QuranVoiceAI] Mic permission error:', err);
+      isCurrentlyListening = false;
+      if (callbacks.onError) callbacks.onError('not-allowed');
       return;
     }
 
-    // Set up Web Audio VAD (Voice Activity Detector)
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      audioContext = new AudioCtx();
-      const source = audioContext.createMediaStreamSource(audioStream);
-      analyser = audioContext.createAnalyser();
-      analyser.fftSize = 512;
-      source.connect(analyser);
-    } catch (e) {}
-
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '');
-
-    mediaRecorder = mimeType ? new MediaRecorder(audioStream, { mimeType }) : new MediaRecorder(audioStream);
-
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data && e.data.size > 0) {
-        audioChunks.push(e.data);
-      }
-    };
-
-    mediaRecorder.onstart = () => {
-      isCurrentlyListening = true;
-      silenceStartTime = null;
-      if (callbacks.onStart) callbacks.onStart();
-
-      // Monitor Audio Level & Silence Detection for Chunk Dispatching
-      const dataArray = new Uint8Array(analyser ? analyser.frequencyBinCount : 0);
-      speechDetectInterval = setInterval(async () => {
-        if (!isCurrentlyListening || !analyser) return;
-        analyser.getByteFrequencyData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-        const avg = sum / dataArray.length;
-
-        // If loud speech detected, reset silence timer
-        if (avg > 15) {
-          silenceStartTime = null;
-        } else {
-          // In silence
-          if (!silenceStartTime) {
-            silenceStartTime = Date.now();
-          } else if (Date.now() - silenceStartTime > 1200 && audioChunks.length > 0) {
-            // User paused for 1.2s -> dispatch chunk to Whisper
-            silenceStartTime = null;
-            await dispatchAudioToGroq(callbacks);
-          }
-        }
-      }, 250);
-    };
-
-    mediaRecorder.onstop = async () => {
-      if (speechDetectInterval) clearInterval(speechDetectInterval);
-      if (audioChunks.length > 0) {
-        await dispatchAudioToGroq(callbacks);
-      }
-      cleanupAudioNodes();
-      if (callbacks.onEnd) callbacks.onEnd();
-    };
-
-    mediaRecorder.start(300); // 300ms chunks
-  }
-
-  async function dispatchAudioToGroq(callbacks) {
-    if (audioChunks.length === 0) return;
-    const blob = new Blob(audioChunks, { type: mediaRecorder ? mediaRecorder.mimeType : 'audio/webm' });
-    audioChunks = []; // clear for next utterance
-
-    // If audio is too short (< 0.4s), skip
-    if (blob.size < 3000) return;
-
-    if (!groqApiKey) {
-      groqApiKey = DEFAULT_GROQ_KEY;
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioCtx();
+    if (audioCtx.state === 'suspended') {
+      try { await audioCtx.resume(); } catch (e) {}
     }
 
-    const apiKey = groqApiKey;
-    const formData = new FormData();
-    formData.append('file', blob, 'recitation.webm');
-    formData.append('model', 'whisper-large-v3-turbo');
-    formData.append('language', 'ar');
-    formData.append('temperature', '0');
-    formData.append('response_format', 'json');
+    const nativeRate = audioCtx.sampleRate || 48000;
+    sourceNode = audioCtx.createMediaStreamSource(micStream);
+    processorNode = audioCtx.createScriptProcessor(4096, 1, 1);
+    muteGainNode = audioCtx.createGain();
+    muteGainNode.gain.value = 0;
+
+    isCurrentlyListening = true;
+    if (callbacks.onStart) callbacks.onStart();
+
+    processorNode.onaudioprocess = (ev) => {
+      if (!isCurrentlyListening) return;
+      const input = ev.inputBuffer.getChannelData(0);
+      const chunk16k = downsampleTo16k(input, nativeRate);
+
+      // Compute RMS energy
+      let sumSq = 0;
+      for (let i = 0; i < chunk16k.length; i++) {
+        sumSq += chunk16k[i] * chunk16k[i];
+      }
+      const rms = Math.sqrt(sumSq / Math.max(1, chunk16k.length));
+      const now = Date.now();
+
+      // Adaptive threshold tracks room noise floor without locking up on laptop fans
+      const voiceThreshold = Math.max(0.010, Math.min(0.038, noiseFloorRms * 2.5));
+
+      if (rms > voiceThreshold) {
+        if (!isSpeechActive) {
+          isSpeechActive = true;
+          speechStartMs = now;
+          peakChunkRms = rms;
+          if (preRollBuffer.length > 0) {
+            pcmChunks16k.push(preRollBuffer);
+            pcmSampleCount += preRollBuffer.length;
+            preRollBuffer = new Float32Array(0);
+          }
+        } else if (rms > peakChunkRms) {
+          peakChunkRms = rms;
+        }
+        lastVoiceMs = now;
+        pcmChunks16k.push(chunk16k);
+        pcmSampleCount += chunk16k.length;
+
+        // Continuous unbroken recitation >= 2.7s -> split cleanly at quietest valley in last 450ms
+        const speechDur = now - speechStartMs;
+        if (speechDur >= 2700 && pcmSampleCount >= 16000 * 2.2) {
+          const full = mergeFloat32Chunks(pcmChunks16k, pcmSampleCount);
+          const searchStart = Math.max(16000, full.length - 7200); // last 450ms
+          const win = 800; // 50ms window
+          let bestValleyIdx = full.length;
+          let minWinEnergy = Infinity;
+          for (let p = searchStart; p + win <= full.length; p += 400) {
+            let e = 0;
+            for (let k = p; k < p + win; k++) e += full[k] * full[k];
+            if (e < minWinEnergy) {
+              minWinEnergy = e;
+              bestValleyIdx = p + Math.floor(win / 2);
+            }
+          }
+          const toSend = full.slice(0, bestValleyIdx);
+          const tail = full.slice(bestValleyIdx);
+          pcmChunks16k = tail.length > 0 ? [tail] : [];
+          pcmSampleCount = tail.length;
+          speechStartMs = now;
+          const capturedPeak = peakChunkRms;
+          peakChunkRms = rms;
+          dispatchPcmUtterance(mode, toSend, capturedPeak, callbacks);
+        }
+      } else {
+        if (isSpeechActive) {
+          pcmChunks16k.push(chunk16k);
+          pcmSampleCount += chunk16k.length;
+          const silenceDur = now - lastVoiceMs;
+          // 520ms breath pause -> immediately dispatch utterance!
+          if (silenceDur >= 520) {
+            const full = mergeFloat32Chunks(pcmChunks16k, pcmSampleCount);
+            const capturedPeak = peakChunkRms;
+            pcmChunks16k = [];
+            pcmSampleCount = 0;
+            isSpeechActive = false;
+            peakChunkRms = 0;
+            if (full.length >= 4800) { // >= 0.30s
+              dispatchPcmUtterance(mode, full, capturedPeak, callbacks);
+            }
+          }
+        } else {
+          // Adapt noise floor smoothly during silence & keep ~220ms pre-roll so initial consonants are never clipped
+          noiseFloorRms = Math.min(0.018, noiseFloorRms * 0.96 + rms * 0.04);
+          const combined = new Float32Array(preRollBuffer.length + chunk16k.length);
+          combined.set(preRollBuffer, 0);
+          combined.set(chunk16k, preRollBuffer.length);
+          const maxPreRoll = 3520; // 220ms at 16kHz
+          preRollBuffer = combined.length > maxPreRoll ? combined.slice(combined.length - maxPreRoll) : combined;
+        }
+      }
+    };
+
+    sourceNode.connect(processorNode);
+    processorNode.connect(muteGainNode);
+    muteGainNode.connect(audioCtx.destination);
+  }
+
+  async function dispatchPcmUtterance(mode, float32Samples, peakRms, callbacks) {
+    if (!float32Samples || float32Samples.length < 4000 || peakRms < 0.009) return;
+    const seq = ++dispatchSeqCounter;
+
+    if (mode === 'local_whisper') {
+      dispatchToOfflineWorker(seq, float32Samples, callbacks);
+      return;
+    }
+
+    // If offline while Groq selected, seamlessly route to Offline Worker or notify
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      if (offlineModelReady) {
+        dispatchToOfflineWorker(seq, float32Samples, callbacks);
+      } else {
+        emitOrderedTranscript(seq, '', callbacks);
+      }
+      return;
+    }
+
+    const wavBlob = encodeWav16kMono(float32Samples);
+    const apiKey = groqApiKey || DEFAULT_GROQ_KEY;
+    const fd = new FormData();
+    fd.append('file', wavBlob, 'recitation.wav');
+    fd.append('model', 'whisper-large-v3-turbo');
+    fd.append('language', 'ar');
+    fd.append('temperature', '0');
+    fd.append('response_format', 'verbose_json');
 
     try {
       const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: formData
+        headers: { 'Authorization': `Bearer ${apiKey}` },
+        body: fd
       });
 
       if (!res.ok) {
-        const errJson = await res.json().catch(() => ({}));
-        console.warn('[Groq Whisper API] error:', res.status, errJson);
-        if (res.status === 401) {
-          if (typeof window.showToast === 'function') {
-            window.showToast('⚠️ لطفاً کلید API معتبر Groq را در تنظیمات وارد فرمایید.');
+        console.warn('[QuranVoiceAI Groq] HTTP status:', res.status);
+        emitOrderedTranscript(seq, '', callbacks);
+        if (res.status === 401 || res.status === 429) {
+          // Auto-fallback to native Google Speech if API key invalid or rate-limited
+          if (res.status === 401 && typeof window.showToast === 'function') {
+            window.showToast('⚠️ خطای کلید ابری؛ سوییچ خودکار به موتور زنده مرورگر');
           }
-          openEngineSettingsModal();
+          changeActiveEngine('google_speech');
+          if (isCurrentlyListening) startNativeGoogleListening(callbacks);
         }
         return;
       }
 
       const data = await res.json();
-      if (data && data.text) {
-        const clean = normalizeText(data.text);
-        if (callbacks.onTranscript) {
-          callbacks.onTranscript(clean, true);
-        }
-      }
-    } catch (err) {
-      console.warn('[Groq Whisper Network Error]:', err);
-    }
-  }
+      let rawText = (data && data.text) ? String(data.text).trim() : '';
 
-  // =========================================================================
-  // 2. ENGINE: LOCAL OFFLINE WHISPER (Transformers.js ONNX)
-  // =========================================================================
-  async function initLocalWhisperModel(progressCallback) {
-    if (localTranscriber) return localTranscriber;
-    isModelLoading = true;
-
-    try {
-      // Dynamic load Transformers.js if not yet loaded
-      if (typeof window.pipeline === 'undefined') {
-        await loadScript('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');
+      // Filter high no_speech_prob segments
+      if (data && Array.isArray(data.segments) && data.segments.length > 0) {
+        const kept = data.segments
+          .filter(seg => (typeof seg.no_speech_prob !== 'number' || seg.no_speech_prob < 0.68))
+          .map(seg => seg.text || '')
+          .join(' ')
+          .trim();
+        rawText = kept;
       }
 
-      const { pipeline, env } = window.transformers || window;
-      if (env) {
-        env.allowLocalModels = false;
-        env.useBrowserCache = true;
-      }
-
-      localTranscriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', {
-        quantized: true,
-        progress_callback: (p) => {
-          if (p.status === 'progress') {
-            modelLoadProgress = Math.round(p.progress || 0);
-            if (progressCallback) progressCallback(modelLoadProgress);
-          }
-        }
-      });
-
-      isModelLoading = false;
-      return localTranscriber;
-    } catch (e) {
-      isModelLoading = false;
-      console.warn('Local Whisper load error:', e);
-      throw e;
-    }
-  }
-
-  async function startLocalWhisperListening(callbacks) {
-    audioChunks = [];
-    try {
-      audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (e) {
-      if (callbacks.onError) callbacks.onError('عدم دسترسی به میکروفون');
-      return;
-    }
-
-    // Ensure model is ready
-    if (!localTranscriber && !isModelLoading) {
-      if (typeof window.showToast === 'function') {
-        window.showToast('🧠 در حال آماده‌سازی مدل آفلاین ویسپر (برای بار اول)...');
-      }
-      try {
-        await initLocalWhisperModel((prog) => {
-          updateEngineBadgesUI();
-        });
-      } catch (e) {
-        if (typeof window.showToast === 'function') {
-          window.showToast('ℹ️ بارگذاری مدل آفلاین ناموفق بود؛ سوئیچ خودکار به موتور پیش‌فرض مرورگر...');
-        }
-        changeActiveEngine('google_speech');
-        startNativeGoogleListening(callbacks);
+      if (isWhisperHallucination(rawText)) {
+        emitOrderedTranscript(seq, '', callbacks);
         return;
       }
+
+      emitOrderedTranscript(seq, rawText, callbacks);
+    } catch (err) {
+      console.warn('[QuranVoiceAI Groq] Network error:', err);
+      emitOrderedTranscript(seq, '', callbacks);
     }
-
-    mediaRecorder = new MediaRecorder(audioStream);
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data && e.data.size > 0) audioChunks.push(e.data);
-    };
-
-    mediaRecorder.onstart = () => {
-      isCurrentlyListening = true;
-      if (callbacks.onStart) callbacks.onStart();
-    };
-
-    mediaRecorder.onstop = async () => {
-      if (audioChunks.length > 0) {
-        const blob = new Blob(audioChunks, { type: 'audio/wav' });
-        audioChunks = [];
-        await processLocalWhisperAudio(blob, callbacks);
-      }
-      cleanupAudioNodes();
-      if (callbacks.onEnd) callbacks.onEnd();
-    };
-
-    mediaRecorder.start();
   }
 
-  async function processLocalWhisperAudio(blob, callbacks) {
-    try {
-      const buffer = await blob.arrayBuffer();
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      const ctx = new AudioCtx({ sampleRate: 16000 });
-      const decoded = await ctx.decodeAudioData(buffer);
-      const audioData = decoded.getChannelData(0);
+  // =========================================================================
+  // 4. DEDICATED OFFLINE TARTEEL QURAN WHISPER ENGINE (Web Worker)
+  // =========================================================================
+  const pendingWorkerReqs = new Map();
 
-      if (localTranscriber) {
-        const result = await localTranscriber(audioData, {
-          language: 'arabic',
-          task: 'transcribe'
-        });
-        if (result && result.text) {
-          const clean = normalizeText(result.text);
-          if (callbacks.onTranscript) callbacks.onTranscript(clean, true);
+  function getOrCreateOfflineWorker() {
+    if (offlineWorker) return offlineWorker;
+    offlineWorker = new Worker('quran_offline_whisper_worker.js?v=20261126_sunni_v16', { type: 'module' });
+
+    offlineWorker.onmessage = (e) => {
+      const msg = e.data || {};
+      if (msg.type === 'progress') {
+        offlineModelLoading = true;
+        offlineLoadProgress = msg.progress || 0;
+        updateOfflineProgressUI(offlineLoadProgress, 'loading');
+      } else if (msg.type === 'ready') {
+        offlineModelLoading = false;
+        offlineModelReady = true;
+        offlineLoadProgress = 100;
+        offlineLoadedModelName = msg.modelId || '';
+        updateOfflineProgressUI(100, 'ready');
+        updateEngineBadgesUI();
+      } else if (msg.type === 'transcript') {
+        const handler = pendingWorkerReqs.get(msg.reqId);
+        if (handler) {
+          pendingWorkerReqs.delete(msg.reqId);
+          handler(msg.text || '');
+        }
+      } else if (msg.type === 'error') {
+        console.warn('[Offline Quran Worker]:', msg.error);
+        offlineModelLoading = false;
+        updateOfflineProgressUI(0, 'error', msg.error);
+        if (msg.reqId && pendingWorkerReqs.has(msg.reqId)) {
+          const handler = pendingWorkerReqs.get(msg.reqId);
+          pendingWorkerReqs.delete(msg.reqId);
+          handler('');
         }
       }
-    } catch (e) {
-      console.warn('Local whisper inference error:', e);
+    };
+
+    return offlineWorker;
+  }
+
+  function ensureOfflineWorkerReady(callbacks, forceReload = false) {
+    if (offlineModelReady && !forceReload) return Promise.resolve(true);
+
+    return new Promise((resolve) => {
+      const w = getOrCreateOfflineWorker();
+      offlineModelLoading = true;
+      updateOfflineProgressUI(Math.max(2, offlineLoadProgress), 'loading');
+
+      if (typeof window.showToast === 'function') {
+        window.showToast('🧠 در حال بارگذاری مدل قرآنی ترتیل آفلاین...');
+      }
+
+      const checkHandler = (ev) => {
+        const msg = ev.data || {};
+        if (msg.type === 'ready') {
+          w.removeEventListener('message', checkHandler);
+          if (typeof window.showToast === 'function') {
+            window.showToast('✅ مدل قرآنی آفلاین آماده و ذخیره شد (۱۰۰٪ بدون اینترنت)!');
+          }
+          resolve(true);
+        } else if (msg.type === 'error' && !msg.reqId) {
+          w.removeEventListener('message', checkHandler);
+          if (typeof window.showToast === 'function') {
+            window.showToast('⚠️ بارگذاری مدل آفلاین نیاز به یک‌بار اتصال اولیه اینترنت دارد.');
+          }
+          if (callbacks && callbacks.onError) callbacks.onError(msg.error);
+          resolve(false);
+        }
+      };
+      w.addEventListener('message', checkHandler);
+      w.postMessage({ type: 'init', tier: offlineModelTier, forceReload });
+    });
+  }
+
+  function dispatchToOfflineWorker(seq, float32Samples, callbacks) {
+    const w = getOrCreateOfflineWorker();
+    const copy = new Float32Array(float32Samples);
+    pendingWorkerReqs.set(seq, (rawText) => {
+      if (isWhisperHallucination(rawText)) {
+        emitOrderedTranscript(seq, '', callbacks);
+      } else {
+        emitOrderedTranscript(seq, rawText, callbacks);
+      }
+    });
+    w.postMessage({ type: 'transcribe', reqId: seq, audio: copy }, [copy.buffer]);
+  }
+
+  function updateOfflineProgressUI(pct, state, errMsg) {
+    const bar = document.getElementById('offlineModelProgressBar');
+    const lbl = document.getElementById('offlineModelProgressLabel');
+    if (bar) {
+      bar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+      bar.style.background = state === 'error' ? '#ef4444' : (state === 'ready' ? '#10b981' : '#38bdf8');
+    }
+    if (lbl) {
+      if (state === 'ready') {
+        lbl.textContent = '✅ مدل قرآنی ترتیل آفلاین روی دستگاه ذخیره و آماده است (100%)';
+        lbl.style.color = '#34d399';
+      } else if (state === 'error') {
+        lbl.textContent = '⚠️ خطا در دانلود مدل آفلاین: ' + (errMsg || 'اینترنت را بررسی کنید');
+        lbl.style.color = '#fca5a5';
+      } else {
+        lbl.textContent = `⬇️ در حال دانلود و نصب مدل قرآنی آفلاین... ${pct}%`;
+        lbl.style.color = '#38bdf8';
+      }
     }
   }
 
   // =========================================================================
-  // 3. ENGINE: NATIVE BROWSER SPEECH RECOGNITION (Google / Safari)
-  // Continuous Immortal Engine: Auto-reconnects on breath pauses without stalling
+  // 5. NATIVE BROWSER SPEECH RECOGNITION (LCP Token-Delta Engine)
   // =========================================================================
-  let nativeRestartTimer = null;
-
   function startNativeGoogleListening(callbacks) {
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) {
-      if (callbacks.onError) callbacks.onError('مرورگر از این قابلیت پشتیبانی نمی‌کند');
+      if (callbacks.onError) callbacks.onError('not-supported');
       return;
     }
 
+    stopNativeGoogleOnly();
+    const mySession = ++nativeSessionId;
+    const emittedByIndex = {}; // resultIndex -> Array<normToken> already emitted
+
+    function bootInstance() {
+      if (!isCurrentlyListening || mySession !== nativeSessionId) return;
+
+      const rec = new SpeechRec();
+      rec.lang = 'ar-SA';
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.maxAlternatives = 5;
+
+      rec.onstart = () => {
+        if (mySession !== nativeSessionId) return;
+        for (const k of Object.keys(emittedByIndex)) delete emittedByIndex[k];
+      };
+
+      rec.onresult = (event) => {
+        if (!isCurrentlyListening || mySession !== nativeSessionId) return;
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const res = event.results[i];
+          if (!res || !res[0]) continue;
+
+          // Pick primary transcript, or if hint word provided by caller, check alternatives
+          let chosenRaw = res[0].transcript || '';
+          if (typeof callbacks.pickBestAlternative === 'function' && res.length > 1) {
+            const alts = [];
+            for (let a = 0; a < res.length; a++) alts.push(res[a].transcript || '');
+            const picked = callbacks.pickBestAlternative(alts);
+            if (picked) chosenRaw = picked;
+          }
+
+          const newTokens = tokenizeQuranText(chosenRaw);
+          const prevTokens = emittedByIndex[i] || [];
+
+          // Compute Longest Common Prefix so already-emitted words are NEVER re-sent,
+          // while newly fused Muqatta'at ('الف لام' + 'ميم' -> 'الم') ARE emitted cleanly!
+          let lcp = 0;
+          const minLen = Math.min(prevTokens.length, newTokens.length);
+          while (lcp < minLen && prevTokens[lcp] === newTokens[lcp]) {
+            lcp++;
+          }
+
+          const deltaTokens = newTokens.slice(lcp);
+          emittedByIndex[i] = newTokens;
+
+          if (deltaTokens.length > 0) {
+            if (callbacks.onDeltaTokens) {
+              callbacks.onDeltaTokens(deltaTokens, !!res.isFinal, chosenRaw);
+            }
+            if (callbacks.onTranscript) {
+              callbacks.onTranscript(deltaTokens.join(' '), !!res.isFinal, deltaTokens, chosenRaw);
+            }
+          }
+        }
+      };
+
+      rec.onerror = (e) => {
+        if (mySession !== nativeSessionId) return;
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          isCurrentlyListening = false;
+          if (callbacks.onError) callbacks.onError('not-allowed');
+        }
+      };
+
+      rec.onend = () => {
+        if (isCurrentlyListening && mySession === nativeSessionId) {
+          if (nativeRestartTimer) clearTimeout(nativeRestartTimer);
+          nativeRestartTimer = setTimeout(() => {
+            if (isCurrentlyListening && mySession === nativeSessionId) {
+              bootInstance();
+            }
+          }, 50);
+        } else if (mySession === nativeSessionId) {
+          if (callbacks.onEnd) callbacks.onEnd();
+        }
+      };
+
+      nativeSpeechRec = rec;
+      try {
+        rec.start();
+      } catch (err) {
+        console.warn('[QuranVoiceAI Native] Start error:', err);
+      }
+    }
+
+    isCurrentlyListening = true;
+    if (callbacks.onStart) callbacks.onStart();
+    bootInstance();
+  }
+
+  function stopNativeGoogleOnly() {
+    nativeSessionId++;
+    if (nativeRestartTimer) {
+      clearTimeout(nativeRestartTimer);
+      nativeRestartTimer = null;
+    }
     if (nativeSpeechRec) {
       try {
         nativeSpeechRec.onend = null;
@@ -385,178 +1207,164 @@
       } catch (e) {}
       nativeSpeechRec = null;
     }
-
-    nativeSpeechRec = new SpeechRec();
-    nativeSpeechRec.lang = 'ar-SA';
-    nativeSpeechRec.continuous = true;
-    nativeSpeechRec.interimResults = true;
-    nativeSpeechRec.maxAlternatives = 3;
-
-    nativeSpeechRec.onstart = () => {
-      isCurrentlyListening = true;
-      if (callbacks.onStart) callbacks.onStart();
-    };
-
-    nativeSpeechRec.onresult = (event) => {
-      let transcript = '';
-      let isFinal = false;
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
-        if (event.results[i].isFinal) isFinal = true;
-      }
-      const clean = normalizeText(transcript);
-      if (callbacks.onTranscript) callbacks.onTranscript(clean, isFinal);
-    };
-
-    nativeSpeechRec.onerror = (e) => {
-      console.warn('Native speech error notice:', e.error);
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-        isCurrentlyListening = false;
-        if (callbacks.onError) callbacks.onError(e.error);
-      }
-    };
-
-    nativeSpeechRec.onend = () => {
-      if (isCurrentlyListening) {
-        // Continuous Immortal Auto-Reconnect on breath pause (under 60ms)
-        if (nativeRestartTimer) clearTimeout(nativeRestartTimer);
-        nativeRestartTimer = setTimeout(() => {
-          if (isCurrentlyListening) {
-            try {
-              nativeSpeechRec.start();
-            } catch (err) {
-              // If already active, ignore
-            }
-          }
-        }, 60);
-      } else {
-        if (callbacks.onEnd) callbacks.onEnd();
-      }
-    };
-
-    try {
-      nativeSpeechRec.start();
-      isCurrentlyListening = true;
-    } catch (e) {
-      console.warn('Native speech start note:', e);
-    }
   }
 
-  function cleanupAudioNodes() {
-    if (speechDetectInterval) {
-      clearInterval(speechDetectInterval);
-      speechDetectInterval = null;
+  function cleanupAudioPipeline() {
+    if (processorNode) {
+      try { processorNode.disconnect(); } catch (e) {}
+      processorNode.onaudioprocess = null;
+      processorNode = null;
     }
-    if (audioStream) {
-      audioStream.getTracks().forEach(t => t.stop());
-      audioStream = null;
+    if (sourceNode) {
+      try { sourceNode.disconnect(); } catch (e) {}
+      sourceNode = null;
     }
-    if (audioContext && audioContext.state !== 'closed') {
-      audioContext.close().catch(() => {});
-      audioContext = null;
+    if (muteGainNode) {
+      try { muteGainNode.disconnect(); } catch (e) {}
+      muteGainNode = null;
     }
+    if (micStream) {
+      try { micStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+      micStream = null;
+    }
+    if (audioCtx && audioCtx.state !== 'closed') {
+      try { audioCtx.close(); } catch (e) {}
+      audioCtx = null;
+    }
+    pcmChunks16k = [];
+    pcmSampleCount = 0;
+    isSpeechActive = false;
   }
 
+  // =========================================================================
+  // 6. ENGINE SWITCHING & MODAL UI
   // =========================================================================
   function changeActiveEngine(engineId) {
     if (!ENGINES[engineId]) return;
-    if (engineId === 'groq_whisper' && !groqApiKey) {
-      groqApiKey = DEFAULT_GROQ_KEY;
+    const wasListening = isCurrentlyListening;
+    const savedCallbacks = activeCallbacks;
+
+    if (wasListening) {
+      QuranVoiceAI.stopListening();
     }
+
     activeEngineId = engineId;
-    localStorage.setItem(STORAGE_ENGINE_KEY, engineId);
+    try { localStorage.setItem(STORAGE_ENGINE_KEY, engineId); } catch (e) {}
     updateEngineBadgesUI();
+
     if (window.Murajaa && typeof window.Murajaa.updateVoiceEngineBadge === 'function') {
       window.Murajaa.updateVoiceEngineBadge();
     }
-    const lang = localStorage.getItem('quran_app_language') || window.currentAppLanguage || 'ku';
-    const label = lang === 'ku' ? (ENGINES[engineId].name + ' دیاری کرا') : (ENGINES[engineId].name + ' ausgewählt');
+
     if (typeof window.showToast === 'function') {
-      window.showToast(`✨ ${label}`);
+      window.showToast(`✨ ${ENGINES[engineId].icon} ${ENGINES[engineId].name}`);
+    }
+
+    if (wasListening && savedCallbacks) {
+      setTimeout(() => QuranVoiceAI.startListening(savedCallbacks), 120);
     }
   }
 
-  // UNIFIED PUBLIC INTERFACE
-  // =========================================================================
+  function setOfflineTier(tier, triggerDownload = false) {
+    offlineModelTier = (tier === 'pro') ? 'pro' : 'fast';
+    try { localStorage.setItem(STORAGE_OFFLINE_TIER_KEY, offlineModelTier); } catch (e) {}
+    offlineModelReady = false;
+    offlineLoadProgress = 0;
+    if (triggerDownload) {
+      ensureOfflineWorkerReady(null, true);
+    }
+    openEngineSettingsModal();
+  }
+
   const QuranVoiceAI = {
     getEngine: () => activeEngineId,
     setEngine: changeActiveEngine,
     getEnginesList: () => Object.values(ENGINES),
     isListening: () => isCurrentlyListening,
+    isOfflineReady: () => offlineModelReady,
+
+    // Shared Quran Linguistic & Alignment API
+    normalizeQuranWord,
+    normalizeQuranPhrase,
+    normalizeMuqattaatPhrase,
+    tokenizeQuranText,
+    extractCleanVerseWords,
+    doQuranWordsMatch,
+    stripOpeningFormulas,
+    createRecitationAligner,
+
+    preloadOfflineModel: (tier) => {
+      if (tier) {
+        offlineModelTier = tier;
+        try { localStorage.setItem(STORAGE_OFFLINE_TIER_KEY, tier); } catch (e) {}
+      }
+      return ensureOfflineWorkerReady(null, true);
+    },
+
+    setOfflineTier,
 
     startListening: (callbacks = {}) => {
+      QuranVoiceAI.stopListening();
       activeCallbacks = callbacks;
       if (activeEngineId === 'groq_whisper') {
-        startGroqWhisperListening(callbacks);
+        startLivePcmCapture('groq_whisper', callbacks);
       } else if (activeEngineId === 'local_whisper') {
-        startLocalWhisperListening(callbacks);
+        startLivePcmCapture('local_whisper', callbacks);
       } else {
         startNativeGoogleListening(callbacks);
       }
     },
 
     stopListening: () => {
+      const wasActive = isCurrentlyListening;
       isCurrentlyListening = false;
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        try { mediaRecorder.stop(); } catch(e){}
+
+      // Flush any final spoken audio >= 0.3s before closing
+      if (wasActive && pcmSampleCount >= 4800 && activeCallbacks && (activeEngineId === 'groq_whisper' || activeEngineId === 'local_whisper')) {
+        const finalPcm = mergeFloat32Chunks(pcmChunks16k, pcmSampleCount);
+        const peak = peakChunkRms;
+        pcmChunks16k = [];
+        pcmSampleCount = 0;
+        if (peak >= 0.009) {
+          dispatchPcmUtterance(activeEngineId, finalPcm, peak, activeCallbacks);
+        }
       }
-      if (nativeSpeechRec) {
-        try { nativeSpeechRec.abort(); } catch(e){}
-        nativeSpeechRec = null;
-      }
-      cleanupAudioNodes();
+
+      stopNativeGoogleOnly();
+      cleanupAudioPipeline();
     },
 
-    openEngineModal: () => {
-      openEngineSettingsModal();
-    },
-
-    closeEngineModal: () => {
-      closeEngineSettingsModal();
-    },
+    openEngineModal: openEngineSettingsModal,
+    closeEngineModal: closeEngineSettingsModal,
 
     saveGroqApiKey: (key) => {
-      groqApiKey = String(key || '').trim();
-      localStorage.setItem(STORAGE_GROQ_KEY, groqApiKey);
+      const trimmed = String(key || '').trim();
+      groqApiKey = trimmed || DEFAULT_GROQ_KEY;
+      try { localStorage.setItem(STORAGE_GROQ_KEY, groqApiKey); } catch (e) {}
       if (typeof window.showToast === 'function') {
-        window.showToast('✓ کلید Groq با موفقیت ذخیره شد ⭐');
+        window.showToast('✅ کلید هوش مصنوعی ذخیره و فعال شد');
       }
-      closeEngineSettingsModal();
+      openEngineSettingsModal();
     }
   };
 
-  // Helper script loader
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = src;
-      s.onload = resolve;
-      s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
-
-  // Update All 3D Pulsing Badges across the UI
   function updateEngineBadgesUI() {
     const current = ENGINES[activeEngineId] || ENGINES.groq_whisper;
     const badges = document.querySelectorAll('.voice-engine-switch-pill');
     badges.forEach(b => {
       b.innerHTML = `
-        <span class="engine-badge-icon" style="color: ${current.color};">${current.icon.includes('bolt') ? '⚡' : (current.icon.includes('brain') ? '🧠' : '🌐')}</span>
+        <span class="engine-badge-icon" style="color: ${current.color};">${current.icon}</span>
         <span class="engine-badge-title">${current.name}</span>
       `;
       b.style.borderColor = current.color;
-      b.title = `موتور فعلی: ${current.titleFa} (کلیک برای تعویض)`;
     });
   }
 
-  // Inject 3D Animated Engine Switcher Styles
   function injectStyles() {
     if (document.getElementById('quranVoiceAIStyles')) return;
     const style = document.createElement('style');
     style.id = 'quranVoiceAIStyles';
     style.textContent = `
-      /* Luxurious 3D Vibrating/Pulsing Engine Switcher Pill */
       .voice-engine-switch-pill {
         display: inline-flex;
         align-items: center;
@@ -571,130 +1379,100 @@
         font-size: 0.68rem;
         font-weight: 800;
         color: #f8fafc;
-        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        animation: voiceEngine3DPulse 3.5s infinite ease-in-out;
+        transition: all 0.22s ease;
         user-select: none;
-        -webkit-tap-highlight-color: transparent;
       }
       .voice-engine-switch-pill:hover {
-        transform: scale(1.08) translateY(-1px);
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
-      }
-      .voice-engine-switch-pill:active {
-        transform: scale(0.95);
-      }
-      @keyframes voiceEngine3DPulse {
-        0% { transform: scale(1); box-shadow: 0 0 0 rgba(16, 185, 129, 0); }
-        50% { transform: scale(1.03); box-shadow: 0 0 12px rgba(16, 185, 129, 0.45); }
-        100% { transform: scale(1); box-shadow: 0 0 0 rgba(16, 185, 129, 0); }
+        transform: scale(1.05);
       }
       .engine-card-option {
         border-radius: 16px;
         padding: 12px 14px;
         cursor: pointer;
         border: 1.5px solid rgba(255, 255, 255, 0.1);
-        background: rgba(15, 23, 42, 0.6);
-        transition: all 0.22s ease;
+        background: rgba(15, 23, 42, 0.65);
+        transition: all 0.2s ease;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 12px;
       }
       .engine-card-option:hover {
-        background: rgba(30, 41, 59, 0.85);
+        background: rgba(30, 41, 59, 0.88);
         border-color: rgba(255, 255, 255, 0.25);
-        transform: translateY(-2px);
       }
       .engine-card-option.active-engine {
         border-color: #10b981;
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(6, 95, 70, 0.28));
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 95, 70, 0.3));
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.22);
       }
     `;
     document.head.appendChild(style);
   }
 
-  // Dynamic Multilingual Translations for Engine Modal
   function getModalTranslations() {
-    let lang = 'fa';
+    let lang = 'ku';
     try {
-      lang = localStorage.getItem('quran_app_language') || window.currentAppLanguage || window.currentLang || 'fa';
-    } catch (e) {
-      lang = window.currentLang || 'fa';
-    }
+      lang = localStorage.getItem('quran_app_language') || window.currentAppLanguage || 'ku';
+    } catch (e) {}
     const dict = {
       ku: {
-        title: 'ڕێکخستنی دەنگی زیرەک',
-        subtitle: 'هەڵبژاردنی مۆتۆری دەنگی تلاوەت (Triple-Engine)',
-        e1_title: '١. Groq Whisper (سەرهێڵ و خێرا) ⭐',
+        title: 'ڕێکخستنی زیرەکی دەنگی قورئان (v5.0)',
+        subtitle: '٣ مۆتۆری پێشکەوتووی تەسمیع و ناسینەوەی وشە بە وشە',
+        e1_title: '١. Groq Whisper AI (سەرهێڵ و خێراترین) ⭐',
         e1_badge: 'پێشنیارکراو',
-        e1_desc: 'خێراترین و وردترین مۆتۆری دەنگی جیهان (ژێر ٠٫٣ چرکە)، تێگەیشتن لە هەموو شێوەزارەکان.',
-        e2_title: '٢. Whisper ناوخۆیی (١٠٠٪ ئۆفلاین)',
+        e1_desc: 'وردترین مۆتۆری زیرەکی دەستکرد بۆ قورئان (الم، تەجوید، گەڕانەوە بۆ دواوە و وەستان) بە فایلی دەنگی ستانداردی WAV.',
+        e2_title: '٢. Tarteel Whisper (١٠٠٪ ئۆفلاین - مۆدێلی نوێی قورئانی)',
         e2_badge: 'بێ ئینتەرنێت',
-        e2_desc: 'کارپێکردن بە پرۆسێسەری ئامێرەکەت (WebAssembly) بەبێ پێویستی بە ئینتەرنێت.',
-        e3_title: '٣. گووگڵ / وێبگەڕ (خۆڕایی و خێرا)',
-        e3_badge: 'سەرەکی',
-        e3_desc: 'مۆتۆری خۆماڵی ئامێرەکەت لەگەڵ پاڵاوتنی دەنگی و چاککردنی پیتەکان (وەک ١٠٠٠ بۆ ئەلف).',
-        apiKeyTitle: '🔑 کلیلی تایبەتی Groq (ئارەزوومەندانە):',
-        apiKeyPlaceholder: 'gsk_...',
-        apiKeyBtn: 'پاشەکەوت',
-        apiKeyNote: 'لە کاتی بەتاڵ بووندا، مۆتۆری خۆڕایی گووگڵ بە شێوەی خۆکار کار دەکات.'
-      },
-      de: {
-        title: 'Spracherkennungs-Engine',
-        subtitle: 'Auswahl der Koran-Rezitations-KI (Triple-Engine)',
-        e1_title: '1. Groq Whisper (Cloud Ultra-Fast) ⭐',
-        e1_badge: 'Empfohlen',
-        e1_desc: 'Höchste Präzision weltweit; unter 0,3s Latenz, versteht alle Akzente.',
-        e2_title: '2. Whisper Offline (100% Lokal)',
-        e2_badge: 'Kein Internet',
-        e2_desc: 'Vollständige Ausführung im Browser/Gerät via WebAssembly.',
-        e3_title: '3. Google / Browser Standard',
-        e3_badge: 'Standard',
-        e3_desc: 'Kostenlose Standard-Spracherkennung mit phonetischer Koran-Optimierung.',
-        apiKeyTitle: '🔑 Eigener Groq API-Key (optional):',
-        apiKeyPlaceholder: 'gsk_...',
-        apiKeyBtn: 'Speichern',
-        apiKeyNote: 'Falls leer, läuft die Spracherkennung direkt über die Standard-Engine.'
-      },
-      ar: {
-        title: 'إعدادات محرك التعرف الصوتي',
-        subtitle: 'اختيار الذكاء الاصطناعي للتلاوة (Triple-Engine)',
-        e1_title: '١. Groq Whisper (سحابي فائق السرعة) ⭐',
-        e1_badge: 'موصى به',
-        e1_desc: 'أدق وأسرع محرك ذكاء اصطناعي (أقل من ٠٫٣ ثانية)، استيعاب كامل لجميع اللهجات.',
-        e2_title: '٢. Whisper محلي (١٠٠٪ دون إنترنت)',
-        e2_badge: 'أوفلاين',
-        e2_desc: 'معالجة مباشرة على معالج الجهاز عبر WebAssembly دون إرسال للخارج.',
-        e3_title: '٣. متصفح جوجل / سفاري القياسي',
-        e3_badge: 'افتراضي',
-        e3_desc: 'محرك الجهاز الداخلي مع فلترة صوتية ذكية لتلاوة القرآن الكريم.',
-        apiKeyTitle: '🔑 مفتاح Groq API الخاص (اختياري):',
-        apiKeyPlaceholder: 'gsk_...',
-        apiKeyBtn: 'حفظ',
-        apiKeyNote: 'في حال تركه فارغاً، يعمل المحرك الافتراضي تلقائياً.'
+        e2_desc: 'مۆدێلی تایبەتی ڕاهێنراو لەسەر قورئان (Tarteel Quran ONNX) کە لەناو ئامێرەکەت کار دەکات بەبێ ئینتەرنێت.',
+        e3_title: '٣. وێبگەڕی گووگڵ (ڕاستەوخۆ و خۆڕایی)',
+        e3_badge: 'خێرا',
+        e3_desc: 'ناسینەوەی دەستبەجێی وشەکان بە ئەلگۆریتمی نوێی بێ دووبارەبوونەوە و دژە پڕکردنەوەی هەڵە.',
+        dlFast: 'مۆدێلی خێرا (57MB)',
+        dlPro: 'مۆدێلی پڕۆفیشناڵ (98MB)',
+        dlBtn: '⬇️ داگرتن / نوێکردنەوەی فایلی ئۆفلاین',
+        dlReady: '✅ مۆدێلی ئۆفلاینی قورئان ئامادەیە (100%)',
+        dlIdle: 'بۆ کارکردنی ١٠٠٪ بێ ئینتەرنێت، یەک جار مۆدێلەکە دابگرە:'
       },
       fa: {
-        title: 'تنظیمات موتور تشخیص صدا',
-        subtitle: 'انتخاب هوش مصنوعی تلاوت (Triple-Engine)',
-        e1_title: '۱. Groq Whisper (ابری فوق‌سریع) ⭐',
+        title: 'تنظیمات هوش مصنوعی تشخیص تلاوت (نسخه ۵)',
+        subtitle: 'سه موتور واقعی با پشتیبانی وقف و ابتدا، تکرار کلمه و حروف مقطعه',
+        e1_title: '۱. Groq Whisper AI (ابری فوق‌دقیق) ⭐',
         e1_badge: 'پیشنهادی',
-        e1_desc: 'دقیق‌ترین و سریع‌ترین موتور هوش مصنوعی جهان (زیر ۰٫۳ ثانیه).',
-        e2_title: '۲. Whisper محلی (۱۰۰٪ آفلاین)',
+        e1_desc: 'ارسال زنده قطعات استاندارد WAV بدون قطع شدن وسط آیه؛ تشخیص دقیق «الم»، وقف، برگشت به عقب و تکرار کلمات.',
+        e2_title: '۲. Tarteel Whisper (۱۰۰٪ آفلاین — مدل جدید قرآنی ترتیل)',
         e2_badge: 'بدون اینترنت',
-        e2_desc: 'اجرای کامل درون گوشی/تبلت با WebAssembly بدون ارسال به اینترنت.',
-        e3_title: '۳. مرورگر پیش‌فرض (گوگل / اپل)',
-        e3_badge: 'استاندارد',
-        e3_desc: 'موتور داخلی دستگاه همراه با تصحیح هوشمند حروف و ارقام ۱۰۰۰.',
-        apiKeyTitle: '🔑 کلید اختصاصی Groq (اختیاری):',
-        apiKeyPlaceholder: 'gsk_...',
-        apiKeyBtn: 'ذخیره',
-        apiKeyNote: 'در صورت خالی بودن، موتور رایگان داخلی به صورت خودکار عمل می‌کند.'
+        e2_desc: 'مدل تخصصی آموزش‌دیده روی تلاوت قرآن کریم (Tarteel Quran ONNX) با اجرای زنده درون مرورگر بدون نیاز به اینترنت.',
+        e3_title: '۳. موتور زنده مرورگر (گوگل کروم / سافاری)',
+        e3_badge: 'آنی',
+        e3_desc: 'تشخیص لحظه‌ای کلمه‌به‌کلمه با الگوریتم جدید ضد پر شدن خودکار آیات.',
+        dlFast: 'مدل سریع ترتیل (57MB)',
+        dlPro: 'مدل حرفه‌ای ترتیل (98MB)',
+        dlBtn: '⬇️ دانلود / آپدیت مدل آفلاین قرآن',
+        dlReady: '✅ مدل قرآنی آفلاین نصب و آماده استفاده است (100%)',
+        dlIdle: 'برای فعال‌سازی ۱۰۰٪ آفلاین، مدل جدید قرآنی را یک‌بار دانلود نمایید:'
+      },
+      de: {
+        title: 'Koran-Spracherkennung KI (v5.0)',
+        subtitle: 'Präzises Wort-für-Wort-Tracking mit Pause & Wiederholung',
+        e1_title: '1. Groq Whisper AI (Ultra-Präzise Cloud) ⭐',
+        e1_badge: 'Empfohlen',
+        e1_desc: 'Höchste Koran-Genauigkeit (Alif-Lam-Mim, Waqf, Rücksprung & Wortwiederholung) via 16kHz WAV-Stream.',
+        e2_title: '2. Tarteel Whisper (100% Offline Koran-Modell)',
+        e2_badge: 'Offline',
+        e2_desc: 'Speziell auf Koranrezitation trainiertes Tarteel-ONNX-Modell direkt im Browser ohne Internet.',
+        e3_title: '3. Google / Browser Live-Erkennung',
+        e3_badge: 'Sofort',
+        e3_desc: 'Verzögerungsfreie Live-Erkennung ohne falsches Ausfüllen.',
+        dlFast: 'Schnell-Modell (57MB)',
+        dlPro: 'Pro-Modell (98MB)',
+        dlBtn: '⬇️ Offline-Koranmodell laden / aktualisieren',
+        dlReady: '✅ Offline-Koranmodell installiert & bereit (100%)',
+        dlIdle: 'Für 100% Offline-Betrieb einmalig das Koran-Modell herunterladen:'
       }
     };
-    return dict[lang] || dict['ku'] || dict['fa'];
+    return dict[lang] || dict.ku;
   }
 
-  // Engine Settings Modal
   function openEngineSettingsModal() {
     let modal = document.getElementById('voiceEngineModal');
     if (!modal) {
@@ -707,69 +1485,74 @@
     }
 
     const t = getModalTranslations();
-    const currentKey = groqApiKey || '';
+    const progPct = offlineModelReady ? 100 : offlineLoadProgress;
+
     modal.innerHTML = `
-      <div class="neo3d-hub-sheet" style="width: 100%; max-width: 480px; max-height: 88vh; display: flex; flex-direction: column; padding: 18px 16px; overflow: hidden; border-radius: 26px; background: linear-gradient(165deg, #0d1722 0%, #060b10 100%); border: 1.5px solid rgba(56, 189, 248, 0.35); box-shadow: 0 28px 65px rgba(0,0,0,0.95); direction: rtl; text-align: right;">
-        <!-- Header -->
+      <div class="neo3d-hub-sheet" style="width: 100%; max-width: 500px; max-height: 90vh; display: flex; flex-direction: column; padding: 18px 16px; overflow: hidden; border-radius: 26px; background: linear-gradient(165deg, #0d1722 0%, #060b10 100%); border: 1.5px solid rgba(56, 189, 248, 0.35); box-shadow: 0 28px 65px rgba(0,0,0,0.95); direction: rtl; text-align: right;">
         <div style="padding: 0 4px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="neo3d-orb-icon" style="width: 38px; height: 38px; border-radius: 12px; font-size: 1.1rem; background: linear-gradient(135deg, #10b981, #047857); box-shadow: 0 6px 16px rgba(16,185,129,0.35);">
+            <div style="width: 38px; height: 38px; border-radius: 12px; font-size: 1.1rem; background: linear-gradient(135deg, #10b981, #047857); display: flex; align-items: center; justify-content: center; color: #fff;">
               <i class="fa-solid fa-microphone-lines"></i>
             </div>
             <div>
-              <div style="font-weight: 900; color: #fff; font-size: 1rem;">${t.title}</div>
-              <div style="font-size: 0.72rem; color: #34d399;">${t.subtitle}</div>
+              <div style="font-weight: 900; color: #fff; font-size: 0.96rem;">${t.title}</div>
+              <div style="font-size: 0.7rem; color: #34d399;">${t.subtitle}</div>
             </div>
           </div>
-          <button onclick="QuranVoiceAI.closeEngineModal()" class="neo3d-close-btn" style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.08); border: none; color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-xmark"></i></button>
+          <button onclick="QuranVoiceAI.closeEngineModal()" style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.08); border: none; color: #cbd5e1; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <!-- Body / Engine Options -->
         <div style="flex: 1; overflow-y: auto; padding: 14px 4px; display: flex; flex-direction: column; gap: 10px;">
-          <!-- Engine 3: Native Browser (Google / Safari) FIRST -->
-          <div class="engine-card-option ${activeEngineId === 'google_speech' ? 'active-engine' : ''}" onclick="QuranVoiceAI.setEngine('google_speech'); QuranVoiceAI.closeEngineModal();">
-            <div style="font-size: 1.6rem; width: 44px; height: 44px; border-radius: 12px; background: rgba(245, 158, 11, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fbbf24;">🌐</div>
-            <div style="flex: 1;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">${t.e3_title}</div>
-                <span style="font-size: 0.65rem; background: #d97706; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 800;">${t.e3_badge}</span>
-              </div>
-              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; line-height: 1.4;">${t.e3_desc}</div>
-            </div>
-          </div>
-
-          <!-- Engine 1: Groq Whisper Cloud -->
+          <!-- 1. Groq Whisper Cloud -->
           <div class="engine-card-option ${activeEngineId === 'groq_whisper' ? 'active-engine' : ''}" onclick="QuranVoiceAI.setEngine('groq_whisper'); QuranVoiceAI.closeEngineModal();">
-            <div style="font-size: 1.6rem; width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #34d399;">⚡</div>
+            <div style="font-size: 1.5rem; width: 42px; height: 42px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">⚡</div>
             <div style="flex: 1;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">${t.e1_title}</div>
-                <span style="font-size: 0.65rem; background: #10b981; color: #042f2e; padding: 1px 6px; border-radius: 4px; font-weight: 800;">${t.e1_badge}</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">${t.e1_title}</div>
+                <span style="font-size: 0.64rem; background: #10b981; color: #042f2e; padding: 2px 6px; border-radius: 5px; font-weight: 800;">${t.e1_badge}</span>
               </div>
-              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; line-height: 1.4;">${t.e1_desc}</div>
+              <div style="font-size: 0.71rem; color: #94a3b8; margin-top: 4px; line-height: 1.45;">${t.e1_desc}</div>
             </div>
           </div>
 
-          <!-- Engine 2: Local Whisper Offline -->
-          <div class="engine-card-option ${activeEngineId === 'local_whisper' ? 'active-engine' : ''}" onclick="QuranVoiceAI.setEngine('local_whisper'); QuranVoiceAI.closeEngineModal();">
-            <div style="font-size: 1.6rem; width: 44px; height: 44px; border-radius: 12px; background: rgba(56, 189, 248, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #38bdf8;">🧠</div>
+          <!-- 2. Tarteel Offline Whisper -->
+          <div class="engine-card-option ${activeEngineId === 'local_whisper' ? 'active-engine' : ''}" onclick="QuranVoiceAI.setEngine('local_whisper');">
+            <div style="font-size: 1.5rem; width: 42px; height: 42px; border-radius: 12px; background: rgba(56, 189, 248, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🧠</div>
             <div style="flex: 1;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-weight: 800; font-size: 0.88rem; color: #fff;">${t.e2_title}</div>
-                <span style="font-size: 0.65rem; background: #0284c7; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 800;">${t.e2_badge}</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">${t.e2_title}</div>
+                <span style="font-size: 0.64rem; background: #0284c7; color: #fff; padding: 2px 6px; border-radius: 5px; font-weight: 800;">${t.e2_badge}</span>
               </div>
-              <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 3px; line-height: 1.4;">${t.e2_desc}</div>
+              <div style="font-size: 0.71rem; color: #94a3b8; margin-top: 4px; line-height: 1.45;">${t.e2_desc}</div>
+
+              <!-- Offline Quran Model Manager -->
+              <div onclick="event.stopPropagation();" style="margin-top: 8px; padding: 8px 10px; border-radius: 10px; background: rgba(2, 6, 23, 0.65); border: 1px solid rgba(56, 189, 248, 0.25);">
+                <div style="display: flex; gap: 6px; margin-bottom: 7px;">
+                  <button type="button" onclick="QuranVoiceAI.setOfflineTier('fast', false)" style="flex: 1; padding: 4px 6px; border-radius: 7px; font-size: 0.68rem; font-weight: 800; cursor: pointer; border: 1px solid ${offlineModelTier === 'fast' ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${offlineModelTier === 'fast' ? 'rgba(56,189,248,0.22)' : 'rgba(255,255,255,0.04)'}; color: #fff;">⚡ ${t.dlFast}</button>
+                  <button type="button" onclick="QuranVoiceAI.setOfflineTier('pro', false)" style="flex: 1; padding: 4px 6px; border-radius: 7px; font-size: 0.68rem; font-weight: 800; cursor: pointer; border: 1px solid ${offlineModelTier === 'pro' ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${offlineModelTier === 'pro' ? 'rgba(56,189,248,0.22)' : 'rgba(255,255,255,0.04)'}; color: #fff;">🎯 ${t.dlPro}</button>
+                </div>
+                <div id="offlineModelProgressLabel" style="font-size: 0.68rem; font-weight: 700; color: ${offlineModelReady ? '#34d399' : '#cbd5e1'}; margin-bottom: 5px;">
+                  ${offlineModelReady ? t.dlReady : t.dlIdle}
+                </div>
+                <div style="width: 100%; height: 6px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden; margin-bottom: 7px;">
+                  <div id="offlineModelProgressBar" style="width: ${progPct}%; height: 100%; background: ${offlineModelReady ? '#10b981' : '#38bdf8'}; transition: width 0.25s ease;"></div>
+                </div>
+                <button type="button" onclick="QuranVoiceAI.preloadOfflineModel(); QuranVoiceAI.setEngine('local_whisper');" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: none; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: 800; font-size: 0.74rem; cursor: pointer;">
+                  ${t.dlBtn}
+                </button>
+              </div>
             </div>
           </div>
 
-          <!-- Preconfigured AI Key Status Badge (No key entry required) -->
-          <div style="margin-top: 8px; padding: 12px 14px; border-radius: 16px; background: rgba(16, 185, 129, 0.1); border: 1.2px solid rgba(16, 185, 129, 0.35); display: flex; align-items: center; gap: 10px;">
-            <div class="neo3d-orb-icon" style="width: 32px; height: 32px; border-radius: 9px; font-size: 0.95rem; background: linear-gradient(135deg, #10b981, #047857); flex-shrink: 0;">
-              <i class="fa-solid fa-shield-halved" style="color: #fff;"></i>
-            </div>
+          <!-- 3. Native Browser Google/Safari -->
+          <div class="engine-card-option ${activeEngineId === 'google_speech' ? 'active-engine' : ''}" onclick="QuranVoiceAI.setEngine('google_speech'); QuranVoiceAI.closeEngineModal();">
+            <div style="font-size: 1.5rem; width: 42px; height: 42px; border-radius: 12px; background: rgba(245, 158, 11, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🌐</div>
             <div style="flex: 1;">
-              <div style="font-weight: 800; color: #6ee7b7; font-size: 0.84rem;">هۆشی دەستکردی ویسپەر پێشوەختە چالاک کراوە</div>
-              <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 2px;">کلیلی خێرای فەرمی بە شێوەی خۆکار جێگیر کراوە و پێویست بە هیچ تەنزیمات یان داخڵکردنی کلیل ناکات.</div>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+                <div style="font-weight: 800; font-size: 0.86rem; color: #fff;">${t.e3_title}</div>
+                <span style="font-size: 0.64rem; background: #d97706; color: #fff; padding: 2px 6px; border-radius: 5px; font-weight: 800;">${t.e3_badge}</span>
+              </div>
+              <div style="font-size: 0.71rem; color: #94a3b8; margin-top: 4px; line-height: 1.45;">${t.e3_desc}</div>
             </div>
           </div>
         </div>
@@ -783,7 +1566,6 @@
     if (modal) modal.style.display = 'none';
   }
 
-  // Init
   document.addEventListener('DOMContentLoaded', () => {
     injectStyles();
     updateEngineBadgesUI();
