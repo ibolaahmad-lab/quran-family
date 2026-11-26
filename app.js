@@ -189,27 +189,19 @@ try {
   }
 } catch (e) {}
 
-// Authentic Tajweed Markup Provider (Madd, Ghunnah, Qalqalah - zero intra-word break)
+// Clean Arabic Text Provider & Pure Medina Mushaf Formatter (No letter-splitting intra-word spans, preserves compact cohesive 15-line layout)
 function applyTajweedMarkup(text) {
   if (!text) return '';
-  const clean = cleanArabicText(text);
-  if (!state.tajweedEnabled) return clean;
-
-  // 1. Madd: letters with Quranic maddah sign (\u0653)
-  let res = clean.replace(/([^\s\u0640]?[\u0653])/g, '<span class="tj-madd">$1</span>');
-
-  // 2. Ghunnah: Noon or Meem with Shaddah (\u0651)
-  res = res.replace(/([نم][\u064b-\u0650\u0652]*\u0651[\u064b-\u0650\u0652]*)/g, '<span class="tj-ghunnah">$1</span>');
-
-  // 3. Qalqalah: قطبجد with Sukun (\u0652 or \u06e1)
-  res = res.replace(/([قطبجد][\u0652\u06e1])/g, '<span class="tj-qalqalah">$1</span>');
-
-  return res;
+  return cleanArabicText(text);
 }
 window.applyTajweedMarkup = applyTajweedMarkup;
 
 function toggleTajweed() {
   state.tajweedEnabled = !state.tajweedEnabled;
+  const card = document.getElementById('mushafPageCard');
+  if (card) {
+    card.classList.toggle('tajweed-mode-active', state.tajweedEnabled);
+  }
   const btn = document.getElementById('tajweedToggleBtn');
   if (btn) {
     btn.classList.toggle('active', state.tajweedEnabled);
@@ -225,10 +217,7 @@ function toggleTajweed() {
     tbBtn.style.color = state.tajweedEnabled ? '#ffffff' : '#6ee7b7';
     tbBtn.style.borderColor = state.tajweedEnabled ? '#34d399' : 'rgba(16,185,129,0.35)';
   }
-  if (state.activeTab === 'mushaf') {
-    renderInteractiveMushaf();
-  }
-  showToast(state.tajweedEnabled ? '🎨 ڕەنگەکانی تەجوید لە مەسحەفدا چالاککران' : '📖 دەقی سادەی عوسمانی چالاککرا');
+  showToast(state.tajweedEnabled ? '🎨 دۆخی تەجوید لە مەسحەفدا چالاککرا' : '📖 دەقی سادەی عوسمانی چالاککرا');
 }
 window.toggleTajweed = toggleTajweed;
 
@@ -2158,6 +2147,7 @@ function createTafsirNamiPlayer(videoId) {
 }
 
 function pauseTafsirNamiAudio() {
+  if (typeof updateTafsirNamiAudioUI === "function") updateTafsirNamiAudioUI(false);
   if (tafsirNamiYtPlayer) {
     try {
       if (typeof tafsirNamiYtPlayer.pauseVideo === 'function') {
@@ -2190,6 +2180,58 @@ function stopTafsirNamiAudio() {
   }
 }
 window.stopTafsirNamiAudio = stopTafsirNamiAudio;
+
+
+// ============================================================
+// TAFSIR NAMI DEDICATED AUDIO ENGINE (Seek, Pause, Play, Stepper)
+// ============================================================
+function tafsirNamiSeek(seconds) {
+  if (tafsirNamiYtPlayer && typeof tafsirNamiYtPlayer.getCurrentTime === 'function' && typeof tafsirNamiYtPlayer.seekTo === 'function') {
+    const cur = tafsirNamiYtPlayer.getCurrentTime() || 0;
+    const target = Math.max(0, cur + seconds);
+    tafsirNamiYtPlayer.seekTo(target, true);
+    if (typeof showToast === 'function') {
+      showToast(seconds > 0 ? `⏩ ١٥ چرکە بەرەو پێش (${formatTimecodeDisplay(target)})` : `⏪ ١٥ چرکە بەرەو دوا (${formatTimecodeDisplay(target)})`);
+    }
+  } else {
+    playTafsirNamiSurahAudio(currentTafsirNamiSurah || state.tafsirSurah || 1);
+  }
+}
+window.tafsirNamiSeek = tafsirNamiSeek;
+
+function toggleTafsirNamiAudio(surahNum) {
+  surahNum = parseInt(surahNum, 10) || currentTafsirNamiSurah || state.tafsirSurah || 1;
+  if (state.playbackSource === 'tafsirNami' && state.isPlaying) {
+    pauseTafsirNamiAudio();
+    updateTafsirNamiAudioUI(false);
+    if (typeof showToast === 'function') showToast('⏸️ دەنگی تەفسیری نامی وەستێنرا');
+  } else {
+    playTafsirNamiSurahAudio(surahNum);
+    updateTafsirNamiAudioUI(true);
+  }
+}
+window.toggleTafsirNamiAudio = toggleTafsirNamiAudio;
+
+function updateTafsirNamiAudioUI(isPlaying) {
+  // 1. In paneTafsirPdf
+  const playBtn = document.getElementById('namiPlayBtn');
+  const playIcon = document.getElementById('namiPlayIcon');
+  const playLabel = document.getElementById('namiPlayLabel');
+  if (playIcon) playIcon.className = isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+  if (playLabel) playLabel.textContent = isPlaying ? 'وەستان' : 'پەخش';
+  if (playBtn) playBtn.style.background = isPlaying ? 'linear-gradient(135deg, #ef4444, #b91c1c)' : 'linear-gradient(135deg, #a855f7, #7c3aed)';
+
+  // 2. In namiPdfModal
+  const mPlayBtn = document.getElementById('namiModalPlayBtn');
+  const mPlayIcon = document.getElementById('namiModalPlayIcon');
+  const mPlayLabel = document.getElementById('namiModalPlayLabel');
+  if (mPlayIcon) mPlayIcon.className = isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+  if (mPlayLabel) mPlayLabel.textContent = isPlaying ? 'وەستان' : 'پەخش';
+  if (mPlayBtn) mPlayBtn.style.background = isPlaying ? 'linear-gradient(135deg, #ef4444, #b91c1c)' : 'linear-gradient(135deg, #a855f7, #7c3aed)';
+
+  updateDockDisplay();
+}
+window.updateTafsirNamiAudioUI = updateTafsirNamiAudioUI;
 
 function playTafsirNamiSurahAudio(surahNum) {
   surahNum = parseInt(surahNum, 10) || (state.tafsirSurah || state.currentSurah || 1);
