@@ -437,11 +437,11 @@
       ]
     },
     duas: {
-      titleDe: '🤲 Bittgebete, Dalā'il & Burdah',
-      titleEn: '🤲 Supplications, Dalā'il & Burdah',
+      titleDe: '🤲 Bittgebete, Dalā\'il & Burdah',
+      titleEn: '🤲 Supplications, Dalā\'il & Burdah',
       titleKu: '🤲 دوعاکان، دەلائلولخەیرات و قەسیدەی بوردە',
-      subDe: 'Dalā'il al-Khayrāt · Qasīda al-Burdah · Rabbana & Adhkār',
-      subEn: 'Dalā'il al-Khayrāt · Qasīda al-Burdah · Rabbana & Adhkār',
+      subDe: 'Dalā\'il al-Khayrāt · Qasīda al-Burdah · Rabbana & Adhkār',
+      subEn: 'Dalā\'il al-Khayrāt · Qasīda al-Burdah · Rabbana & Adhkār',
       subKu: 'دەلائلولخەیرات · قەسیدەی بوردە · دوعاکانی ڕەببەنا و زیکرەکان',
       color: '#10b981',
       items: [
@@ -449,8 +449,8 @@
           icon: 'fa-book-quran',
           grad: 'linear-gradient(135deg, #10b981, #047857)',
           glow: 'rgba(16, 185, 129, 0.45)',
-          titleDe: 'Dalā'il al-Khayrāt (دلائل الخيرات)',
-          titleEn: 'Dalā'il al-Khayrāt (Complete Ahzab + Audio)',
+          titleDe: 'Dalā\'il al-Khayrāt (دلائل الخيرات)',
+          titleEn: 'Dalā\'il al-Khayrāt (Complete Ahzab + Audio)',
           titleKu: 'پەڕتووکی دەلائلولخەیرات (حزب بە حزب + دەنگ)',
           descDe: 'Eröffnung, 201 Namen & alle 8 Tages-Ahzāb zum Mitlesen & Abspielen',
           descEn: 'Opening, 201 Names & all 8 daily Ahzāb with audio',
@@ -3225,7 +3225,7 @@
     const m = mode || window.activeSpiritualSubView || 'dalail_list';
 
     if (m.startsWith('dalail')) {
-      if (titleEl) titleEl.textContent = "Dalā'il al-Khayrāt (دلائل الخيرات)";
+      if (titleEl) titleEl.textContent = "Dalā\'il al-Khayrāt (دلائل الخيرات)";
       if (subEl) subEl.textContent = 'Imam al-Dschazūlī · Eröffnung, 201 Namen & die 8 Tages-Ahzāb mit Audio';
       if (iconEl) iconEl.className = 'fa-solid fa-book-quran';
     } else if (m.startsWith('burda')) {

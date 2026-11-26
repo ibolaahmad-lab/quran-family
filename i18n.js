@@ -373,7 +373,7 @@ const I18N_TRANSLATIONS = {
     bookmark_verse: "نیشانەکردن",
     share_verse: "کۆپیکردن",
     copied_alert: "ئایەتەکە کۆپی کرا!",
-    quick_search: "گەڕان لە قورئان",
+    quick_search: "گەڕان",
     quick_search_placeholder: "ناوی سورەت، ژمارەی ئایەت یان وشەیەک بنووسە...",
     streak_label: "رۆژی بەردەوام",
     memorized_stat: "ئایەتی لەبەرکراو",
