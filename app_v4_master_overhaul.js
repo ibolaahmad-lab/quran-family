@@ -291,6 +291,8 @@
       titleEn: '📖 Quran Studios (1–4)',
       titleKu: '📖 ستۆدیۆکانی قورئان (١–٤)',
       subDe: 'Muṣḥaf & Lesung · Wort-für-Wort Studio · Smarte Rezitation · Tafsīr',
+      subEn: 'Muṣḥaf & Reading · Word-for-Word · Smart Recitation · Tafsīr',
+      subKu: 'مەسحەف و خوێندنەوە · وشە بە وشە · دەنگی زیرەک · تەفسیر',
       color: '#f59e0b',
       items: [
         {
@@ -301,6 +303,8 @@
           titleEn: '1. Muṣḥaf & Reading',
           titleKu: '١. مەسحەف و خوێندنەوە',
           descDe: '604 Seiten · Uthmān-Taha Text, Tajweed & HD Medina Scan',
+          descEn: '604 Pages · Uthmān-Taha Text, Tajweed & HD Medina Scan',
+          descKu: '٦٠٤ لاپەڕە · دەقی عوسمان تەها، ڕەنگەکانی تەجوید و سکانی فەرمی مەدینە',
           badge: '604 Seiten',
           action: "switchMainTab('mushaf')"
         },
@@ -312,6 +316,8 @@
           titleEn: '2. Word-for-Word Studio',
           titleKu: '٢. ستۆدیۆی وشە بە وشە',
           descDe: 'Wort-Analyse, Einzelwort-Audio & Stufen-Hifz',
+          descEn: 'Word Analysis, Single Word Audio & Progressive Hifz',
+          descKu: 'شیکاری وشە بە وشە، دەنگی تاکە وشە و قۆناغەکانی لەبەرکردن',
           badge: 'Wort-Audio',
           action: "switchMainTab('wordStudio')"
         },
@@ -323,6 +329,8 @@
           titleEn: '3. Smart Recitation & Hifz',
           titleKu: '٣. خوێندنەوەی زیرەک و لەبەرکردن',
           descDe: '1. Einzelvers-Modus & 2. Fortlaufend-Modus mit KI-Fehlererkennung',
+          descEn: '1. Single Verse & 2. Continuous Mode with AI Recognition',
+          descKu: '١. تاک ئایەت و ٢. بەردەوام بە دیاریکردنی هەڵە بە دەنگ',
           badge: 'Tarteel AI 🎙️',
           action: "switchMainTab('micTest')"
         },
@@ -334,6 +342,8 @@
           titleEn: '4. Tafsīr & Translations',
           titleKu: '٤. تەفسیر و وەرگێڕانەکان',
           descDe: 'Bubenheim · Amir Zaidan · Al-Muyassar · Tafsīr Nāmī Buch (PDF)',
+          descEn: 'Bubenheim · Amir Zaidan · Al-Muyassar · Tafsīr Nāmī Book (PDF)',
+          descKu: 'تەفسیری کوردی ڕێبەر و پوختە · پەڕتووکی تەفسیری نامی (PDF) و ئەوانی تر',
           badge: 'Alle 114 Suren',
           action: "switchMainTab('tafsir')"
         }
@@ -344,6 +354,8 @@
       titleEn: '🎓 Learning & Study',
       titleKu: '🎓 فێربوون و خوێندنەوە',
       subDe: 'Tafsīr & Übersetzungen · 5-Stufen Hifz',
+      subEn: 'Tafsīr & Translations · 5-Stage Hifz',
+      subKu: 'تەفسیر و وەرگێڕانەکان · ٥ قۆناغی لەبەرکردن',
       color: '#ec4899',
       items: [
         {
@@ -354,6 +366,8 @@
           titleEn: 'Tafsīr & Translations',
           titleKu: 'تەفسیر و وەرگێڕانەکان',
           descDe: 'Bubenheim · Amir Zaidan · Al-Muyassar · Tafsīr Nāmī Buch (PDF)',
+          descEn: 'Bubenheim · Amir Zaidan · Al-Muyassar · Tafsīr Nāmī Book (PDF)',
+          descKu: 'تەفسیری کوردی ڕێبەر و پوختە · پەڕتووکی تەفسیری نامی (PDF)',
           badge: 'Alle 114 Suren',
           action: "switchMainTab('tafsir')"
         },
@@ -365,6 +379,8 @@
           titleEn: '5-Stage Hifz Learning Studio',
           titleKu: 'ستۆدیۆی ٥ قۆناغی لەبەرکردن',
           descDe: '5-Stufen Resonanz-Training & Endlos-Loop (1× bis ∞)',
+          descEn: '5-Stage Resonance Training & Endless Loop (1× to ∞)',
+          descKu: 'ڕاهێنانی ٥ قۆناغی لەبەرکردن و دووبارەکردنەوەی بێ کۆتایی',
           badge: '5 Stufen 🎧',
           action: "switchMainTab('repetition')"
         }
@@ -375,6 +391,8 @@
       titleEn: '📊 Tracking & Quiz',
       titleKu: '📊 بەدواداچوون و تاقیکردنەوە',
       subDe: 'Hifz-Archiv ⭐ · Hifz-Quiz · Khatm-Planer',
+      subEn: 'Hifz Archive ⭐ · Hifz Quiz · Khatm Planner',
+      subKu: 'ئەرشیفی حیفظ ⭐ · تاقیکردنەوە · پلانی خەتم',
       color: '#a855f7',
       items: [
         {
@@ -385,17 +403,21 @@
           titleEn: 'Hifz Progress & Starred Archive',
           titleKu: 'ئەرشیفی لەبەرکردن و نیشانەکراوەکان ⭐',
           descDe: 'Alle markierten Suren, Seiten & gelernten Verse an einem Ort',
+          descEn: 'All bookmarked Surahs, pages & memorized verses in one place',
+          descKu: 'هەموو سورەت و لاپەڕە و ئایەتە لەبەرکراوەکان لە یەک شوێن',
           badge: 'Markierungen ⭐',
           action: "switchMainTab('hifzArchive')"
         },
         {
           icon: 'fa-microphone-lines',
           grad: 'linear-gradient(135deg, #10b981, #059669)',
-          glow: 'rgba(16, 185, 129, 0.4)',
+          glow: 'rgba(168, 85, 247, 0.4)',
           titleDe: 'Hifz-Quiz & Prüfung',
           titleEn: 'Hifz Quiz & Continuation',
           titleKu: 'تاقیکردنەوەی حیفظ',
           descDe: 'Sure wählen und den nächsten Vers per Mikrofon oder Auswahl fortsetzen',
+          descEn: 'Choose Surah and recite next verse via microphone or choices',
+          descKu: 'سورەتێک دیاری بکە و ئایەتی دواتر بە دەنگ یان بژاردە تەواو بکە',
           badge: 'Interaktiv 🎙️',
           action: "switchMainTab('quiz')"
         },
@@ -407,26 +429,32 @@
           titleEn: 'Khatm Quran Planner',
           titleKu: 'پلاندانەری خەتمی قورئان',
           descDe: 'Visueller 3D-Fortschrittsring (604 Seiten) mit direktem Muṣḥaf-Sprung',
+          descEn: 'Visual 3D progress ring (604 pages) with direct Muṣḥaf jump',
+          descKu: 'پێشکەوتنی بینراوی ٣D لە ٦٠٤ لاپەڕە بە ڕۆیشتن بۆ ناو مەسحەف',
           badge: '604 Seiten',
           action: "switchMainTab('khatm')"
         }
       ]
     },
     duas: {
-      titleDe: '🤲 Bittgebete, Dalā\'il & Burdah',
-      titleEn: '🤲 Supplications, Dalā\'il & Burdah',
+      titleDe: '🤲 Bittgebete, Dalā'il & Burdah',
+      titleEn: '🤲 Supplications, Dalā'il & Burdah',
       titleKu: '🤲 دوعاکان، دەلائلولخەیرات و قەسیدەی بوردە',
-      subDe: 'Dalā\'il al-Khayrāt · Qasīda al-Burdah · Rabbana & Adhkār',
+      subDe: 'Dalā'il al-Khayrāt · Qasīda al-Burdah · Rabbana & Adhkār',
+      subEn: 'Dalā'il al-Khayrāt · Qasīda al-Burdah · Rabbana & Adhkār',
+      subKu: 'دەلائلولخەیرات · قەسیدەی بوردە · دوعاکانی ڕەببەنا و زیکرەکان',
       color: '#10b981',
       items: [
         {
           icon: 'fa-book-quran',
           grad: 'linear-gradient(135deg, #10b981, #047857)',
           glow: 'rgba(16, 185, 129, 0.45)',
-          titleDe: 'Dalā\'il al-Khayrāt (دلائل الخيرات)',
-          titleEn: 'Dalā\'il al-Khayrāt (Complete Ahzab + Audio)',
+          titleDe: 'Dalā'il al-Khayrāt (دلائل الخيرات)',
+          titleEn: 'Dalā'il al-Khayrāt (Complete Ahzab + Audio)',
           titleKu: 'پەڕتووکی دەلائلولخەیرات (حزب بە حزب + دەنگ)',
           descDe: 'Eröffnung, 201 Namen & alle 8 Tages-Ahzāb zum Mitlesen & Abspielen',
+          descEn: 'Opening, 201 Names & all 8 daily Ahzāb with audio',
+          descKu: 'دەستپێک، ٢٠١ ناوەکانی پێغەمبەر ﷺ و هەموو ٨ حیزبەکە بە خوێندنەوە و دەنگ',
           badge: 'Mit Audio ▶️',
           action: "openSpiritualFeature('dalail_list')"
         },
@@ -438,6 +466,8 @@
           titleEn: 'Qasīda al-Burdah (All 10 Chapters + Audio)',
           titleKu: 'قەسیدەی بوردەی ئیمامی بوصەیری (١٠ فەسڵ + دەنگ)',
           descDe: 'Alle 10 Kapitel von Imam al-Būṣīrī Vers für Vers mit Refrain & Audio',
+          descEn: 'All 10 chapters by Imam al-Būṣīrī with refrain & audio',
+          descKu: 'هەموو ١٠ فەسڵەکەی ئیمامی بوصەیری بە دەقی تەواو و دەنگ',
           badge: '10 Kapitel ▶️',
           action: "openSpiritualFeature('burda_list')"
         },
@@ -449,6 +479,8 @@
           titleEn: '40 Rabbana Duas & Prophetic Adhkar',
           titleKu: '٤٠ دوعای ڕەببەنا و زیکرەکانی بەیانیان و ئێواران',
           descDe: '40 Rabbana-Bittgebete, Morgen-, Abend- & Nacht-Adhkār mit Audio',
+          descEn: '40 Rabbana duas, morning, evening & night adhkar with audio',
+          descKu: '٤٠ دوعای قورئانی ڕەببەنا، زیکرەکانی بەیانیان و ئێواران و خەوتن بە دەنگ',
           badge: 'Mit Audio 🔊',
           action: "openSpiritualFeature('duas_reader')"
         }
@@ -478,6 +510,7 @@
 
     const lang = window.currentAppLanguage || 'de';
     const mainTitle = lang === 'ku' ? cfg.titleKu : (lang === 'en' ? cfg.titleEn : cfg.titleDe);
+    const subTitle = lang === 'ku' ? (cfg.subKu || cfg.subDe) : (lang === 'en' ? (cfg.subEn || cfg.subDe) : cfg.subDe);
 
     const cardsHtml = cfg.items.map(item => {
       const t = lang === 'ku' ? item.titleKu : (lang === 'en' ? item.titleEn : item.titleDe);
@@ -491,7 +524,7 @@
               <span style="font-weight: 800; font-size: 1rem; color: #f8fafc;">${t}</span>
               <span style="font-size: 0.7rem; font-weight: 800; padding: 3px 9px; border-radius: 20px; background: rgba(255,255,255,0.08); color: #fef08a; white-space: nowrap;">${item.badge}</span>
             </div>
-            <div style="font-size: 0.8rem; color: #94a3b8; line-height: 1.4;">${item.descDe}</div>
+            <div style="font-size: 0.8rem; color: #94a3b8; line-height: 1.4;">${lang === 'ku' ? (item.descKu || item.descDe) : (lang === 'en' ? (item.descEn || item.descDe) : item.descDe)}</div>
           </div>
           <i class="fa-solid fa-chevron-right" style="color: #64748b; font-size: 0.9rem;"></i>
         </div>
@@ -503,7 +536,7 @@
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.08);">
           <div>
             <h3 style="margin: 0; font-size: 1.25rem; font-weight: 900; color: #fff; letter-spacing: 0.2px;">${mainTitle}</h3>
-            <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 3px;">${cfg.subDe}</div>
+            <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 3px;">${subTitle}</div>
           </div>
           <button onclick="closeCategoryHub()" class="neo3d-close-btn" title="Schließen">
             <i class="fa-solid fa-xmark"></i>

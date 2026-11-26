@@ -5,6 +5,33 @@
 
 const I18N_TRANSLATIONS = {
   de: {
+    settings: "Einstellungen",
+    smart_audio: "Smart Audio",
+    drawer_cat_studios_title: "Koran-Studios",
+    drawer_cat_studios_sub: "Muṣḥaf · Wort-für-Wort · Tafsīr",
+    drawer_item_mushaf_title: "Muṣḥaf & Lesung",
+    drawer_item_mushaf_desc: "604 Seiten · Uthmānī Text & HD Scan",
+    drawer_item_wordstudio_title: "Wort-für-Wort Studio",
+    drawer_item_wordstudio_desc: "Wort-Analyse · Ganze Verse · Stufen-Hifz",
+    drawer_item_tafsir_title: "Tafsīr & Übersetzungen",
+    drawer_item_tafsir_desc: "Bubenheim · Zaidan · Al-Muyassar · Nāmī PDF",
+    drawer_cat_tracking_title: "Verfolgen & Prüfung",
+    drawer_cat_tracking_sub: "Smarte Rezitation · Hifz-Quiz & Prüfung",
+    drawer_item_recite_title: "Smarte Rezitation (Tarteel)",
+    drawer_item_recite_desc: "Einzelvers & Fortlaufend mit Mikrofon",
+    drawer_item_quiz_title: "Hifz-Quiz & Prüfung",
+    drawer_item_quiz_desc: "Mit Mikrofon & Auswahl-Antworten",
+    drawer_cat_duas_title: "Dalā'il al-Khayrāt & Burdah",
+    drawer_cat_duas_sub: "Dalā'il al-Khayrāt · Qasīda al-Burdah",
+    drawer_item_dalail_title: "Dalā'il al-Khayrāt",
+    drawer_item_dalail_desc: "Alle 8 Tages-Ahzāb mit Audio",
+    drawer_item_burdah_title: "Qasīda al-Burdah",
+    drawer_item_burdah_desc: "Alle 10 Kapitel mit Audio",
+    drawer_hujra_title: "وانەکانی حوجرە",
+    drawer_hujra_desc: "دەرس و وانە ئایینییەکان لە دەنگی مامۆستایان",
+    khatm_planer_title: "Khatm-Plan",
+    khatm_planer_sub: "604 Seiten · 30 Tage",
+
     app_title: "Quran Ultimate",
     app_subtitle: "☽ Für meine geliebte Frau",
     home: "Start",
@@ -104,6 +131,33 @@ const I18N_TRANSLATIONS = {
 
   },
   en: {
+    settings: "Settings",
+    smart_audio: "Smart Audio",
+    drawer_cat_studios_title: "Quran Studios",
+    drawer_cat_studios_sub: "Muṣḥaf · Word-by-Word · Tafsīr",
+    drawer_item_mushaf_title: "Muṣḥaf & Reading",
+    drawer_item_mushaf_desc: "604 Pages · Uthmānī Text & HD Scan",
+    drawer_item_wordstudio_title: "Word-by-Word Studio",
+    drawer_item_wordstudio_desc: "Word Analysis · Full Verses · Progressive Hifz",
+    drawer_item_tafsir_title: "Tafsīr & Translations",
+    drawer_item_tafsir_desc: "Bubenheim · Zaidan · Al-Muyassar · Nāmī PDF",
+    drawer_cat_tracking_title: "Tracking & Exam",
+    drawer_cat_tracking_sub: "Smart Recitation · Hifz Quiz & Exam",
+    drawer_item_recite_title: "Smart Recitation (Tarteel)",
+    drawer_item_recite_desc: "Single Verse & Continuous with Mic",
+    drawer_item_quiz_title: "Hifz Quiz & Exam",
+    drawer_item_quiz_desc: "With Microphone & Multiple Choice",
+    drawer_cat_duas_title: "Dalā'il al-Khayrāt & Burdah",
+    drawer_cat_duas_sub: "Dalā'il al-Khayrāt · Qasīda al-Burdah",
+    drawer_item_dalail_title: "Dalā'il al-Khayrāt",
+    drawer_item_dalail_desc: "All 8 Daily Ahzāb with Audio",
+    drawer_item_burdah_title: "Qasīda al-Burdah",
+    drawer_item_burdah_desc: "All 10 Chapters with Audio",
+    drawer_hujra_title: "وانەکانی حوجرە",
+    drawer_hujra_desc: "دەرس و وانە ئایینییەکان لە دەنگی مامۆستایان",
+    khatm_planer_title: "Khatm Plan",
+    khatm_planer_sub: "604 Pages · 30 Days",
+
     app_title: "Quran Ultimate",
     app_subtitle: "☽ For My Beloved Wife",
     home: "Home",
@@ -203,6 +257,33 @@ const I18N_TRANSLATIONS = {
 
   },
   ku: {
+    settings: "ڕێکخستنەکان",
+    smart_audio: "دەنگی زیرەک",
+    drawer_cat_studios_title: "ستۆدیۆکانی قورئان",
+    drawer_cat_studios_sub: "مەسحەف · وشە بە وشە · تەفسیر",
+    drawer_item_mushaf_title: "مەسحەف و خوێندنەوە",
+    drawer_item_mushaf_desc: "٦٠٤ لاپەڕە · دەقی عوسمانی و سکانی مەدینە",
+    drawer_item_wordstudio_title: "ستۆدیۆی وشە بە وشە",
+    drawer_item_wordstudio_desc: "شیکاری وشە · تەواوی ئایەتەکان · لەبەرکردن",
+    drawer_item_tafsir_title: "تەفسیر و وەرگێڕانەکان",
+    drawer_item_tafsir_desc: "تەفسیری ڕێبەر · پوختە · نامی و ئەوانی تر",
+    drawer_cat_tracking_title: "بەدواداچوون و تاقیکردنەوە",
+    drawer_cat_tracking_sub: "خوێندنەوەی زیرەک · تاقیکردنەوەی حیفز",
+    drawer_item_recite_title: "خوێندنەوەی زیرەک (تەرتیل)",
+    drawer_item_recite_desc: "تاک ئایەت و بەردەوام بە مایکرۆفۆن",
+    drawer_item_quiz_title: "تاقیکردنەوە و کوئیزی حیفز",
+    drawer_item_quiz_desc: "بە مایکرۆفۆن و هەڵبژاردنی وەڵام",
+    drawer_cat_duas_title: "دەلیلولخەیرات و قەسیدەی بوردە",
+    drawer_cat_duas_sub: "دەلیلولخەیرات · قەسیدەی بوردە لەگەڵ دەنگ",
+    drawer_item_dalail_title: "دەلیلولخەیرات",
+    drawer_item_dalail_desc: "هەموو حیزبەکانی ڕۆژانە لەگەڵ دەنگ",
+    drawer_item_burdah_title: "قەسیدەی بوردە",
+    drawer_item_burdah_desc: "هەموو ١٠ بەشەکەی بوردە بە دەنگ",
+    drawer_hujra_title: "وانەکانی حوجرە",
+    drawer_hujra_desc: "دەرس و وانە ئایینییەکان لە دەنگی مامۆستایان",
+    khatm_planer_title: "پلانی خەتم",
+    khatm_planer_sub: "٦٠٤ لاپەڕە · ٣٠ ڕۆژ",
+
     app_title: "قورئان ئاڵتمێت (Quran Ultimate)",
     app_subtitle: "☽ پێشکەش بە هاوسەری ئازیزم",
     home: "سەرەکی",
@@ -303,7 +384,7 @@ const I18N_TRANSLATIONS = {
   }
 };
 
-let currentAppLanguage = localStorage.getItem('quran_app_language') || 'de';
+let currentAppLanguage = localStorage.getItem('quran_app_language') || 'ku';
 
 function t(key) {
   const langTable = I18N_TRANSLATIONS[currentAppLanguage] || I18N_TRANSLATIONS['de'];
@@ -311,8 +392,9 @@ function t(key) {
 }
 
 function setAppLanguage(lang) {
-  if (!I18N_TRANSLATIONS[lang]) lang = 'de';
+  if (!I18N_TRANSLATIONS[lang]) lang = 'ku';
   currentAppLanguage = lang;
+  window.currentAppLanguage = lang;
   try {
     localStorage.setItem('quran_app_language', lang);
   } catch (e) {}
@@ -325,23 +407,20 @@ function setAppLanguage(lang) {
     }
   });
 
-  // Apply title/placeholder if present
-  document.querySelectorAll('[data-i18n-title]').forEach(el => {
-    const key = el.getAttribute('data-i18n-title');
-    if (key && I18N_TRANSLATIONS[lang] && I18N_TRANSLATIONS[lang][key]) {
-      el.setAttribute('title', I18N_TRANSLATIONS[lang][key]);
-    }
+  // Highlight active lang pill in settings modal if present
+  ['de', 'en', 'ku'].forEach(l => {
+    const btn = document.getElementById('langCardBtn_' + l);
+    if (btn) btn.classList.toggle('active', l === lang);
   });
 
-  // Update language select elements
-  ['modalLangSelect', 'appLangSelect', 'drawerLangSelect'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = lang;
-  });
+  if (typeof window.translateSettingsModalUI === 'function') {
+    window.translateSettingsModalUI(lang);
+  }
 
-  // Direction handling for Kurdish if needed (keep general UI LTR, Kurdish elements RTL)
-  document.documentElement.lang = lang;
-  
+  // Re-render UI with new language
+  if (typeof renderPrayerTimesWidget === 'function') renderPrayerTimesWidget();
+  if (typeof renderDashboardStats === 'function') renderDashboardStats();
+  if (typeof renderCategoryHubs === 'function') renderCategoryHubs();
   if (typeof updateDashboardLabels === 'function') {
     updateDashboardLabels();
   }

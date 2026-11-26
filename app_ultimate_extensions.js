@@ -1906,6 +1906,17 @@ function calculateLevenshteinSimilarity(s1, s2) {
   return 1 - (dist / Math.max(len1, len2));
 }
 
+function stripArabicPrefixStrict(w) {
+  if (!w) return '';
+  if (w.startsWith('ال') && w.length >= 4) return w.substring(2);
+  if ((w.startsWith('و') || w.startsWith('ف') || w.startsWith('ب') || w.startsWith('ل')) && w.length >= 4) {
+    const sub = w.substring(1);
+    if (sub.startsWith('ال') && sub.length >= 4) return sub.substring(2);
+    return sub;
+  }
+  return w;
+}
+
 function doArabicWordsMatch(w1, w2) {
   const n1 = normalizeArabicForMatch(w1);
   const n2 = normalizeArabicForMatch(w2);
@@ -1913,30 +1924,35 @@ function doArabicWordsMatch(w1, w2) {
   if (n1 === n2) return true;
 
   // Muqatta'at: Alif Lam Mim equivalence
-  if ((n1 === 'الم' || n1 === 'الف' || n1 === 'الفلام' || n1 === '1000' || n1 === '١٠٠٠') &&
-      (n2 === 'الم' || n2 === 'الف' || n2 === 'الفلام')) return true;
+  if ((n1 === 'الم' || n1 === 'الف' || n1 === 'الفلام' || n1 === 'الف لام ميم' || n1 === '1000' || n1 === '١٠٠٠') &&
+      (n2 === 'الم' || n2 === 'الف' || n2 === 'الفلام' || n2 === 'الف لام ميم')) return true;
 
   // Specific Quran orthography aliases
   if ((n1 === 'مالك' && n2 === 'ملك') || (n1 === 'ملك' && n2 === 'مالك')) return true;
   if ((n1 === 'الصراط' && n2 === 'السراط') || (n1 === 'السراط' && n2 === 'الصراط')) return true;
   if ((n1 === 'الرحمن' && n2 === 'الرحمان') || (n1 === 'الرحمان' && n2 === 'الرحمن')) return true;
-  if ((n1 === 'ذلك' && (n2 === 'ذالك' || n2 === 'زالك' || n2 === 'زلك')) ||
-      (n2 === 'ذلك' && (n1 === 'ذالك' || n1 === 'زالك' || n1 === 'زلك'))) return true;
+  if ((n1 === 'ذلك' && (n2 === 'ذالك' || n2 === 'زالك')) ||
+      (n2 === 'ذلك' && (n1 === 'ذالك' || n1 === 'زالك'))) return true;
+  if ((n1 === 'طه' && n2 === 'طاها') || (n1 === 'طاها' && n2 === 'طه')) return true;
+  if ((n1 === 'يس' && n2 === 'ياسين') || (n1 === 'ياسين' && n2 === 'يس')) return true;
 
-  if (stripArabicPrefix(n1) === stripArabicPrefix(n2)) return true;
+  // Prefix match (e.g. بالحق vs الحق, والسماء vs السماء) for words >= 3 letters
+  const p1 = stripArabicPrefixStrict(n1);
+  const p2 = stripArabicPrefixStrict(n2);
+  if (p1.length >= 3 && p2.length >= 3 && p1 === p2) return true;
 
-  // Consonant skeleton match for Kurdish / Persian / German non-native reciters
-  const sk1 = toQuranPhoneticConsonants(stripArabicPrefix(n1));
-  const sk2 = toQuranPhoneticConsonants(stripArabicPrefix(n2));
-  if (sk1.length >= 2 && sk1 === sk2) return true;
+  // High threshold similarity (only for long words >= 5 letters, 1 acoustic typo max)
+  // Short words (< 5 letters) MUST be exact to prevent false positive triggers!
+  if (n1.length >= 5 && n2.length >= 5) {
+    if (calculateLevenshteinSimilarity(n1, n2) >= 0.82) return true;
+    if (p1.length >= 4 && p2.length >= 4 && calculateLevenshteinSimilarity(p1, p2) >= 0.82) return true;
+  }
 
-  if (calculateLevenshteinSimilarity(n1, n2) >= 0.58) return true;
-  if (calculateLevenshteinSimilarity(stripArabicPrefix(n1), stripArabicPrefix(n2)) >= 0.58) return true;
   return false;
 }
 window.doArabicWordsMatch = doArabicWordsMatch;
 
-// Precision Word-by-Word Streaming Evaluator (Smart Window Alignment - Never Stalls in Mid-Ayah)
+// Strict Word-by-Word Streaming Evaluator (No False Positives - Never Auto-Completes on Mistakes)
 function evaluateAyahWordStream(fullSessionSpoken, latestChunk, rawTargetWords, currentRevealed) {
   const normSFull = normalizeArabicForMatch(fullSessionSpoken).split(' ').filter(w => w.length > 0);
   const normSLatest = normalizeArabicForMatch(latestChunk).split(' ').filter(w => w.length > 0);
@@ -1963,71 +1979,54 @@ function evaluateAyahWordStream(fullSessionSpoken, latestChunk, rawTargetWords, 
       if (liveEl) liveEl.textContent = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ 🌸 (خوێندنەوەی دەستپێک - ئێستا بڵێ: الم)';
       return { matchedWords: 0, totalWords: 1, isComplete: false };
     }
+    return { matchedWords: 0, totalWords: 1, isComplete: false };
   }
 
-  // 1. SMART WINDOW ALIGNMENT: Never gets stuck on a single misheard or skipped word!
-  let bestTargetProgress = currentRevealed;
-  const candidateLists = [normSFull, normSLatest];
+  // Strict Sequential Progression: Never skip unrecited words!
+  let maxMatched = currentRevealed;
+  const candidateTokenStreams = [normSFull, normSLatest];
 
-  for (const sTokens of candidateLists) {
+  for (const sTokens of candidateTokenStreams) {
     if (!sTokens || sTokens.length === 0) continue;
-    let curT = currentRevealed;
+    let tIdx = 0;
 
-    for (let s = 0; s < sTokens.length; s++) {
-      const sw = sTokens[s];
-      let bestMatchIdx = -1;
-      
-      // Look window: check curT - 1 (backtrack), curT (expected), up to curT + 4 (lookahead)
-      const lookStart = Math.max(0, curT - 1);
-      const lookEnd = Math.min(T - 1, curT + 4);
+    for (let sIdx = 0; sIdx < sTokens.length && tIdx < T; sIdx++) {
+      const sw = sTokens[sIdx];
+      const tw = normTarget[tIdx];
 
-      for (let t = lookStart; t <= lookEnd; t++) {
-        if (doArabicWordsMatch(sw, normTarget[t])) {
-          bestMatchIdx = t;
-          break;
-        }
-      }
-
-      if (bestMatchIdx !== -1) {
-        if (bestMatchIdx >= curT) {
-          curT = bestMatchIdx + 1;
-        }
-      }
-    }
-
-    if (curT > bestTargetProgress) {
-      bestTargetProgress = curT;
-    }
-  }
-
-  // 2. Sequential fallback check from beginning (0 to T) with particle tolerance
-  let matchedFromStart = 0;
-  let sIdx = 0;
-  for (let tIdx = 0; tIdx < T; tIdx++) {
-    let found = false;
-    for (let look = sIdx; look < Math.min(normSFull.length, sIdx + 4); look++) {
-      if (doArabicWordsMatch(normSFull[look], normTarget[tIdx])) {
-        matchedFromStart = tIdx + 1;
-        sIdx = look + 1;
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      // Tolerate short skipped particles (و، ف، فی، من)
-      if (tIdx < T - 1 && normTarget[tIdx].length <= 2) {
+      // 1. Direct word match
+      if (doArabicWordsMatch(sw, tw)) {
+        tIdx++;
         continue;
       }
-      break;
+
+      // 2. Compound word check: two target words spoken as one (e.g. ان لا -> الا)
+      if (tIdx + 1 < T && doArabicWordsMatch(sw, tw + normTarget[tIdx + 1])) {
+        tIdx += 2;
+        continue;
+      }
+
+      // 3. Two spoken tokens form one target word (e.g. ها ذا -> هذا)
+      if (sIdx + 1 < sTokens.length && doArabicWordsMatch(sw + sTokens[sIdx + 1], tw)) {
+        tIdx++;
+        sIdx++;
+        continue;
+      }
+
+      // Word mismatch: DO NOT SKIP. User must recite the expected word!
+    }
+
+    if (tIdx > maxMatched) {
+      maxMatched = tIdx;
     }
   }
 
-  const newRevealed = Math.min(T, Math.max(currentRevealed, matchedFromStart, bestTargetProgress));
-  // Ayah is complete when all words match, or T-1 for long ayahs
-  const isComplete = (newRevealed >= T) || (newRevealed >= T - 1 && T >= 5) || (T >= 10 && newRevealed >= Math.floor(T * 0.9));
+  const finalMatched = Math.min(T, Math.max(currentRevealed, maxMatched));
+  // Strictly requires 100% of words in the ayah to match before completing!
+  const isComplete = (finalMatched === T);
 
   return {
-    matchedWords: newRevealed,
+    matchedWords: finalMatched,
     totalWords: T,
     isComplete: isComplete
   };
@@ -2391,7 +2390,9 @@ function startTarteelRecitation() {
   tarteelState.isRecording = true;
   tarteelState.timerSeconds = 0;
   tarteelState.ignoreSpeechBeforeTime = Date.now() + 250;
-  tarteelState.sessionResultIndex = tarteelState.speechRecognizerLatestResultIndex || 0;
+  tarteelState.accumulatedSpokenText = '';
+  tarteelState.lastChunkSpoken = '';
+  tarteelState.sessionResultIndex = 0;
 
   const fab = document.getElementById('tarteelEmeraldFab');
   const fabIcon = document.getElementById('tarteelEmeraldFabIcon');
@@ -2442,7 +2443,7 @@ function startTarteelRecitation() {
     return;
   }
 
-  // Initialize Speech Recognition Engine (ar-SA with offline Android support)
+  // Initialize Speech Recognition Engine (ar-SA with continuous recognition)
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (SpeechRecognition) {
     try {
@@ -2455,21 +2456,24 @@ function startTarteelRecitation() {
       tarteelState.speechRecognizer.lang = 'ar-SA';
       tarteelState.speechRecognizer.continuous = true;
       tarteelState.speechRecognizer.interimResults = true;
-      tarteelState.speechRecognizer.maxAlternatives = 3;
+      tarteelState.speechRecognizer.maxAlternatives = 5;
 
       tarteelState.speechRecognizer.onresult = function(event) {
         if (!tarteelState.isRecording || tarteelState.isPacingPause) return;
         if (Date.now() < tarteelState.ignoreSpeechBeforeTime) return;
 
-        const sessionStart = tarteelState.sessionResultIndex || 0;
-        let fullSessionSpoken = '';
-        for (let i = sessionStart; i < event.results.length; i++) {
-          fullSessionSpoken += ' ' + event.results[i][0].transcript;
+        let currentTurnSpoken = '';
+        for (let i = tarteelState.sessionResultIndex || 0; i < event.results.length; i++) {
+          currentTurnSpoken += ' ' + event.results[i][0].transcript;
         }
-        fullSessionSpoken = fullSessionSpoken.trim();
+        currentTurnSpoken = currentTurnSpoken.trim();
 
         const lastResult = event.results[event.results.length - 1];
         const latestChunk = (lastResult && lastResult[0]) ? lastResult[0].transcript.trim() : '';
+
+        // Accumulate across breath pauses so reciter is never stuck mid-ayah
+        const fullSessionSpoken = ((tarteelState.accumulatedSpokenText || '') + ' ' + currentTurnSpoken).trim();
+        tarteelState.lastChunkSpoken = currentTurnSpoken;
 
         handleTarteelSpokenStream(fullSessionSpoken, latestChunk, event.results.length);
       };
@@ -2491,12 +2495,18 @@ function startTarteelRecitation() {
       };
 
       tarteelState.speechRecognizer.onend = function() {
+        if (tarteelState.lastChunkSpoken) {
+          tarteelState.accumulatedSpokenText = ((tarteelState.accumulatedSpokenText || '') + ' ' + tarteelState.lastChunkSpoken).trim();
+          tarteelState.lastChunkSpoken = '';
+        }
+        tarteelState.sessionResultIndex = 0; // Fresh start for next recognition stream
+
         if (tarteelState.isRecording && !tarteelState.isPacingPause) {
           setTimeout(() => {
             if (tarteelState.isRecording && !tarteelState.isPacingPause && tarteelState.speechRecognizer) {
               try { tarteelState.speechRecognizer.start(); } catch(e){}
             }
-          }, 120);
+          }, 60);
         }
       };
 
@@ -2516,6 +2526,11 @@ function onAyahSuccessfullyRecognized(targetV, spoken) {
   const key = `${targetV.surahNum}:${targetV.num}`;
   tarteelState.revealed[key] = true;
   tarteelState.revealedWords[key] = (targetV.ar || '').split(/\s+/).filter(w => w.length > 0).length;
+
+  // Clear accumulated spoken text for the newly completed ayah
+  tarteelState.accumulatedSpokenText = '';
+  tarteelState.lastChunkSpoken = '';
+  tarteelState.sessionResultIndex = 0;
 
   if (tarteelState.settings.soundOnMistake) {
     playTarteelTone('success');
@@ -2547,7 +2562,7 @@ function onAyahSuccessfullyRecognized(targetV, spoken) {
   } else {
     // Mode 2: Continuous (Fortlaufend)
     // Respectful Tajweed pacing pause (1.2 seconds) before moving to next ayah
-    updateTarteelStatusText(getTarteelText('matchSuccess', targetV.num) + ' Â· ' + getTarteelText('shortPause'), true);
+    updateTarteelStatusText(getTarteelText('matchSuccess', targetV.num) + ' · ' + getTarteelText('shortPause'), true);
     tarteelState.isPacingPause = true;
 
     setTimeout(() => {
@@ -2555,7 +2570,9 @@ function onAyahSuccessfullyRecognized(targetV, spoken) {
       if (!tarteelState.isRecording) return;
 
       tarteelState.ignoreSpeechBeforeTime = Date.now() + 350;
-      tarteelState.sessionResultIndex = tarteelState.speechRecognizerLatestResultIndex || 0;
+      tarteelState.sessionResultIndex = 0;
+      tarteelState.accumulatedSpokenText = '';
+      tarteelState.lastChunkSpoken = '';
 
       if (curIdx >= 0 && curIdx < verses.length - 1) {
         tarteelState.targetAyah = verses[curIdx + 1].num;
@@ -2578,7 +2595,6 @@ function onAyahSuccessfullyRecognized(targetV, spoken) {
   }
 }
 
-
 // Mistake Handler
 function onAyahRecitationMistake(targetV, spoken, accuracyPct) {
   recordTarteelMistake(targetV.surahNum, targetV.num, spoken);
@@ -2597,6 +2613,9 @@ function onAyahRecitationMistake(targetV, spoken, accuracyPct) {
 function stopTarteelRecitation() {
   tarteelState.isRecording = false;
   tarteelState.isPacingPause = false;
+  tarteelState.accumulatedSpokenText = '';
+  tarteelState.lastChunkSpoken = '';
+  tarteelState.sessionResultIndex = 0;
 
   const fab = document.getElementById('tarteelEmeraldFab');
   const fabIcon = document.getElementById('tarteelEmeraldFabIcon');

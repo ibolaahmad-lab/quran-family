@@ -456,11 +456,25 @@
   // =========================================================================
   function changeActiveEngine(engineId) {
     if (!ENGINES[engineId]) return;
+    if (engineId === 'groq_whisper' && !groqApiKey) {
+      const lang = localStorage.getItem('quran_app_language') || window.currentAppLanguage || 'ku';
+      const msg = lang === 'ku' 
+        ? 'ℹ️ بۆ بەکارهێنانی Groq دەبێت کلیلی API تۆمار بکرێت؛ مۆتۆری گووگڵ بەکاردێت.' 
+        : 'ℹ️ Für Groq Whisper wird ein API-Key benötigt; Google/Browser-Engine aktiv.';
+      if (typeof window.showToast === 'function') window.showToast(msg);
+      activeEngineId = 'google_speech';
+      localStorage.setItem(STORAGE_ENGINE_KEY, 'google_speech');
+      updateEngineBadgesUI();
+      openEngineSettingsModal();
+      return;
+    }
     activeEngineId = engineId;
     localStorage.setItem(STORAGE_ENGINE_KEY, engineId);
     updateEngineBadgesUI();
+    const lang = localStorage.getItem('quran_app_language') || window.currentAppLanguage || 'ku';
+    const label = lang === 'ku' ? (ENGINES[engineId].name + ' دیاری کرا') : (ENGINES[engineId].name + ' ausgewählt');
     if (typeof window.showToast === 'function') {
-      window.showToast(`✨ موتور تشخیص صدا: ${ENGINES[engineId].titleFa}`);
+      window.showToast(`✨ ${label}`);
     }
   }
 
