@@ -4777,6 +4777,9 @@ window.switchMainTab = function(tabName) {
 function openAppSettingsModal() {
   const m = document.getElementById('appSettingsModal');
   if (m) m.style.display = 'flex';
+  if (typeof window.populateOfflineSurahsDropdown === 'function') {
+    window.populateOfflineSurahsDropdown();
+  }
 }
 window.openAppSettingsModal = openAppSettingsModal;
 

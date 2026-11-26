@@ -101,12 +101,14 @@
     });
   }
 
-  function showPrompt() {
-    // If user recently dismissed in this session, don't re-annoy, show pill instead
-    if (sessionStorage.getItem('pwa_prompt_dismissed') === 'true') {
-      showFloatingPill();
+  function showPrompt(force = false) {
+    // Only ask ONCE on the very first visit unless explicitly requested
+    if (!force && localStorage.getItem('quran_pwa_prompt_shown_v1') === 'true') {
       return;
     }
+    try {
+      localStorage.setItem('quran_pwa_prompt_shown_v1', 'true');
+    } catch (e) {}
 
     let overlay = document.getElementById('pwaSmartInstallOverlay');
     if (!overlay) {
@@ -282,10 +284,11 @@
   }
 
   function dismiss() {
-    sessionStorage.setItem('pwa_prompt_dismissed', 'true');
+    try {
+      localStorage.setItem('quran_pwa_prompt_shown_v1', 'true');
+    } catch (e) {}
     const overlay = document.getElementById('pwaSmartInstallOverlay');
     if (overlay) overlay.style.display = 'none';
-    showFloatingPill();
   }
 
   function install() {
@@ -307,38 +310,9 @@
   }
 
   function showFloatingPill() {
-    let pill = document.getElementById('pwaFloatingInstallPill');
-    if (!pill) {
-      pill = document.createElement('button');
-      pill.id = 'pwaFloatingInstallPill';
-      pill.type = 'button';
-      pill.onclick = showPrompt;
-      pill.ontouchend = showPrompt;
-      pill.style.cssText = `
-        position: fixed;
-        bottom: 82px;
-        right: 14px;
-        z-index: 99990;
-        background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        color: #000;
-        font-weight: 800;
-        font-size: 0.74rem;
-        padding: 6px 14px;
-        border-radius: 20px;
-        box-shadow: 0 4px 14px rgba(251, 191, 36, 0.4);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        animation: pwaPulse 2s infinite;
-        -webkit-tap-highlight-color: transparent;
-      `;
-      document.body.appendChild(pill);
-    }
-    const t = I18N[getLang()];
-    pill.innerHTML = `<i class="fa-solid fa-download"></i> <span>${t.pill}</span>`;
-    pill.style.display = 'flex';
+    // Disabled: User requested no persistent floating install buttons on screen
+    const pill = document.getElementById('pwaFloatingInstallPill');
+    if (pill) pill.style.display = 'none';
   }
 
   // Inject CSS Keyframes

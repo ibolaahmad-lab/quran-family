@@ -325,10 +325,11 @@
       bottom: 0 !important;
       left: 0 !important;
       right: 0 !important;
-      margin: 0 auto !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
       transform: none !important;
       width: 100% !important;
-      max-width: var(--app-max-width, 480px) !important;
+      max-width: 480px !important;
       height: auto !important;
       min-height: 56px !important;
       background: rgba(8, 13, 20, 0.96) !important;
@@ -4065,15 +4066,17 @@
     padding: 0 0 75px 0 !important;
   }
   .android-bottom-nav {
+    position: fixed !important;
+    bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    margin: 0 auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     transform: none !important;
     width: 100% !important;
-    max-width: var(--app-max-width) !important;
+    max-width: 480px !important;
     box-sizing: border-box !important;
     direction: ltr !important;
-    transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
   #androidDrawerBackdrop {
     left: 0 !important;
@@ -4081,33 +4084,15 @@
     margin: 0 auto !important;
     transform: none !important;
     width: 100% !important;
-    max-width: var(--app-max-width) !important;
+    max-width: 480px !important;
   }
   #androidSideDrawer {
     max-width: 330px !important;
   }
 
-  /* Floating iPad / Mobile Screen Fit Mode Toggle (Matching User Attachment 1) */
+  /* Screen Fit Mode Toggle */
   #screenFitToggleBtn {
-    position: fixed;
-    bottom: 82px;
-    left: 14px;
-    z-index: 12500;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: rgba(22, 28, 38, 0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1.2px solid rgba(251, 191, 36, 0.45);
-    color: #fbbf24;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65), 0 0 10px rgba(251, 191, 36, 0.2);
-    transition: all 0.25s ease;
-    -webkit-tap-highlight-color: transparent;
+    display: none !important;
   }
   #screenFitToggleBtn:hover {
     transform: scale(1.08);
@@ -4157,8 +4142,8 @@
   <script src="pdf.min.js"></script>
   <script src="pdf.worker.min.js"></script>
   <script src="i18n.js?v=20261126_final_perf"></script>
-  <script src="quran_voice_ai_engine.js?v=20261126_final_perf"></script>
-  <script src="app.js?v=20261126_final_perf"></script>
+  <script src="quran_voice_ai_engine.js?v=20261126_groq_v2"></script>
+  <script src="app.js?v=20261126_groq_v2"></script>
 
   <style id="neo3dMasterStyles">
     /* Permanently disable legacy PIN overlay */
@@ -6776,7 +6761,7 @@
   <!-- ======================================================= -->
   <!-- ANDROID MOBILE BOTTOM NAVIGATION BAR                     -->
   <!-- ======================================================= -->
-  <nav class="android-bottom-nav" style="position: fixed; bottom: 0; left: 0; right: 0; margin: 0 auto; transform: none; width: 100%; max-width: var(--app-max-width, 480px); display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; justify-items: center; direction: ltr; background: rgba(8, 13, 20, 0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 5px 2px 6px; z-index: 12000; box-shadow: 0 -8px 28px rgba(0,0,0,0.85); box-sizing: border-box;">
+  <nav class="android-bottom-nav" style="position: fixed; bottom: 0; left: 0; right: 0; margin-left: auto; margin-right: auto; transform: none; width: 100%; max-width: 480px; display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; justify-items: center; direction: ltr; background: rgba(8, 13, 20, 0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.12); padding: 5px 2px 6px; z-index: 12000; box-shadow: 0 -8px 28px rgba(0,0,0,0.85); box-sizing: border-box;">
     <!-- 1. Start (Home) -->
     <button class="abn-btn active" id="abnHome" onclick="switchMainTab('home')" title="Startseite">
       <div class="abn-orb" style="background: linear-gradient(135deg, #38bdf8, #0284c7); box-shadow: 0 4px 10px rgba(14,165,233,0.35), inset 0 1px 2px rgba(255,255,255,0.4);">
@@ -6826,8 +6811,8 @@
     </button>
   </nav>
 
-  <!-- Floating iPad & Screen Fit Mode Toggle Button (Matching User Upload 1) -->
-  <button type="button" id="screenFitToggleBtn" onclick="toggleScreenFitMode()" ontouchend="toggleScreenFitMode()" title="تغییر عرض صفحه / تناسب با آیپد و موبایل">
+  <!-- Screen Fit Mode Toggle Button (Hidden to keep bottom bar stable and uncluttered) -->
+  <button type="button" id="screenFitToggleBtn" style="display: none !important;" onclick="toggleScreenFitMode()" ontouchend="toggleScreenFitMode()" title="تغییر عرض صفحه">
     <i id="screenFitIcon" class="fa-solid fa-up-right-and-down-left-from-center"></i>
   </button>
 
@@ -7086,22 +7071,30 @@
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
-            <div id="settingsOfflineQariLabel" style="font-size: 0.76rem; color: #cbd5e1; font-weight: 700;">Rezitator (Qāri’) wählen:</div>
+            <div id="settingsOfflineQariLabel" style="font-size: 0.76rem; color: #cbd5e1; font-weight: 700;">قورئانخوێن هەڵبژێرە:</div>
             <select id="settingsOfflineQariSelect" onchange="onQariChanged(this.value)" style="width: 100%; height: 40px; border-radius: 12px; background: rgba(0,0,0,0.45); color: #fef08a; border: 1px solid rgba(255,255,255,0.14); padding: 0 10px; font-weight: 800; font-size: 0.84rem;">
               <option value="Alafasy_128kbps" selected>🎙️ مشاري راشد العفاسي (Mishary Alafasy)</option>
+              <option value="Mansour_Al_Salimi">🎙️ منصور السالمي (Mansour Al-Salimi - تلاوة كاملة)</option>
               <option value="Husary_128kbps">🎙️ محمود خليل الحصري (Al-Hussary Murattal)</option>
               <option value="Abdul_Basit_Murattal_192kbps">🎙️ عبد الباسط عبد الصمد (Abdul Basit)</option>
               <option value="Minshawy_Murattal_128kbps">🎙️ محمد صديق المنشاوي (Al-Minshawy)</option>
               <option value="MaherAlMuaiqly128kbps">🎙️ ماهر المعيقلي (Maher Al-Muaiqly)</option>
               <option value="Yasser_Ad-Dussary_128kbps">🎙️ ياسر الدوسري (Yasser Ad-Dossari)</option>
               <option value="Abdurrahmaan_As-Sudais_192kbps">🎙️ عبد الرحمن السديس (As-Sudais)</option>
+              <option value="Ghamadi_40kbps">🎙️ سعد الغامدي (Saad Al-Ghamdi)</option>
+              <option value="Abu_Bakr_Ash-Shaatree_128kbps">🎙️ أبو بكر الشاطري (Abu Bakr Al-Shatri)</option>
             </select>
 
-            <div id="settingsOfflineScopeLabel" style="font-size: 0.76rem; color: #cbd5e1; font-weight: 700; margin-top: 4px;">Offline-Paket wählen:</div>
+            <div id="settingsOfflineScopeLabel" style="font-size: 0.76rem; color: #cbd5e1; font-weight: 700; margin-top: 4px;">پاکێج یان سورەتی ئۆفلاین هەڵبژێرە:</div>
             <select id="settingsOfflineScopeSelect" style="width: 100%; height: 40px; border-radius: 12px; background: rgba(0,0,0,0.45); color: #fff; border: 1px solid rgba(255,255,255,0.14); padding: 0 10px; font-weight: 700; font-size: 0.84rem;">
-              <option id="settingsScopeOptCurrent" value="current">📖 Aktuell geöffnete Sure offline speichern</option>
-              <option id="settingsScopeOptEssentials" value="essentials">🌟 Wichtigste Suren (Al-Fatiha, Al-Kahf, Ya-Sin, Ar-Rahman, Al-Mulk)</option>
-              <option id="settingsScopeOptJuz30" value="juz30">🎓 Juz 'Amma (Suren 78–114) für Hifz &amp; Gebet</option>
+              <optgroup label="📦 پاکێجە خێراکان">
+                <option id="settingsScopeOptCurrent" value="current">📖 پاشەکەوتکردنی سورەتی ئێستا بە ئۆفلاین</option>
+                <option id="settingsScopeOptEssentials" value="essentials">🌟 سورەتە گرنگەکان (فاتیحە، کەهف، یاسین، ڕەحمان، مولک)</option>
+                <option id="settingsScopeOptJuz30" value="juz30">🎓 جوزئی عەممە (سورەتەکانی ٧٨ تا ١١٤)</option>
+                <option id="settingsScopeOptAll" value="all_quran">🕋 هەموو قورئانی پیرۆز (١١٤ سورەت)</option>
+              </optgroup>
+              <optgroup id="settingsScopeAllSurahsGroup" label="📖 هەموو ١١٤ سورەتەکە بە جیا">
+              </optgroup>
             </select>
           </div>
 
@@ -7432,9 +7425,9 @@
   <script src="asmaa_allah_data.js"></script>
   <script src="hujra_lessons_data.js?v=20261125_sulook15"></script>
   <script src="hujra_lessons_engine.js?v=20261125_sulook15"></script>
-  <script src="app_v4_master_overhaul.js?v=20261126_final_perf"></script>
+  <script src="app_v4_master_overhaul.js?v=20261126_groq_v2"></script>
   <script src="murajaa_features_engine.js?v=20261125_puremushaf"></script>
-  <script src="pwa_installer.js?v=20261124_v1"></script>
+  <script src="pwa_installer.js?v=20261126_groq_v2"></script>
   <script>
     window.toggleScreenFitMode = function() {
       const isFull = document.body.classList.contains('screen-fit-full');

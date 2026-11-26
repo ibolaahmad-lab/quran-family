@@ -668,10 +668,11 @@
         themeHdr: '2. Neo-3D Design & Themen',
         offHdr: '3. Offline-Qāri’ herunterladen',
         qariLbl: 'Rezitator (Qāri’) wählen:',
-        scopeLbl: 'Offline-Paket wählen:',
+        scopeLbl: 'Offline-Paket / Sure wählen:',
         optCur: '📖 Aktuell geöffnete Sure offline speichern',
         optEss: '🌟 Wichtigste Suren (Al-Fatiha, Al-Kahf, Ya-Sin, Ar-Rahman, Al-Mulk)',
         optJuz: '🎓 Juz \'Amma (Suren 78–114) für Hifz & Gebet',
+        optAll: '🕋 Ganzer Heiliger Koran (Alle 114 Suren)',
         desc: 'Lädt die Rezitation herunter, damit sie ohne Internet im Muṣḥaf, Wort-Studio, Tarteel und Quiz funktioniert.',
         btn: 'Jetzt für Offline-Nutzung herunterladen',
         ready: 'Bereit'
@@ -681,10 +682,11 @@
         themeHdr: '2. Neo-3D Themes & Visual Style',
         offHdr: '3. Offline Qāri’ Audio Downloader',
         qariLbl: 'Select Reciter (Qāri’):',
-        scopeLbl: 'Select Offline Package:',
+        scopeLbl: 'Select Offline Package / Surah:',
         optCur: '📖 Save Currently Open Surah Offline',
         optEss: '🌟 Essential Surahs (Al-Fatiha, Al-Kahf, Ya-Sin, Ar-Rahman, Al-Mulk)',
         optJuz: '🎓 Juz \'Amma (Surahs 78–114) for Hifz & Prayer',
+        optAll: '🕋 Complete Holy Quran (All 114 Surahs)',
         desc: 'Downloads the recitation so it works offline across Muṣḥaf, Word Studio, Tarteel, and Quiz.',
         btn: 'Download Now for Offline Use',
         ready: 'Ready'
@@ -694,10 +696,11 @@
         themeHdr: '٢. دیزاینی سێ‌ڕەهەندی (Neo-3D Themes)',
         offHdr: '٣. داگرتنی دەنگی قورئانخوێن بە ئۆفلاین',
         qariLbl: 'قورئانخوێن هەڵبژێرە:',
-        scopeLbl: 'پاکێجی ئۆفلاین هەڵبژێرە:',
+        scopeLbl: 'پاکێج یان سورەتی ئۆفلاین هەڵبژێرە:',
         optCur: '📖 پاشەکەوتکردنی سورەتی ئێستا بە ئۆفلاین',
         optEss: '🌟 سورەتە گرنگەکان (فاتیحە، کەهف، یاسین، ڕەحمان، مولک)',
         optJuz: '🎓 جوزئی عەممە (سورەتەکانی ٧٨ تا ١١٤)',
+        optAll: '🕋 هەموو قورئانی پیرۆز (١١٤ سورەت)',
         desc: 'دەنگی قورئانخوێنەکە دادەگرێت بۆ ئەوەی بەبێ ئینتەرنێت لە هەموو بەشەکاندا کار بکات.',
         btn: 'داگرتن بۆ بەکارهێنانی ئۆفلاین',
         ready: 'ئامادەیە'
@@ -713,10 +716,28 @@
     setTxt('settingsScopeOptCurrent', t.optCur);
     setTxt('settingsScopeOptEssentials', t.optEss);
     setTxt('settingsScopeOptJuz30', t.optJuz);
+    setTxt('settingsScopeOptAll', t.optAll);
     setTxt('offlineDownloadStatusText', t.desc);
     setTxt('settingsOfflineBtnText', t.btn);
+    populateOfflineSurahsDropdown();
   }
   window.translateSettingsModalUI = translateSettingsModalUI;
+
+  function populateOfflineSurahsDropdown() {
+    const grp = document.getElementById('settingsScopeAllSurahsGroup');
+    if (!grp) return;
+    if (grp.children.length >= 114) return;
+    grp.innerHTML = '';
+    const allSurahs = window.ALL_114_SURAHS || [];
+    allSurahs.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = String(s.id);
+      opt.textContent = `${s.id}. سورة ${s.arabic || s.name} (${s.name})`;
+      grp.appendChild(opt);
+    });
+  }
+  window.populateOfflineSurahsDropdown = populateOfflineSurahsDropdown;
+  setTimeout(populateOfflineSurahsDropdown, 800);
 
   function selectLanguageCard(langCode) {
     if (typeof setAppLanguage === 'function') {
@@ -807,8 +828,15 @@
     const q = qariName || (window.state && window.state.qari) || 'Alafasy_128kbps';
     const sStr = String(surah).padStart(3, '0');
     const aStr = String(ayah).padStart(3, '0');
+    if (q === 'Mansour_Al_Salimi') {
+      const sKey = `Mansour_Al_Salimi_${sStr}`;
+      if (window.offlineAudioMemoryBlobs && window.offlineAudioMemoryBlobs[sKey]) {
+        return window.offlineAudioMemoryBlobs[sKey];
+      }
+      return `https://cdn.mp3quran.net/audio/mansour-salimi/r1/${sStr}.mp3`;
+    }
     const cacheKey = `${q}_${sStr}${aStr}`;
-    if (window.offlineAudioMemoryBlobs[cacheKey]) {
+    if (window.offlineAudioMemoryBlobs && window.offlineAudioMemoryBlobs[cacheKey]) {
       return window.offlineAudioMemoryBlobs[cacheKey];
     }
     if (typeof originalGetAyahAudioUrl === 'function') {
@@ -842,27 +870,81 @@
       surahsToDownload = [1, 18, 36, 55, 56, 67, 112, 113, 114];
     } else if (scope === 'juz30') {
       for (let s = 78; s <= 114; s++) surahsToDownload.push(s);
+    } else if (scope === 'all_quran') {
+      for (let s = 1; s <= 114; s++) surahsToDownload.push(s);
     } else {
-      const sNum = parseInt(scope, 10) || 1;
-      surahsToDownload = [sNum];
+      const sNum = parseInt(scope, 10);
+      if (!isNaN(sNum) && sNum >= 1 && sNum <= 114) {
+        surahsToDownload = [sNum];
+      } else {
+        surahsToDownload = [1];
+      }
     }
 
-    // Build list of verses
+    isOfflineDownloading = true;
+    if (btn) btn.disabled = true;
+
+    // Special handler: Mansour Al-Salimi (Surah-level files)
+    if (qari === 'Mansour_Al_Salimi') {
+      let completedSurahs = 0;
+      for (let i = 0; i < surahsToDownload.length; i++) {
+        const sId = surahsToDownload[i];
+        const sStr = String(sId).padStart(3, '0');
+        const key = `Mansour_Al_Salimi_${sStr}`;
+        const cdnUrl = `https://cdn.mp3quran.net/audio/mansour-salimi/r1/${sStr}.mp3`;
+        const meta = (window.ALL_114_SURAHS || []).find(x => x.id === sId);
+        const sName = meta ? (meta.arabic || meta.name) : `Sure ${sId}`;
+
+        if (statusEl) {
+          statusEl.textContent = `داگرتنی دەنگی مەنسوور ئەلسالمی: سورة ${sName} (${i + 1} / ${surahsToDownload.length})...`;
+        }
+
+        if (!window.offlineAudioMemoryBlobs[key]) {
+          try {
+            const resp = await fetch(cdnUrl);
+            if (resp.ok) {
+              const blob = await resp.blob();
+              window.offlineAudioMemoryBlobs[key] = URL.createObjectURL(blob);
+              await saveAyahBlobToDB(key, blob);
+            }
+          } catch(err) {
+            console.warn('Salimi download error:', err);
+          }
+        }
+        completedSurahs++;
+        const pct = Math.round((completedSurahs / surahsToDownload.length) * 100);
+        if (barFill) barFill.style.width = pct + '%';
+      }
+
+      isOfflineDownloading = false;
+      if (btn) btn.disabled = false;
+      const totalSaved = Object.keys(window.offlineAudioMemoryBlobs).length;
+      updateOfflineAudioStatusBadge(totalSaved);
+      if (statusEl) {
+        statusEl.textContent = `✅ داگرتن تەواو بوو! دەنگی مەنسوور ئەلسالمی بۆ ${completedSurahs} سورەت بە سەرکەوتوویی پاشەکەوت کرا.`;
+      }
+      if (typeof showToast === 'function') {
+        showToast(`✅ ${completedSurahs} سورەت بۆ بەکارهێنانی ئۆفلاین پاشەکەوت کرا!`);
+      }
+      return;
+    }
+
+    // Build list of verses for Ayah-by-Ayah reciters
     const queue = [];
     const allSurahs = window.ALL_114_SURAHS || [];
     surahsToDownload.forEach(sId => {
       const meta = allSurahs.find(x => x.id === sId);
       const vCount = meta ? (meta.versesCount || meta.ayahCount || 7) : 7;
-      // Cap single batch at 80 verses per click for snappy mobile download
-      const limit = Math.min(vCount, 80);
-      for (let a = 1; a <= limit; a++) {
+      for (let a = 1; a <= vCount; a++) {
         queue.push({ surah: sId, ayah: a });
       }
     });
 
-    if (queue.length === 0) return;
-    isOfflineDownloading = true;
-    if (btn) btn.disabled = true;
+    if (queue.length === 0) {
+      isOfflineDownloading = false;
+      if (btn) btn.disabled = false;
+      return;
+    }
 
     let completed = 0;
     for (let i = 0; i < queue.length; i++) {
@@ -873,7 +955,7 @@
       const cdnUrl = `https://everyayah.com/data/${qari}/${sStr}${aStr}.mp3`;
 
       if (statusEl) {
-        statusEl.textContent = `Lade Sure ${item.surah}:${item.ayah} (${i + 1} / ${queue.length})...`;
+        statusEl.textContent = `داگرتن: سورة ${item.surah}:${item.ayah} (${i + 1} / ${queue.length})...`;
       }
 
       if (!window.offlineAudioMemoryBlobs[key]) {
@@ -885,7 +967,7 @@
             await saveAyahBlobToDB(key, blob);
           }
         } catch (err) {
-          // Try local fallback
+          // Fallback
         }
       }
       completed++;
@@ -898,10 +980,10 @@
     const totalSaved = Object.keys(window.offlineAudioMemoryBlobs).length;
     updateOfflineAudioStatusBadge(totalSaved);
     if (statusEl) {
-      statusEl.textContent = `✅ Download abgeschlossen! Qāri’ ist für alle Bereiche offline bereit.`;
+      statusEl.textContent = `✅ داگرتن تەواو بوو! دەنگی قورئانخوێن بە سەرکەوتوویی پاشەکەوت کرا.`;
     }
     if (typeof showToast === 'function') {
-      showToast(`✅ ${completed} Verse für Offline-Nutzung gespeichert!`);
+      showToast(`✅ ${completed} ئایەت بۆ بەکارهێنانی ئۆفلاین پاشەکەوت کرا!`);
     }
   }
   window.startOfflineQariDownload = startOfflineQariDownload;
