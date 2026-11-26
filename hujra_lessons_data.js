@@ -1,6 +1,6 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Updated via Hujra Lessons Studio on 2026-11-25T22:09:18.054Z
+ * Updated via Hujra Lessons Studio on 2026-11-26T16:04:58.047Z
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
@@ -1009,6 +1009,93 @@ window.HUJRA_SCHOLARS_DATA = [
             "isAudio": true,
             "isVideo": false,
             "summary": "وانەی فەرمی ژمارە 15 لە دەنگی مامۆستا هادی ئەحمەدی"
+          }
+        ]
+      },
+      {
+        "id": "cat_1795708911395",
+        "titleKu": "تەفسیری سوورەتی «الفاتحة»",
+        "descKu": "وانە و دەرسەکانی شیکردنەوەی تەفسیری سوورەتی «الفاتحة»",
+        "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+        "color": "#10b981",
+        "icon": "fa-solid fa-book-quran",
+        "lessons": [
+          {
+            "id": 1795708939822,
+            "lessonNumber": 1,
+            "title": "دەرس 1: شیکردنەوەی تەفسیری سوورەتی «الفاتحة»",
+            "subtopic": "تەفسیری سوورەتی «الفاتحة»",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795708911395_dars_01.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 1 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795708964436,
+            "lessonNumber": 2,
+            "title": "دەرس 2: شیکردنەوەی تەفسیری سوورەتی «الفاتحة»",
+            "subtopic": "تەفسیری سوورەتی «الفاتحة»",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795708911395_dars_02.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 2 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795708987283,
+            "lessonNumber": 3,
+            "title": "دەرس 3: شیکردنەوەی تەفسیری سوورەتی «الفاتحة»",
+            "subtopic": "تەفسیری سوورەتی «الفاتحة»",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795708911395_dars_03.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 3 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795709012579,
+            "lessonNumber": 4,
+            "title": "دەرس 4: شیکردنەوەی تەفسیری سوورەتی «الفاتحة»",
+            "subtopic": "تەفسیری سوورەتی «الفاتحة»",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795708911395_dars_04.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 4 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795709040386,
+            "lessonNumber": 5,
+            "title": "دەرس 5: شیکردنەوەی تەفسیری سوورەتی «الفاتحة»",
+            "subtopic": "تەفسیری سوورەتی «الفاتحة»",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795708911395_dars_05.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 5 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795709066612,
+            "lessonNumber": 6,
+            "title": "دەرس 6: شیکردنەوەی تەفسیری سوورەتی «الفاتحة»",
+            "subtopic": "تەفسیری سوورەتی «الفاتحة»",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795708911395_dars_06.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 6 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795709098052,
+            "lessonNumber": 7,
+            "title": "دەرس 7: شیکردنەوەی تەفسیری سوورەتی «الفاتحة»",
+            "subtopic": "تەفسیری سوورەتی «الفاتحة»",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795708911395_dars_07.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 7 لە دەنگی مامۆستا هادی ئەحمەدی"
           }
         ]
       }
