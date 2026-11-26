@@ -16,7 +16,7 @@
   // 2. Register Service Worker for PWA compliance
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(err => {
+      navigator.serviceWorker.register('sw.js?v=20261126_sunni_v11').catch(err => {
         console.warn('SW Registration:', err);
       });
     });

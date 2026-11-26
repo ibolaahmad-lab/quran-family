@@ -1,14 +1,11 @@
-// Service Worker for Quran Karim PWA
-const CACHE_NAME = 'quran-karim-cache-v20261125_v8';
+// Service Worker for Quran Karim PWA - Sunni Tafsir Edition
+const CACHE_NAME = 'quran-karim-cache-v20261126_sunni_v11';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './quran.png',
-  './quran_512.png',
-  './app_v4_master_overhaul.js',
-  './murajaa_features_engine.js',
-  './quran_voice_ai_engine.js'
+  './quran_512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -28,6 +25,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cache => {
           if (cache !== CACHE_NAME) {
+            console.log('[SW] Purging old cache:', cache);
             return caches.delete(cache);
           }
         })
@@ -37,11 +35,16 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Let network handle dynamic requests, fallback to cache if offline
   if (event.request.method !== 'GET') return;
+  
+  // Network first for all HTML and JS scripts
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
-    })
+    fetch(event.request)
+      .then(networkResponse => {
+        return networkResponse;
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
   );
 });

@@ -4569,9 +4569,8 @@ window.renderWordStudio = function() {
   updateWordStudioPageInput();
 };
 
-const origRenderTafsirStudio = window.renderTafsirStudio || renderTafsirStudio;
-window.renderTafsirStudio = function() {
-  if (typeof origRenderTafsirStudio === 'function') origRenderTafsirStudio();
+window.renderTafsirStudio = async function() {
+  if (typeof renderTafsirStudio === 'function') await renderTafsirStudio();
   updateTafsirPageInput();
 };
 
