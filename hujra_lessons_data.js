@@ -1,6 +1,6 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Updated via Hujra Lessons Studio on 2026-11-26T16:04:58.047Z
+ * Updated via Hujra Lessons Studio on 2026-11-26T17:01:33.385Z
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
@@ -1096,6 +1096,390 @@ window.HUJRA_SCHOLARS_DATA = [
             "isAudio": true,
             "isVideo": false,
             "summary": "وانەی فەرمی ژمارە 7 لە دەنگی مامۆستا هادی ئەحمەدی"
+          }
+        ]
+      },
+      {
+        "id": "cat_1795712031437",
+        "titleKu": "شرح صحیح مسلم",
+        "descKu": "وانە و دەرسەکانی شیکردنەوەی شرح صحیح مسلم",
+        "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+        "color": "#10b981",
+        "icon": "fa-solid fa-book-quran",
+        "lessons": [
+          {
+            "id": 1795712047216,
+            "lessonNumber": 1,
+            "title": "دەرس 1: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_01.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 1 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712055774,
+            "lessonNumber": 2,
+            "title": "دەرس 2: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_02.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 2 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712081551,
+            "lessonNumber": 3,
+            "title": "دەرس 3: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_03.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 3 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712087742,
+            "lessonNumber": 4,
+            "title": "دەرس 4: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_04.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 4 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712095325,
+            "lessonNumber": 5,
+            "title": "دەرس 5: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_05.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 5 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712104289,
+            "lessonNumber": 6,
+            "title": "دەرس 6: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_06.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 6 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712114686,
+            "lessonNumber": 7,
+            "title": "دەرس 7: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_07.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 7 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712119996,
+            "lessonNumber": 8,
+            "title": "دەرس 8: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_08.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 8 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712126724,
+            "lessonNumber": 9,
+            "title": "دەرس 9: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_09.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 9 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712133133,
+            "lessonNumber": 10,
+            "title": "دەرس 10: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_10.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 10 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712141237,
+            "lessonNumber": 11,
+            "title": "دەرس 11: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_11.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 11 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712150832,
+            "lessonNumber": 12,
+            "title": "دەرس 12: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_12.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 12 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712159413,
+            "lessonNumber": 13,
+            "title": "دەرس 13: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_13.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 13 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712167310,
+            "lessonNumber": 14,
+            "title": "دەرس 14: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_14.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 14 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712187548,
+            "lessonNumber": 15,
+            "title": "دەرس 15: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_15.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 15 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712194780,
+            "lessonNumber": 16,
+            "title": "دەرس 16: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_16.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 16 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712211173,
+            "lessonNumber": 17,
+            "title": "دەرس 17: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_17.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 17 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712215533,
+            "lessonNumber": 18,
+            "title": "دەرس 18: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_18.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 18 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712231610,
+            "lessonNumber": 19,
+            "title": "دەرس 19: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_19.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 19 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712238620,
+            "lessonNumber": 20,
+            "title": "دەرس 20: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_20.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 20 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712261359,
+            "lessonNumber": 21,
+            "title": "دەرس 21: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_21.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 21 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712279552,
+            "lessonNumber": 22,
+            "title": "دەرس 22: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_22.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 22 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712300316,
+            "lessonNumber": 23,
+            "title": "دەرس 23: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_23.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 23 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712314808,
+            "lessonNumber": 24,
+            "title": "دەرس 24: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_24.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 24 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712332173,
+            "lessonNumber": 25,
+            "title": "دەرس 25: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_25.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 25 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712349662,
+            "lessonNumber": 26,
+            "title": "دەرس 26: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_26.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 26 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712369277,
+            "lessonNumber": 27,
+            "title": "دەرس 27: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_27.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 27 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712392779,
+            "lessonNumber": 28,
+            "title": "دەرس 28: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_28.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 28 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712400525,
+            "lessonNumber": 29,
+            "title": "دەرس 29: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_29.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 29 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712418693,
+            "lessonNumber": 30,
+            "title": "دەرس 30: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_30.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 30 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712433270,
+            "lessonNumber": 31,
+            "title": "دەرس 31: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_31.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 31 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712454881,
+            "lessonNumber": 32,
+            "title": "دەرس 32: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_32.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 32 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712472056,
+            "lessonNumber": 33,
+            "title": "دەرس 33: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_33.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 33 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795712493417,
+            "lessonNumber": 34,
+            "title": "دەرس 34: شیکردنەوەی شرح صحیح مسلم",
+            "subtopic": "شرح صحیح مسلم",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795712031437_dars_34.mp3",
+            "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 34 لە دەنگی مامۆستا هادی ئەحمەدی"
           }
         ]
       }
