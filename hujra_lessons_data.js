@@ -1,6 +1,6 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Updated via Hujra Lessons Studio V2. Last updated: 2026-11-28T21:15:26.415Z
+ * Updated via Hujra Lessons Studio V2. Last updated: 2026-11-28T21:40:55.914Z
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
@@ -1680,7 +1680,7 @@ window.HUJRA_SCHOLARS_DATA = [
           {
             "id": 1795900472054,
             "lessonNumber": 2,
-            "title": "دەرس 117: شیکردنەوەی كبری الیقینیات الكونیة",
+            "title": "دەرس 2 : شیکردنەوەی كبری الیقینیات الكونیة",
             "subtopic": "كبری الیقینیات الكونیة",
             "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1_1795885092919.png",
             "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v2/Mamosta_hadi_ahmadi______________________1795900523813.mp3",
