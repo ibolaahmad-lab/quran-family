@@ -1,6 +1,6 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Updated via Hujra Lessons Studio V2. Last updated: 2026-11-28T21:04:22.560Z
+ * Updated via Hujra Lessons Studio V2. Last updated: 2026-11-28T21:08:34.391Z
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
@@ -1671,10 +1671,11 @@ window.HUJRA_SCHOLARS_DATA = [
             "title": "دەرس 1 : شیکردنەوەی كبری الیقینیات الكونیة",
             "subtopic": "كبری الیقینیات الكونیة",
             "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1_1795885092919.png",
-            "directAudioUrl": "",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v2/kubra_yaqiniyat_01_1795900111637.mp3",
             "youtubeUrl": "",
             "isAudio": true,
-            "isVideo": false
+            "isVideo": false,
+            "uploadedAt": "2026-11-28T21:08:34.385Z"
           },
           {
             "id": 1795885471966,
