@@ -2814,17 +2814,25 @@
     .lock-dots-container {
       display: flex;
       justify-content: center;
-      gap: 14px;
+      gap: 8px;
       margin-bottom: 16px;
       direction: ltr;
     }
     .lock-dot {
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
       border: 2px solid var(--gold-border);
       background: transparent;
       transition: all 0.2s ease;
+    }
+    body.app-locked {
+      overflow: hidden !important;
+    }
+    body.app-locked > *:not(#familyLockScreen) {
+      visibility: hidden !important;
+      pointer-events: none !important;
+      user-select: none !important;
     }
     .lock-dot.filled {
       background: var(--gold-primary);
@@ -4139,10 +4147,10 @@
   <script src="quran_kurdish_tafsir.js"></script>
   <script src="pdf.min.js"></script>
   <script src="pdf.worker.min.js"></script>
-  <script src="i18n.js?v=20261126_sunni_v16"></script>
-  <script src="quran_voice_ai_engine.js?v=20261126_sunni_v16"></script>
-  <script src="tafsir_nami_audio_data.js?v=20261126_sunni_v16"></script>
-  <script src="app.js?v=20261126_sunni_v16"></script>
+  <script src="i18n.js?v=20261128_v17_lock"></script>
+  <script src="quran_voice_ai_engine.js?v=20261128_v17_lock"></script>
+  <script src="tafsir_nami_audio_data.js?v=20261128_v17_lock"></script>
+  <script src="app.js?v=20261128_v17_lock"></script>
 
   <style id="neo3dMasterStyles">
     /* Permanently disable legacy PIN overlay */
@@ -4734,29 +4742,34 @@
 
 </head>
 
-<body class="theme-luxury">
+<body class="theme-luxury app-locked">
 
   <!-- ======================================================= -->
   <!-- FAMILY PIN LOCK SCREEN (SECURITY GATE)                  -->
   <!-- ======================================================= -->
-  <div id="familyLockScreen" class="family-lock-overlay" style="display: none;">
+  <div id="familyLockScreen" class="family-lock-overlay" style="display: flex;">
     <div class="family-lock-box">
       <div class="lock-brand-icon">
-        <i class="fa-solid fa-moon"></i>
+        <i class="fa-solid fa-shield-halved"></i>
       </div>
       <div class="lock-bismillah">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>
-      <h2 class="lock-title">Koran Hifz &amp; Muṣḥaf Studio</h2>
-      <p class="lock-subtitle">☽ Für meine geliebte Frau · Exklusive Familien-Edition</p>
-      <p class="lock-hint" dir="ltr" style="direction: ltr !important; text-align: center;">Bitte 4-stellige PIN eingeben:</p>
+      <h2 class="lock-title">Quran Karim · Private Edition</h2>
+      <p class="lock-subtitle">☽ کۆدی تایبەتی خێزانی · کد اختصاصی ورود</p>
+      <p class="lock-hint" dir="rtl" style="text-align: center;">کۆدی ٩ ژمارەیی داخڵ بکە · کد ۹ رقمی را وارد کنید:</p>
 
       <div class="lock-dots-container" id="lockDots">
         <span class="lock-dot" id="dot0"></span>
         <span class="lock-dot" id="dot1"></span>
         <span class="lock-dot" id="dot2"></span>
         <span class="lock-dot" id="dot3"></span>
+        <span class="lock-dot" id="dot4"></span>
+        <span class="lock-dot" id="dot5"></span>
+        <span class="lock-dot" id="dot6"></span>
+        <span class="lock-dot" id="dot7"></span>
+        <span class="lock-dot" id="dot8"></span>
       </div>
 
-      <div id="lockErrorMsg" class="lock-error-msg" style="display: none;" dir="ltr">Falsche PIN! Bitte erneut versuchen.</div>
+      <div id="lockErrorMsg" class="lock-error-msg" style="display: none;" dir="rtl">❌ کۆدەکە هەڵەیە! · کد واردشده اشتباه است!</div>
 
       <div class="lock-keypad">
         <button type="button" class="lock-key" onclick="handlePinKey('1')">1</button>
@@ -7653,17 +7666,17 @@
     </div>
   </div>
 
-  <script src="app_ultimate_extensions.js?v=20261126_sunni_v16"></script>
+  <script src="app_ultimate_extensions.js?v=20261128_v17_lock"></script>
   <script src="dalail_chapters_data.js"></script>
   <script src="burda_chapters_data.js"></script>
   <script src="dalail_burda_tajweed_data.js"></script>
   <script src="authentic_duas_azkar_data.js"></script>
   <script src="asmaa_allah_data.js"></script>
-  <script src="hujra_lessons_data.js?v=20261126_sunni_v16"></script>
-  <script src="hujra_lessons_engine.js?v=20261126_sunni_v16"></script>
-  <script src="app_v4_master_overhaul.js?v=20261126_sunni_v16"></script>
-  <script src="murajaa_features_engine.js?v=20261126_sunni_v16"></script>
-  <script src="pwa_installer.js?v=20261126_sunni_v16"></script>
+  <script src="hujra_lessons_data.js?v=20261128_v17_lock"></script>
+  <script src="hujra_lessons_engine.js?v=20261128_v17_lock"></script>
+  <script src="app_v4_master_overhaul.js?v=20261128_v17_lock"></script>
+  <script src="murajaa_features_engine.js?v=20261128_v17_lock"></script>
+  <script src="pwa_installer.js?v=20261128_v17_lock"></script>
   <script>
     window.toggleScreenFitMode = function() {
       const isFull = document.body.classList.contains('screen-fit-full');

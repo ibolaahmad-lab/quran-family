@@ -9,12 +9,10 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
   }
 
-  // Disable PIN lock permanently as requested in Point 4
-  try {
-    localStorage.setItem('quran_family_unlocked', 'true');
-    const lockOverlay = document.getElementById('familyLockOverlay');
-    if (lockOverlay) lockOverlay.style.display = 'none';
-  } catch (e) {}
+  // Enforce cryptographic 9-digit Private Access Gate on startup
+  if (typeof window.checkPinAuth === 'function') {
+    window.checkPinAuth();
+  }
 
   // ============================================================
   // 1. STEP-BY-STEP NAVIGATION HISTORY STACK & BACK BUTTON (Point 1, 5, 15)
@@ -131,6 +129,10 @@
   // Master Bulletproof Step-by-Step Back Handler
   function handleAppBackNavigation() {
     try {
+      // Never allow Back button to dismiss the private PIN lock screen
+      if (document.body.classList.contains('app-locked')) {
+        return true;
+      }
       // 0. If Mushaf Fullscreen is active, exit fullscreen first!
       if (document.body.classList.contains('mushaf-fullscreen-active')) {
         if (typeof toggleMushafFullscreen === 'function') {

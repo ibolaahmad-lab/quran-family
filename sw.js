@@ -1,12 +1,12 @@
 // Service Worker for Quran Karim PWA - Offline Tarteel AI & Sunni Tafsir Edition
-const CACHE_NAME = 'quran-karim-cache-v20261126_sunni_v16';
+const CACHE_NAME = 'quran-karim-cache-v20261128_v17_lock';
 const PRECACHE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './quran_voice_ai_engine.js?v=20261126_sunni_v16',
-  './quran_offline_whisper_worker.js?v=20261126_sunni_v16',
-  './tafsir_nami_audio_data.js?v=20261126_sunni_v16',
+  './quran_voice_ai_engine.js?v=20261128_v17_lock',
+  './quran_offline_whisper_worker.js?v=20261128_v17_lock',
+  './tafsir_nami_audio_data.js?v=20261128_v17_lock',
   './quran.png',
   './quran_512.png'
 ];
@@ -27,8 +27,8 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
-          // Keep 'transformers-cache' so downloaded Offline Quran ONNX models persist across app updates!
-          if (cache !== CACHE_NAME && cache !== 'transformers-cache') {
+          // Keep 'transformers-cache' and V2 caches intact!
+          if (cache !== CACHE_NAME && cache !== 'transformers-cache' && !cache.startsWith('quran-karim-v2-cache-')) {
             console.log('[SW] Purging old cache:', cache);
             return caches.delete(cache);
           }
