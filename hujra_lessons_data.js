@@ -1,6 +1,6 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Updated via Hujra Lessons Studio V2. Last updated: 2026-11-28T21:40:55.914Z
+ * Updated via Hujra Lessons Studio V2. Last updated: 2026-11-28T21:55:27.843Z
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
@@ -1611,49 +1611,6 @@ window.HUJRA_SCHOLARS_DATA = [
             "isAudio": true,
             "isVideo": false,
             "summary": "وانەی فەرمی ژمارە 11 لە دەنگی مامۆستا هادی ئەحمەدی"
-          }
-        ]
-      },
-      {
-        "id": "cat_1795885100784",
-        "titleKu": "كبری الیقینیات الكونیة",
-        "descKu": "وانە و دەرسەکانی شیکردنەوەی كبری الیقینیات الكونیة",
-        "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1_1795885092919.png",
-        "color": "#10b981",
-        "icon": "fa-solid fa-book-quran",
-        "lessons": [
-          {
-            "id": 1795885118929,
-            "lessonNumber": 1,
-            "title": "دەرس 1: شیکردنەوەی كبری الیقینیات الكونیة",
-            "subtopic": "كبری الیقینیات الكونیة",
-            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795885100784_dars_01.mp3",
-            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1_1795885092919.png",
-            "isAudio": true,
-            "isVideo": false,
-            "summary": "وانەی فەرمی ژمارە 1 لە دەنگی مامۆستا هادی ئەحمەدی"
-          },
-          {
-            "id": 1795885133812,
-            "lessonNumber": 2,
-            "title": "دەرس 2: شیکردنەوەی كبری الیقینیات الكونیة",
-            "subtopic": "كبری الیقینیات الكونیة",
-            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795885100784_dars_02.mp3",
-            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1_1795885092919.png",
-            "isAudio": true,
-            "isVideo": false,
-            "summary": "وانەی فەرمی ژمارە 2 لە دەنگی مامۆستا هادی ئەحمەدی"
-          },
-          {
-            "id": 1795885151259,
-            "lessonNumber": 3,
-            "title": "دەرس 3: شیکردنەوەی كبری الیقینیات الكونیة",
-            "subtopic": "كبری الیقینیات الكونیة",
-            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795885100784_dars_03.mp3",
-            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1_1795885092919.png",
-            "isAudio": true,
-            "isVideo": false,
-            "summary": "وانەی فەرمی ژمارە 3 لە دەنگی مامۆستا هادی ئەحمەدی"
           }
         ]
       },
