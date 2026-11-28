@@ -1,6 +1,6 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Updated via Hujra Lessons Studio on 2026-11-26T17:01:33.385Z
+ * Updated via Hujra Lessons Studio on 2026-11-28T09:04:44.254Z
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
@@ -1480,6 +1480,137 @@ window.HUJRA_SCHOLARS_DATA = [
             "isAudio": true,
             "isVideo": false,
             "summary": "وانەی فەرمی ژمارە 34 لە دەنگی مامۆستا هادی ئەحمەدی"
+          }
+        ]
+      },
+      {
+        "id": "cat_1795856534603",
+        "titleKu": "زەنجیرە دانیشتنی خاتوونەکان",
+        "descKu": "وانە و دەرسەکانی شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+        "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+        "color": "#10b981",
+        "icon": "fa-solid fa-book-quran",
+        "lessons": [
+          {
+            "id": 1795856546021,
+            "lessonNumber": 1,
+            "title": "دەرس 1: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_01.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 1 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795856560920,
+            "lessonNumber": 2,
+            "title": "دەرس 2: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_02.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 2 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795856575318,
+            "lessonNumber": 3,
+            "title": "دەرس 3: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_03.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 3 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795856589575,
+            "lessonNumber": 4,
+            "title": "دەرس 4: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_04.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 4 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795856605257,
+            "lessonNumber": 5,
+            "title": "دەرس 5: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_05.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 5 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795856621729,
+            "lessonNumber": 6,
+            "title": "دەرس 6: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_06.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 6 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795856633983,
+            "lessonNumber": 7,
+            "title": "دەرس 7: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_07.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 7 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795856646014,
+            "lessonNumber": 8,
+            "title": "دەرس 8: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_08.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 8 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795856661490,
+            "lessonNumber": 9,
+            "title": "دەرس 9: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_09.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 9 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795856673109,
+            "lessonNumber": 10,
+            "title": "دەرس 10: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_10.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 10 لە دەنگی مامۆستا هادی ئەحمەدی"
+          },
+          {
+            "id": 1795856684259,
+            "lessonNumber": 11,
+            "title": "دەرس 11: شیکردنەوەی زەنجیرە دانیشتنی خاتوونەکان",
+            "subtopic": "زەنجیرە دانیشتنی خاتوونەکان",
+            "directAudioUrl": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/cat_1795856534603_dars_11.mp3",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1230845_1795856502915.jpg",
+            "isAudio": true,
+            "isVideo": false,
+            "summary": "وانەی فەرمی ژمارە 11 لە دەنگی مامۆستا هادی ئەحمەدی"
           }
         ]
       }
