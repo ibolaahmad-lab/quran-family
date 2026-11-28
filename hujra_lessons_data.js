@@ -1,6 +1,6 @@
 /**
  * HujraLessonsData - وانەکانی حوجرە (مامۆستایان و دەرسە شەرعییەکان)
- * Updated via Hujra Lessons Studio on 2026-11-28T17:32:30.628Z
+ * Updated via Hujra Lessons Studio V2. Last updated: 2026-11-28T21:04:22.560Z
  */
 window.HUJRA_SCHOLARS_DATA = [
   {
@@ -1665,6 +1665,17 @@ window.HUJRA_SCHOLARS_DATA = [
         "color": "#10b981",
         "icon": "fa-solid fa-book-quran",
         "lessons": [
+          {
+            "id": 1795898821095,
+            "lessonNumber": 1,
+            "title": "دەرس 1 : شیکردنەوەی كبری الیقینیات الكونیة",
+            "subtopic": "كبری الیقینیات الكونیة",
+            "coverImage": "https://github.com/ibolaahmad-lab/quran-family/releases/download/hujra_lessons_v1/poster_1_1795885092919.png",
+            "directAudioUrl": "",
+            "youtubeUrl": "",
+            "isAudio": true,
+            "isVideo": false
+          },
           {
             "id": 1795885471966,
             "lessonNumber": 3,
